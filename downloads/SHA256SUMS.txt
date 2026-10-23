@@ -1,0 +1,2 @@
+0e5a9af83c7394bb817d59a93700b08552e001f1322c0c7ceee335989932dd8d  shiur-player-companion-windows-x64.zip
+27ceedf6c8c89c476600a1db4a41a38556077d97d1c5b895bbc5bac1395ea019  shiur-player-1.3.0.otzplugin

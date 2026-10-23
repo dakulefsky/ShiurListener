@@ -4,9 +4,9 @@ Experimental shiur players for Otzaria 0.9.98 or newer.
 
 ## Downloads
 
-- [Windows companion ZIP](https://github.com/dakulefsky/ShiurListener/releases/download/comparison-v1/shiur-player-companion-windows-x64.zip) — includes the companion program, Python, a reduced VLC runtime, and a separately named Otzaria plugin.
-- [Plugin-only player 1.3.0](https://github.com/dakulefsky/ShiurListener/releases/download/comparison-v1/shiur-player-1.3.0.otzplugin) — install directly in Otzaria and keep its player pane visible.
-- [Release notes and checksums](https://github.com/dakulefsky/ShiurListener/releases/tag/comparison-v1).
+- [Windows companion ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-companion-windows-x64.zip) — includes the companion program, Python, a reduced VLC runtime, and a separately named Otzaria plugin.
+- [Plugin-only player 1.3.0](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-1.3.0.otzplugin) — install directly in Otzaria and keep its player pane visible.
+- [Download notes](downloads/README.md) and [checksums](downloads/SHA256SUMS.txt).
 
 ## Companion setup (Windows x64)
 
