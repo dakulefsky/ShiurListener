@@ -1,31 +1,47 @@
-# ShiurListener
+# ShiurListener — נגן שיעורים
 
-Experimental shiur players for Otzaria 0.9.98 or newer.
+A Hebrew local-shiur player for Otzaria 0.9.98 or newer.
 
-## Downloads
+## Download
 
-- [Windows companion ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-companion-windows-x64.zip) — includes the companion program, Python, a reduced VLC runtime, and a separately named Otzaria plugin.
-- [Plugin-only player 1.3.0](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-1.3.0.otzplugin) — install directly in Otzaria and keep its player pane visible.
-- [Download notes](downloads/README.md) and [checksums](downloads/SHA256SUMS.txt).
+- **[Plugin-only player 1.4.0](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-1.4.0.otzplugin)** — redesigned controls, recovery actions, saved positions and a bundled sound check. Install directly in Otzaria; no companion is required.
+- [Windows companion ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-companion-windows-x64.zip) — the earlier experimental comparison build, including its runtime and a separately named plugin.
+- [Plugin source and developer documents](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-source-1.4.0.zip).
+- [Checksums](downloads/SHA256SUMS.txt).
 
-## Companion setup (Windows x64)
+## Install the plugin-only player
 
-1. Extract the entire ZIP and run **Shiur Player.exe**.
-2. Choose your recordings folder and copy the pairing code from the companion window.
-3. Install the included **shiur-player-companion-compare.otzplugin** in Otzaria. Approve its local connection permission.
-4. Open **נגן מלווה**, click **נגן מלווה · האזנה ברקע**, paste the code, and click **חיבור**.
-5. Choose a shiur. Keep the companion window running. Closing Otzaria leaves it playing; close the companion window to stop it.
+1. Install **shiur-player-1.4.0.otzplugin** as an update in Otzaria. Keep existing plugin data; do not uninstall first.
+2. Restart Otzaria once and allow reading user-selected files.
+3. Click **הוספת שיעור** or **ייבוא תיקייה**. Wait for **מוכן לניגון**, then press **ניגון**.
+4. If there is a problem, use **ניסיון נוסף**, or open **עזרה** and click **השמעת צליל בדיקה**. The help panel includes a direct audio strip. Expanded error details include the player version.
 
-The companion handles playback independently of the visible Otzaria tab. It includes a Windows floating control bar and global shortcuts. The companion and plugin-only player have separate plugin IDs and can remain installed together. They keep separate libraries and listening positions.
+The first new recording loads silently; selecting a recording does not automatically start sound. Existing folders, bookmarks and per-shiur positions are retained on update. The new layout puts playback controls first and moves less-used actions into menus.
 
-## Plugin-only setup
+![Player 1.4.0](previews/player-1.4.0.png)
 
-Install **shiur-player-1.3.0.otzplugin** in Otzaria. Restart Otzaria when updating from an older hidden-background player. Select a recording, wait for it to load, and press Play. Open a book and use the player tab's **הצג לצד** menu to keep both visible. **נגן קטן** switches to compact controls. Hiding the player or minimizing Otzaria may pause playback.
+For reading while listening, right-click the player tab, choose **הצג לצד**, then choose an open book. Keep the player pane visible. **נגן קטן** reduces the controls. Hiding the player or minimizing Otzaria may pause it.
 
-## Testing and limitations
+## Instructions for Otzaria developers
 
-These are experimental builds. Companion service and Chromium control tests pass. The ZIP and x64 launcher structure were verified, but the Windows executable, audible output, floating bar and Windows shortcuts have not been tested on a Windows computer. Actual VLC decoding was tested on Linux with a dummy audio output.
+[Hebrew handoff: playback across tabs, floating controls and global shortcuts](docs/OTZARIA_AUDIO_HANDOFF.he.md).
 
-The plugin-only player passed real-audio browser tests with user-activation restrictions enabled. Those tests do not verify an actual Otzaria Windows installation.
+It includes a forwardable request, inspected host code paths, a proposed native audio API, permission boundaries, cross-platform floating-window requirements and acceptance tests. These are proposed host changes; the plugin does not claim to implement them by itself.
 
-The companion has no browser interface or URL-opening API. It is not a browser or Internet lockdown tool: bundled Python is a general interpreter. Device restrictions must be enforced through operating-system and network policy. Runtime licenses and source URLs are included in the ZIP.
+[Plugin source, installation details and verification](player/README.md). No Otzaria native source is modified by the 1.4.0 update.
+
+## Companion comparison
+
+Extract the entire companion ZIP, run **Shiur Player.exe**, choose a recordings folder and copy its pairing code. Install the included comparison plugin, approve its local connection permission, open **נגן מלווה**, choose **נגן מלווה · האזנה ברקע**, and connect using that code.
+
+The companion plays independently of the visible Otzaria tab. It includes a Windows floating bar and global shortcuts. Both plugins can remain installed, with separate libraries and positions. Closing Otzaria leaves the companion playing; close the companion window to stop it.
+
+## Verification and limitations
+
+Version 1.4.0 passes eight persistence regressions, real-WAV Chromium tests with click restrictions enabled, and a test using Otzaria's actual JavaScript bridge with a file-origin page and separate loopback media server. Startup retry, preservation after failed library reads, old-WebView UUID compatibility and missing-recording recovery are covered. The actual Otzaria packager validates its manifest and design.
+
+The exact cause of the user's original installation failure has not been established without its error message. The updated build has not been run in an installed Windows/macOS/Linux Otzaria application. Browser playback tests do not verify physical speaker output.
+
+The companion Windows executable, floating bar and global shortcuts also remain unverified on a Windows computer. Its service and VLC decoding checks ran on Linux; VLC checks used a dummy audio output.
+
+The plugin has no external network or browser-opening permission. The companion is not a device browser-lockdown tool: it bundles a general Python interpreter. Runtime licenses and source URLs are included in its ZIP.

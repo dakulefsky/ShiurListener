@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "org.shiurplayer.local",
+  "name": "נגן שיעורים",
+  "version": "1.4.0",
+  "description": "נגן שיעורים מקומיים עם ממשק פשוט, שמירת מיקום, טעינה חוזרת ובדיקת שמע. ללא תוכנה נלווית.",
+  "entrypoint": "index.html",
+  "minAppVersion": "0.9.98",
+  "sdkVersion": "1.x",
+  "permissions": [
+    "fs.user_files.read",
+    "app.startup_contributions",
+    "reader.toolbar"
+  ],
+  "network": {
+    "enabled": false,
+    "allowlist": []
+  },
+  "contributes": {
+    "toolTab": {
+      "title": "נגן שיעורים",
+      "order": 200,
+      "defaultPinned": true,
+      "iconName": "headphones_24_regular"
+    },
+    "startup": {
+      "toolbarItems": [
+        {
+          "id": "shiur-library",
+          "title": "נגן שיעורים",
+          "icon": "headphones_24_regular",
+          "openPlugin": true
+        }
+      ]
+    }
+  }
+}
