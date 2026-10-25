@@ -5,6 +5,10 @@ Author: **DanTheMan**. Current source is 1.6.0 in development, with fast two-exc
 A Hebrew Otzaria player for local shiurim, with a simpler layout, separate saved listening positions and recovery controls. Install the plugin directly; no companion, Python or VLC installation is needed.
 
 
+## Hebrew developer handoff
+
+See the [complete Hebrew handoff](../docs/INSIDE_DEVELOPER_HANDOFF.he.md) or [download its PDF](../docs/INSIDE_DEVELOPER_HANDOFF.he.pdf) for implementation status, security limits, test evidence, and the host changes required for background playback and floating controls.
+
 ## Store upload requirements
 
 See [the publishing review](STORE_UPLOAD.md) for the official sources, field requirements, validation results and first-upload requirements. Published packages were built and checked with the official Otzaria validator; the current development source has been validated without publishing a new archive; the repository now checks manifest metadata and runs the official validator in CI with store publishing explicitly disabled.

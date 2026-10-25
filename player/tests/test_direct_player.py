@@ -129,6 +129,8 @@ def main():
     page.evaluate('window.shortFile=false;window.musicFile=true')
     page.locator('#add-file').click();expect(page.locator('#status')).to_contain_text('מוזיקה')
     assert page.locator('#audio').evaluate('(a)=>a.paused && a.muted && !a.getAttribute("src")')
+    blocked=page.evaluate("""()=>new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(false);image.onerror=()=>resolve(true);image.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';})""")
+    assert blocked,'GIF image load was not blocked by plugin CSP'
     assert not outside,outside
     assert not errors,errors
     manifest=json.loads((ROOT/'plugin/manifest.json').read_text())
