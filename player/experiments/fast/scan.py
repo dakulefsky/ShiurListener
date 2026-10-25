@@ -12,11 +12,11 @@ def sha(file,deadline=None):
    if deadline and time.perf_counter()>deadline:raise TimeoutError('Fast-scan time budget exceeded')
    h.update(chunk)
  return h.hexdigest()
-def schedule(seconds,identity,count=24):
+def schedule(seconds,identity):
  if not np.isfinite(seconds) or seconds<300:raise ValueError('Recording must have a finite duration of at least five minutes')
- if not 4<=count<=64:raise ValueError('Use 4–64 sample windows')
- rng=random.Random(identity);end=max(0,seconds-.975)
- return sorted({0.,end,*[round(end*(i+rng.random())/(count-2),3) for i in range(count-2)]})
+ rng=random.Random(identity);end=seconds-.975
+ # Two interior regions avoid relying on introductions or closing silence.
+ return [round(end*(.2+.15*rng.random()),3),round(end*(.65+.15*rng.random()),3)]
 def decode(file,start,deadline):
  command=['ffmpeg','-nostdin','-v','error','-threads','1','-protocol_whitelist','file,pipe','-ss',str(start),'-i',str(file),'-t','0.975','-vn','-ac','1','-ar','16000','-f','f32le','pipe:1']
  remaining=deadline-time.perf_counter()
@@ -26,7 +26,7 @@ def decode(file,start,deadline):
  a=np.frombuffer(raw,dtype='<f4')[:15600]
  if not np.isfinite(a).all():raise ValueError('Invalid decoded samples')
  return np.pad(a,(0,15600-len(a)))
-def scan(file,model,windows=24,budget=5):
+def scan(file,model,budget=5):
  if budget<=0:raise TimeoutError('Fast-scan time budget exceeded')
  start=time.perf_counter();deadline=start+budget;file=file.resolve();before=file.stat()
  if not file.is_file() or before.st_size>2*1024**3:raise ValueError('Choose a local audio file no larger than 2 GiB')
@@ -34,28 +34,24 @@ def scan(file,model,windows=24,budget=5):
  if not info.get('streams') or any(s.get('codec_type')!='audio' for s in info['streams']):raise ValueError('Only audio streams are supported')
  seconds=float(info['format']['duration'])
  if seconds>8*3600:raise ValueError('Development duration limit is eight hours')
- digest=sha(file,deadline);times=schedule(seconds,digest,windows);prepared=time.perf_counter();rows=[]
+ digest=sha(file,deadline);times=schedule(seconds,digest);prepared=time.perf_counter();rows=[]
  def classify(at,a):
   if time.perf_counter()>deadline:raise TimeoutError('Fast-scan time budget exceeded')
   model.set_tensor(0,a);model.invoke();scores=model.get_tensor(model.get_output_details()[0]['index'])[0]
   return dict(start=at,seconds=.975,speech=float(scores[0]),music=float(scores[132]),singing=float(scores[24]))
- with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+ with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
   for at,a in zip(times,pool.map(lambda t:decode(file,t,deadline),times)):rows.append(classify(at,a))
- first=time.perf_counter();suspects=[r for r in rows if max(r['music'],r['singing'])>=.5]
- # Bounded second look around up to four flagged locations, never a full scan.
- follow=sorted({round(max(0,min(seconds-.975,r['start']+offset)),3) for r in suspects[:4] for offset in [-.975,.975]})
- with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
-  for at,a in zip(follow,pool.map(lambda t:decode(file,t,deadline),follow)):rows.append(classify(at,a))
+ first=time.perf_counter()
  after=file.stat()
  if after.st_size!=before.st_size or after.st_mtime_ns!=before.st_mtime_ns:raise ValueError('Input changed during analysis')
  rows.sort(key=lambda r:r['start']);hits=sum(max(r['music'],r['singing'])>=.5 for r in rows);speech=sum(r['speech']>=.5 for r in rows)
- decision='music_detected_in_samples' if hits>=2 else 'uncertain' if hits or speech<len(rows)/2 else 'provisional_speech'
+ decision='music_detected_in_samples' if hits>=2 else 'uncertain' if hits or speech!=2 else 'provisional_speech'
  elapsed=time.perf_counter()-start
  if elapsed>budget:raise TimeoutError('Fast-scan time budget exceeded')
  covered=0.;last_end=0.
  for row in rows:
   end=min(seconds,row['start']+row['seconds']);covered+=max(0,end-max(last_end,row['start']));last_end=max(last_end,end)
- return dict(file=file.name,sha256=digest,encoded_bytes=before.st_size,recording_seconds=seconds,scope='sampled_only',decision=decision,full_file_approved=False,sampled_windows=len(rows),sampled_seconds=covered,coverage_fraction=covered/seconds,wall_seconds=elapsed,metadata_and_hash_seconds=prepared-start,first_pass_seconds=first-prepared,target_seconds=budget,target_met=elapsed<=budget,windows=rows)
+ return dict(file=file.name,sha256=digest,encoded_bytes=before.st_size,recording_seconds=seconds,policy='two-interior-checks-v1',scope='sampled_only',decision=decision,full_file_approved=False,sampled_windows=len(rows),sampled_seconds=covered,coverage_fraction=covered/seconds,wall_seconds=elapsed,metadata_and_hash_seconds=prepared-start,first_pass_seconds=first-prepared,target_seconds=budget,target_met=elapsed<=budget,windows=rows)
 def main():
  p=argparse.ArgumentParser();p.add_argument('--model',type=pathlib.Path,required=True);p.add_argument('--output',type=pathlib.Path,required=True);p.add_argument('files',type=pathlib.Path,nargs='+');args=p.parse_args();begin=time.perf_counter()
  if sha(args.model)!=MODEL_SHA:raise ValueError('Unexpected model checksum')

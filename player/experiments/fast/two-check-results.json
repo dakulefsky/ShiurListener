@@ -1,0 +1,109 @@
+{
+  "experimental": true,
+  "initialization_seconds": 0.04540608200477436,
+  "model_sha256": "e193da5676a2fdb7a3702c10fba62aa27d76f64e4534467443811c1a2ff1667d",
+  "files": [
+    {
+      "file": "hour-192k.mp3",
+      "sha256": "047ffa5bdc56911af9069986415221d53dc916a949517c2fa24f00e9f3131e23",
+      "encoded_bytes": 86401742,
+      "recording_seconds": 3600.039184,
+      "policy": "two-interior-checks-v1",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999318,
+      "coverage_fraction": 0.0005416607709900781,
+      "wall_seconds": 0.3948039270180743,
+      "metadata_and_hash_seconds": 0.1968899820058141,
+      "first_pass_seconds": 0.19788017301470973,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 739.888,
+          "seconds": 0.975,
+          "speech": 0.9903003573417664,
+          "music": 0.00017877924256026745,
+          "singing": 0.000162122945766896
+        },
+        {
+          "start": 2369.662,
+          "seconds": 0.975,
+          "speech": 0.13829144835472107,
+          "music": 0.021111197769641876,
+          "singing": 0.000981126562692225
+        }
+      ]
+    },
+    {
+      "file": "hour-stereo.wav",
+      "sha256": "aab32c2eb0e0733fb3d2cc0a34d8b09a15b04ca80a8b3fd3d6be66f1d027ba0d",
+      "encoded_bytes": 635040194,
+      "recording_seconds": 3600.0,
+      "policy": "two-interior-checks-v1",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.949999999999818,
+      "coverage_fraction": 0.0005416666666666161,
+      "wall_seconds": 1.1762949289986864,
+      "metadata_and_hash_seconds": 0.9514312990067992,
+      "first_pass_seconds": 0.22480672001256607,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 1255.766,
+          "seconds": 0.975,
+          "speech": 0.9980382919311523,
+          "music": 0.0001237761607626453,
+          "singing": 1.7776737877284177e-05
+        },
+        {
+          "start": 2589.272,
+          "seconds": 0.975,
+          "speech": 0.983887791633606,
+          "music": 0.0012087799841538072,
+          "singing": 1.5088889085745905e-05
+        }
+      ]
+    },
+    {
+      "file": "hour-music.wav",
+      "sha256": "84778edcfb65cfc04d48d4225eed62d5b55fda2cf71df38a41d5dacfa2e8c7b9",
+      "encoded_bytes": 115200078,
+      "recording_seconds": 3600.0,
+      "policy": "two-interior-checks-v1",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.949999999999818,
+      "coverage_fraction": 0.0005416666666666161,
+      "wall_seconds": 0.2604522040055599,
+      "metadata_and_hash_seconds": 0.1730811059824191,
+      "first_pass_seconds": 0.08733380900230259,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 1213.842,
+          "seconds": 0.975,
+          "speech": 0.0037666589487344027,
+          "music": 0.05397265776991844,
+          "singing": 0.06051621586084366
+        },
+        {
+          "start": 2747.09,
+          "seconds": 0.975,
+          "speech": 0.022827671840786934,
+          "music": 0.048732973635196686,
+          "singing": 0.01598181016743183
+        }
+      ]
+    }
+  ]
+}

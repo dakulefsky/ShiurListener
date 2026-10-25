@@ -7,12 +7,12 @@ Development only. No plugin, installer, download channel or installed behavior i
 - Up to 2 GiB per local file and eight hours duration, replacing the research scanner's need to decode a complete recording into browser memory. These are development limits, not a claim that every file up to them completes within five seconds.
 - Full-file incremental SHA-256 with a 1 MiB read buffer; input audio is not loaded whole into memory.
 - Audio-only stream check and at least five minutes duration.
-- Twenty-four short decode windows distributed across the recording, including start and end. Interior positions are reproducible pseudorandom offsets keyed by the file hash. Re-encoding changes the hash and can change the sample positions and result.
-- Concurrent local seek/decode of four windows, with bounded follow-up around at most four suspicious locations. No real-time playback is needed for analysis.
+- Exactly two 0.975-second checks, one at 20–35% and one at 65–80% through the recording. Positions are reproducible pseudorandom offsets keyed by the file hash. Re-encoding changes the hash and can change the sample positions and result.
+- Concurrent local seek/decode of two windows, with no extra follow-up checks. No real-time playback is needed for analysis.
 - A five-second per-file budget: checks during hashing/classification and decoder timeouts. An exceeded budget returns `incomplete`, never approval. OS reads, inference calls and process cleanup are not hard-real-time interruptible, so exact wall-clock enforcement is not guaranteed. Model startup is measured separately.
 - Explicit `sampled_only` scope and `full_file_approved: false` on all outcomes. `provisional_speech` is not full-file approval. It is not wired into playback.
 
-## Actual measurements
+## Previous 24-check measurements (historical)
 
 Modern Linux Intel Xeon Platinum 8573C cloud machine, two inference threads, four decode jobs, locally cached source files. These are not Windows-PC performance promises. Model initialization is recorded separately in the JSON.
 
@@ -25,6 +25,18 @@ Modern Linux Intel Xeon Platinum 8573C cloud machine, two inference threads, fou
 The complete full MP3 scan using the previous native scanner took 16.03 seconds, rather than meeting a five-second complete-scan target. It was measured in the same development session while other experimental work was running. Filesystem caches were warm; old disks and slower CPUs can take longer.
 
 The speech fixtures repeat the previously tested 460-second Rabbi Freifeld recording to an hour; the music fixture repeats the benchmark opera clip. They test file size/duration/performance, not independent new discourses or detector accuracy. The MP3 and WAV used different hash-keyed sampling positions, so their differing decisions do not demonstrate a codec-related accuracy difference.
+
+## Current two-check results
+
+The requested two-check route is now the default and only schedule in this prototype. Six tests pass, including an assertion that music candidates do not trigger extra decode calls or predictions.
+
+| Hour-long fixture | Fast-check time | Result |
+| --- | ---: | --- |
+| 86.4 MB MP3 | 0.39 s | uncertain: one excerpt had weak speech evidence |
+| 635.0 MB stereo WAV | 1.18 s | provisional speech |
+| 115.2 MB music WAV | 0.26 s | uncertain: neither excerpt clearly established speech |
+
+Exactly two model predictions per file, approximately 1.95 seconds of audio out of an hour (0.054%). Both excerpts must support speech, without a music candidate, for provisional speech. Uncertain remains uncertain; silence is not approval. This is less coverage than the earlier 24-check experiment and can miss more music. See `two-check-results.json` for the current measured outputs. No playback integration is changed.
 
 ## Coverage tradeoff
 
