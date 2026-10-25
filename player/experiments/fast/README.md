@@ -26,7 +26,7 @@ The complete full MP3 scan using the previous native scanner took 16.03 seconds,
 
 The speech fixtures repeat the previously tested 460-second Rabbi Freifeld recording to an hour; the music fixture repeats the benchmark opera clip. They test file size/duration/performance, not independent new discourses or detector accuracy. The MP3 and WAV used different hash-keyed sampling positions, so their differing decisions do not demonstrate a codec-related accuracy difference.
 
-## Current two-check results
+## Original two-check results (v1)
 
 The requested two-check route is now the default and only schedule in this prototype. Six tests pass, including an assertion that music candidates do not trigger extra decode calls or predictions.
 
@@ -36,7 +36,7 @@ The requested two-check route is now the default and only schedule in this proto
 | 635.0 MB stereo WAV | 1.18 s | provisional speech |
 | 115.2 MB music WAV | 0.26 s | uncertain: neither excerpt clearly established speech |
 
-Exactly two model predictions per file, approximately 1.95 seconds of audio out of an hour (0.054%). Both excerpts must support speech, without a music candidate, for provisional speech. Uncertain remains uncertain; silence is not approval. This is less coverage than the earlier 24-check experiment and can miss more music. See `two-check-results.json` for the current measured outputs. No playback integration is changed.
+Exactly two model predictions per file, approximately 1.95 seconds of audio out of an hour (0.054%). That original v1 rule required both excerpts to support speech, without a music candidate, for provisional speech. It has now been superseded by the speech-priority rule described below. Uncertain remains uncertain; silence is not approval. This is less coverage than the earlier 24-check experiment and can miss more music. See `two-check-results.json` for the current measured outputs. No playback integration is changed.
 
 ## Coverage tradeoff
 
@@ -68,3 +68,9 @@ The current plugin uses OfflineAudioContext, which decodes a whole recording. Th
 ## Broader two-check file test
 
 [136-file evaluation results](FILE_TEST_RESULTS.md): no music-only example passed, nine speech examples were uncertain, and three mixed music/speech examples passed. Rules were unchanged during the run; fixtures and limitations are documented.
+
+## Speech-priority rule (v2)
+
+Still exactly two checks, with no extra decoding or model calls. If both checks have Music/Singing scores of at least 0.5, keep the music decision. Otherwise, one Speech score of at least 0.8 is enough for provisional speech. If neither reaches 0.8, two Speech scores of at least 0.5 with no music hit can still receive provisional speech. Remaining cases stay uncertain. A strong speech excerpt plus a pause, weak excerpt or one music-like excerpt is no longer automatically withheld.
+
+The threshold was chosen after inspecting the nine uncertain speech files from the previous evaluation. Results on those same source recordings are regression/development evidence, not an independent estimate of general accuracy. The model is unchanged. This deliberately prioritizes speech and can allow more mixed speech/music material, which the user accepted. See `SPEECH_PRIORITY_RESULTS.md` for the actual rerun. No plugin package or installed behavior changed.

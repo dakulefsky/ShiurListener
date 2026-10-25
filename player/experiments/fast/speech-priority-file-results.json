@@ -1,0 +1,5339 @@
+{
+  "policy": "two-interior-checks-v2-speech-priority",
+  "rules_changed_during_test": false,
+  "model_sha256": "e193da5676a2fdb7a3702c10fba62aa27d76f64e4534467443811c1a2ff1667d",
+  "wall_seconds": 63.6885923089867,
+  "summary": {
+    "constructed_music": {
+      "music_detected_in_samples": 1,
+      "provisional_speech": 4,
+      "uncertain": 0
+    },
+    "music": {
+      "music_detected_in_samples": 54,
+      "provisional_speech": 0,
+      "uncertain": 10
+    },
+    "non_speech": {
+      "music_detected_in_samples": 0,
+      "provisional_speech": 0,
+      "uncertain": 2
+    },
+    "shiur": {
+      "music_detected_in_samples": 0,
+      "provisional_speech": 1,
+      "uncertain": 0
+    },
+    "speech": {
+      "music_detected_in_samples": 0,
+      "provisional_speech": 64,
+      "uncertain": 0
+    }
+  },
+  "files": [
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "7c326ce443e131b6f1e13d1d1043a9ac6932ed1bf111e7473939c425cd0f727f",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2065297229855787,
+      "metadata_and_hash_seconds": 0.08456041000317782,
+      "first_pass_seconds": 0.12190471298526973,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 81.461,
+          "seconds": 0.975,
+          "speech": 0.0003805914311669767,
+          "music": 0.9213219285011292,
+          "singing": 0.00915503315627575
+        },
+        {
+          "start": 202.15,
+          "seconds": 0.975,
+          "speech": 0.00032058454235084355,
+          "music": 0.9684687256813049,
+          "singing": 0.0008712759590707719
+        }
+      ],
+      "source": "bagpipe.wav",
+      "source_sha256": "04d7f02dcfc5b824549e2410da7a329a3528c871fcb6c79d9d8782c6c2ef34ff",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "d8b817463cf2c5927925e1688efcddc738c2a7724ca22d7b7288e82e0b76471e",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19514052901649848,
+      "metadata_and_hash_seconds": 0.08084240902098827,
+      "first_pass_seconds": 0.11423616498359479,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 84.738,
+          "seconds": 0.975,
+          "speech": 6.690071313641965e-05,
+          "music": 0.9924615025520325,
+          "singing": 0.00017635305994190276
+        },
+        {
+          "start": 225.838,
+          "seconds": 0.975,
+          "speech": 2.8835167540819384e-05,
+          "music": 0.930692732334137,
+          "singing": 6.314543861662969e-05
+        }
+      ],
+      "source": "ballad.wav",
+      "source_sha256": "9cba0a00407f90989fcfdf59630d922b2c099f4c65ddbc28cca02e66e6b6104e",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "fe4874d99f376273b4bb0e3655842c8f91870f9e7e4866bdfb5598d539ef62c8",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19808073301101103,
+      "metadata_and_hash_seconds": 0.08341193100204691,
+      "first_pass_seconds": 0.1146093140123412,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 91.975,
+          "seconds": 0.975,
+          "speech": 0.0003058946749661118,
+          "music": 0.7566409707069397,
+          "singing": 0.0006570781697519124
+        },
+        {
+          "start": 212.389,
+          "seconds": 0.975,
+          "speech": 0.00014923284470569342,
+          "music": 0.9154462814331055,
+          "singing": 0.000781388720497489
+        }
+      ],
+      "source": "bartok.wav",
+      "source_sha256": "227fae8124626c026313683b028c38ce3d4fc000757ed2fdab365e3d4274f183",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "b684883a50eb7fd48f18d45d3d51f770a6972367d2d300746b8d62f52a0e944b",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16600878699682653,
+      "metadata_and_hash_seconds": 0.08028087500133552,
+      "first_pass_seconds": 0.08566712299943902,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 74.526,
+          "seconds": 0.975,
+          "speech": 0.00010516079055378214,
+          "music": 0.9462762475013733,
+          "singing": 0.0011781702050939202
+        },
+        {
+          "start": 203.243,
+          "seconds": 0.975,
+          "speech": 0.00016161699022632092,
+          "music": 0.9277856349945068,
+          "singing": 0.015023056417703629
+        }
+      ],
+      "source": "beat.wav",
+      "source_sha256": "8bab165750d5ce03871d4777b356c23d498f4beb68af92a96037d0fb493bdbbe",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "7a37cb120d7ee84fe06408a86d1bf1043a3599a60c8f6f9c3e14bfd791fba62b",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19441774900769815,
+      "metadata_and_hash_seconds": 0.07988036601454951,
+      "first_pass_seconds": 0.11448493198258802,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 104.267,
+          "seconds": 0.975,
+          "speech": 8.925651491153985e-05,
+          "music": 0.9898418188095093,
+          "singing": 6.0489270254038274e-05
+        },
+        {
+          "start": 238.578,
+          "seconds": 0.975,
+          "speech": 0.0010051899589598179,
+          "music": 0.901734471321106,
+          "singing": 5.2622315706685185e-05
+        }
+      ],
+      "source": "beatles.wav",
+      "source_sha256": "da466fbbf88300cd38562c49c2cd90f3c8a7e2056064a8ff6636cdc4e4a35944",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "a9e0a15701df9069d739b394be680891bd931c0cd6cf0a16c63a93e7b83ebae3",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.20852522100904025,
+      "metadata_and_hash_seconds": 0.09054728501359932,
+      "first_pass_seconds": 0.11792284500552341,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 82.881,
+          "seconds": 0.975,
+          "speech": 0.0007135008345358074,
+          "music": 0.3421207666397095,
+          "singing": 0.0008549717604182661
+        },
+        {
+          "start": 215.121,
+          "seconds": 0.975,
+          "speech": 7.509172428399324e-05,
+          "music": 0.9344557523727417,
+          "singing": 0.0006259307265281677
+        }
+      ],
+      "source": "bigband.wav",
+      "source_sha256": "1d30201f6925a90eacf0c6693e8933946b5548683fe946dc3fd882c7623111a7",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "b4409257933d32aacf7c84f95550372c4810ff79a88949c0042dccee49d035b8",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19111000598059036,
+      "metadata_and_hash_seconds": 0.07876430900068954,
+      "first_pass_seconds": 0.11229382699821144,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 67.605,
+          "seconds": 0.975,
+          "speech": 0.00015357251686509699,
+          "music": 0.8428283929824829,
+          "singing": 0.03717635199427605
+        },
+        {
+          "start": 208.329,
+          "seconds": 0.975,
+          "speech": 8.97594218258746e-05,
+          "music": 0.8136336207389832,
+          "singing": 0.024426376447081566
+        }
+      ],
+      "source": "birdland.wav",
+      "source_sha256": "c8475a107034fcab6468d2a0ec94c868e2f2cbb5bdcf51680daa9c0698fef41c",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "de54507a2c1a0c5390524e4ccfc5f5fde12e82ec909ebb29886579a4408eb17e",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2929800930141937,
+      "metadata_and_hash_seconds": 0.12422658200375736,
+      "first_pass_seconds": 0.16870014401501976,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 72.134,
+          "seconds": 0.975,
+          "speech": 0.00032955274218693376,
+          "music": 0.9709782004356384,
+          "singing": 0.007803496904671192
+        },
+        {
+          "start": 203.091,
+          "seconds": 0.975,
+          "speech": 0.00035846413811668754,
+          "music": 0.16833339631557465,
+          "singing": 9.047215280588716e-05
+        }
+      ],
+      "source": "blues.wav",
+      "source_sha256": "55fed77ab15cbad861373999a033305abaa05662336ab69755db25c45ebfcff8",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "620af34ab7b18fd9112de146e21b75ffe971a835e8fcdf17895d93c5cb0b7348",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16173482898739167,
+      "metadata_and_hash_seconds": 0.08230774899129756,
+      "first_pass_seconds": 0.07937708200188354,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 99.597,
+          "seconds": 0.975,
+          "speech": 0.000293714547296986,
+          "music": 0.9129852652549744,
+          "singing": 0.010293148458003998
+        },
+        {
+          "start": 227.027,
+          "seconds": 0.975,
+          "speech": 0.0012556411093100905,
+          "music": 0.9544093608856201,
+          "singing": 0.005444503389298916
+        }
+      ],
+      "source": "bmarsalis.wav",
+      "source_sha256": "d647ae031e0d0621bd1e07fe5b939ed0394419c0365a11d6afbec20fbc8f5d8a",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "4ac4f66f8e746316926dab9ebb6a48e19e9bd1e35aed61d6f73ef97df559aab3",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16954834401258267,
+      "metadata_and_hash_seconds": 0.09122796001611277,
+      "first_pass_seconds": 0.07827515399549156,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 76.974,
+          "seconds": 0.975,
+          "speech": 0.00010247451427858323,
+          "music": 0.9403035044670105,
+          "singing": 0.0002144161844626069
+        },
+        {
+          "start": 214.679,
+          "seconds": 0.975,
+          "speech": 5.1972136134281754e-05,
+          "music": 0.983485996723175,
+          "singing": 0.0002900919644162059
+        }
+      ],
+      "source": "brahms.wav",
+      "source_sha256": "608e3b178d5c181c569fb9e4521ed09af306cb4183e1baefa816a905df4a5043",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "fd268547ff8ebf2e3186f3391b4b05cbe0fd38d5bdedd7c33d77bb639ac1cb8c",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1806266529893037,
+      "metadata_and_hash_seconds": 0.08250425499863923,
+      "first_pass_seconds": 0.09807244001422077,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 91.041,
+          "seconds": 0.975,
+          "speech": 7.19081872375682e-05,
+          "music": 0.9895465970039368,
+          "singing": 0.00010967234265990555
+        },
+        {
+          "start": 211.663,
+          "seconds": 0.975,
+          "speech": 6.344681605696678e-05,
+          "music": 0.9642138481140137,
+          "singing": 0.0007725651375949383
+        }
+      ],
+      "source": "canonaki.wav",
+      "source_sha256": "0c58262535a786acee427e771f262ed70c3196a99c91fe825162955d14eb9ae7",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "34fa8bcb615ec131568e49acec39bab3114e89cb8d15bfc1df4786fd625738dd",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1669930740026757,
+      "metadata_and_hash_seconds": 0.08626299601746723,
+      "first_pass_seconds": 0.08068051398731768,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 104.356,
+          "seconds": 0.975,
+          "speech": 0.0005545419408008456,
+          "music": 0.9586037397384644,
+          "singing": 0.016162559390068054
+        },
+        {
+          "start": 217.478,
+          "seconds": 0.975,
+          "speech": 0.00011537149839568883,
+          "music": 0.9197199940681458,
+          "singing": 0.00011245083442190662
+        }
+      ],
+      "source": "caravan.wav",
+      "source_sha256": "ef175885631b7a1cef86860cc2a5dba2470f242c0ab7505b376d80e1b49fef82",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "1c2498dac157cc290c7928420dfd34ec57ff5464760fdb460e936c3d11bdc939",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19441742601338774,
+      "metadata_and_hash_seconds": 0.07909092301269993,
+      "first_pass_seconds": 0.11527218998526223,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 83.372,
+          "seconds": 0.975,
+          "speech": 4.153094414505176e-05,
+          "music": 0.9713472127914429,
+          "singing": 0.007078726775944233
+        },
+        {
+          "start": 207.207,
+          "seconds": 0.975,
+          "speech": 0.00020331992709543556,
+          "music": 0.952450692653656,
+          "singing": 0.007837755605578423
+        }
+      ],
+      "source": "chaka.wav",
+      "source_sha256": "c695d59c4a31f52a7ebd3c93d823d71af57e47b846b888fc02cc112b21f37408",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "633c21a45783bfda522f07435eef1e90812a0ab0133ea8184f95405bcddebdbf",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.19662678500753827,
+      "metadata_and_hash_seconds": 0.08072579500731081,
+      "first_pass_seconds": 0.1158409159979783,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 62.68,
+          "seconds": 0.975,
+          "speech": 0.11433494091033936,
+          "music": 0.03148367255926132,
+          "singing": 0.005574955604970455
+        },
+        {
+          "start": 204.642,
+          "seconds": 0.975,
+          "speech": 0.006554598454385996,
+          "music": 0.09728962182998657,
+          "singing": 0.0003969829704146832
+        }
+      ],
+      "source": "classical.wav",
+      "source_sha256": "5486b382a0cde50495a9361b12ae8ad0bb77abd2775bf2543577d37fdf06018d",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "33ca527ed8bba2b0b0adf54f12283ed7496796a2594ae42a9ac020bdeac44925",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.20393575198249891,
+      "metadata_and_hash_seconds": 0.08469720598077402,
+      "first_pass_seconds": 0.11917900000116788,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 66.473,
+          "seconds": 0.975,
+          "speech": 0.00011900077515747398,
+          "music": 0.9780165553092957,
+          "singing": 6.231894803931937e-05
+        },
+        {
+          "start": 209.706,
+          "seconds": 0.975,
+          "speech": 4.242570503265597e-05,
+          "music": 0.9943792223930359,
+          "singing": 4.464559242478572e-05
+        }
+      ],
+      "source": "classical1.wav",
+      "source_sha256": "a3e388a8bf6a8abdfa17486cfed25f3d44a8b88a3ce52859a04f4cea471f4582",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "89d973b9cd74b310f067ec5dbc9e65e4b1a2dc24978082f9b51d062980025aaf",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16534743600641377,
+      "metadata_and_hash_seconds": 0.08149474000674672,
+      "first_pass_seconds": 0.08379313899786212,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 81.212,
+          "seconds": 0.975,
+          "speech": 1.2105513633287046e-05,
+          "music": 0.9830226302146912,
+          "singing": 3.0054909075261094e-05
+        },
+        {
+          "start": 225.062,
+          "seconds": 0.975,
+          "speech": 3.495578494039364e-05,
+          "music": 0.9719606041908264,
+          "singing": 9.149181278189644e-05
+        }
+      ],
+      "source": "classical2.wav",
+      "source_sha256": "c2db31c0ae61c5f6f0cb5e4cd20de7d3ffceadf85f99c1bdcfc8bf7ecbd8b91e",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "7bcbf748aa5bd750dd52b5558b96ea0b75719b871993df094a1ab9d4efd28e86",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.20025936802267097,
+      "metadata_and_hash_seconds": 0.08464997800183482,
+      "first_pass_seconds": 0.11555024099652655,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 102.554,
+          "seconds": 0.975,
+          "speech": 0.001861566910520196,
+          "music": 0.828312873840332,
+          "singing": 0.0043327114544808865
+        },
+        {
+          "start": 211.174,
+          "seconds": 0.975,
+          "speech": 0.009125611744821072,
+          "music": 0.008495564572513103,
+          "singing": 0.0014403096865862608
+        }
+      ],
+      "source": "copland.wav",
+      "source_sha256": "0c48eccd90cc723e73ff711d495e26d1a2b4e46dbd27c84d94f5225e12e15cf0",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "5c6fec732e2cf9bdb8acb2ce80713d615e31540c3c7f2aac2c107835f523c380",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.159081658028299,
+      "metadata_and_hash_seconds": 0.07960882602492347,
+      "first_pass_seconds": 0.07942300199647434,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 62.887,
+          "seconds": 0.975,
+          "speech": 1.0559931979514658e-05,
+          "music": 0.9942466020584106,
+          "singing": 0.0001674410596024245
+        },
+        {
+          "start": 236.126,
+          "seconds": 0.975,
+          "speech": 5.69979738429538e-06,
+          "music": 0.9951490163803101,
+          "singing": 4.963632454746403e-05
+        }
+      ],
+      "source": "copland2.wav",
+      "source_sha256": "8d7e07ca5635e4cbe4348d15c619cf4c21c842dbe925438e89dc3018e39dde26",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "8545bc93c917d80eed62780c9b6fb8ea6e374fd7d62a5931edfcb4a001bb0108",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19418696299544536,
+      "metadata_and_hash_seconds": 0.08102189199416898,
+      "first_pass_seconds": 0.11311743099940941,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 102.637,
+          "seconds": 0.975,
+          "speech": 0.0006605434464290738,
+          "music": 0.8551881313323975,
+          "singing": 9.300436795456335e-05
+        },
+        {
+          "start": 197.184,
+          "seconds": 0.975,
+          "speech": 1.362795228487812e-05,
+          "music": 0.9855397939682007,
+          "singing": 9.753846370585961e-07
+        }
+      ],
+      "source": "corea.wav",
+      "source_sha256": "c753fe2b139f0812dc62296eefee50502a72a5b7b509a63c33681bb2988fa750",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "57b2c2cc0eee9f254303a9dfee87aa552d21766500ea842abb754a4d1ce037d9",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2651602280093357,
+      "metadata_and_hash_seconds": 0.09373498600325547,
+      "first_pass_seconds": 0.1713676340004895,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 65.133,
+          "seconds": 0.975,
+          "speech": 9.485355258220807e-05,
+          "music": 0.9690739512443542,
+          "singing": 8.565541793359444e-05
+        },
+        {
+          "start": 199.597,
+          "seconds": 0.975,
+          "speech": 6.0045585996704176e-05,
+          "music": 0.9729018211364746,
+          "singing": 2.874815800169017e-05
+        }
+      ],
+      "source": "corea1.wav",
+      "source_sha256": "c1b01905c22da5a160be06561d6c9e74749e39c83a9839b06fcad2170428e0c1",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "b9e8a9706affddaa0809c4ba6d1988d263604f45355997516abd15e4f2d0b6df",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1586413079930935,
+      "metadata_and_hash_seconds": 0.08152401700499468,
+      "first_pass_seconds": 0.0770613309869077,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 99.817,
+          "seconds": 0.975,
+          "speech": 0.0004001021443400532,
+          "music": 0.9870691895484924,
+          "singing": 0.002340695820748806
+        },
+        {
+          "start": 222.601,
+          "seconds": 0.975,
+          "speech": 0.00012236522161401808,
+          "music": 0.9815011024475098,
+          "singing": 0.004790995270013809
+        }
+      ],
+      "source": "cure.wav",
+      "source_sha256": "244d1377cf88fd06762f364834afff21164fcc5a311586ab02bcb98d1a4a3a48",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "c2e037c3fc6673a6e76802a8873a0a77f4a63d8adb6a1e2594e06f628c0f9c93",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.18213717700564303,
+      "metadata_and_hash_seconds": 0.10067271502339281,
+      "first_pass_seconds": 0.08141330900252797,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 75.175,
+          "seconds": 0.975,
+          "speech": 0.0003513191477395594,
+          "music": 0.951770007610321,
+          "singing": 0.0024610792752355337
+        },
+        {
+          "start": 226.526,
+          "seconds": 0.975,
+          "speech": 0.00023757320013828576,
+          "music": 0.9644269943237305,
+          "singing": 0.0011778150219470263
+        }
+      ],
+      "source": "debussy.wav",
+      "source_sha256": "42c005e1f7b5398524ca82bf080182dfa328bd06be23683249e19a684186bbc1",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "bf8056d9b3290af65c5e30182ad965ff950a2b737c2d66679725bb121eb0f423",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19106598300277255,
+      "metadata_and_hash_seconds": 0.07997732301009819,
+      "first_pass_seconds": 0.11103413501405157,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 70.531,
+          "seconds": 0.975,
+          "speech": 0.0005701383342966437,
+          "music": 0.7226276397705078,
+          "singing": 0.00926084816455841
+        },
+        {
+          "start": 232.225,
+          "seconds": 0.975,
+          "speech": 0.0016268659383058548,
+          "music": 0.7663646936416626,
+          "singing": 0.027119172737002373
+        }
+      ],
+      "source": "deedee.wav",
+      "source_sha256": "ae4af04eee58957ff89ba56b3d8fa419084539b29d9dc761e20cb762d56c98c9",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "f70234d51a409ddc27633d896a799524ded9f588b6e1513c9edb86b423d733bc",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16730228302185424,
+      "metadata_and_hash_seconds": 0.08769964502425864,
+      "first_pass_seconds": 0.079551034985343,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 85.087,
+          "seconds": 0.975,
+          "speech": 0.000546193215996027,
+          "music": 0.9673767685890198,
+          "singing": 1.3268539078126196e-05
+        },
+        {
+          "start": 210.138,
+          "seconds": 0.975,
+          "speech": 0.01434244867414236,
+          "music": 0.9516167640686035,
+          "singing": 0.002481781179085374
+        }
+      ],
+      "source": "deedee1.wav",
+      "source_sha256": "a2db709684e2dc03c6e5ad878b64e696c55d4ad21e5d058072764f9f280812ed",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "6126b3cea1e92d8f620b95d448b1e356056adb2793517e41cada38ac16de5b7a",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.20904889499070123,
+      "metadata_and_hash_seconds": 0.08831357298186049,
+      "first_pass_seconds": 0.1206587530032266,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 64.661,
+          "seconds": 0.975,
+          "speech": 0.00014967932656873018,
+          "music": 0.8214370012283325,
+          "singing": 0.0034306845627725124
+        },
+        {
+          "start": 210.0,
+          "seconds": 0.975,
+          "speech": 1.3189544745273452e-07,
+          "music": 0.9987146854400635,
+          "singing": 1.2807330676878337e-05
+        }
+      ],
+      "source": "duke.wav",
+      "source_sha256": "f2fb48c0e5927a563658e3b1b0e0ef18e10acc36c6f555104c52715b4d069354",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "23d11b9b5f768ac65476b91fe09e9ea2f0654aabbb3e3b3839453467fd5b79b7",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.20244244299829006,
+      "metadata_and_hash_seconds": 0.08095117899938487,
+      "first_pass_seconds": 0.12142997700721025,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 95.063,
+          "seconds": 0.975,
+          "speech": 0.0017505200812593102,
+          "music": 0.05085403472185135,
+          "singing": 0.17619258165359497
+        },
+        {
+          "start": 223.758,
+          "seconds": 0.975,
+          "speech": 0.0006400062120519578,
+          "music": 0.056103333830833435,
+          "singing": 0.2532275319099426
+        }
+      ],
+      "source": "echoes.wav",
+      "source_sha256": "10af0eade24d8be480e2855bcde6403ecd2d520c9b0d1895ac5427429ff40f09",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "180d5ea22e52a4d8c30eb6499e1e24b8d9a747f7eb536c8f403630398e6aabdb",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2050651250174269,
+      "metadata_and_hash_seconds": 0.0855484870262444,
+      "first_pass_seconds": 0.11946183297550306,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 64.344,
+          "seconds": 0.975,
+          "speech": 5.709675679099746e-05,
+          "music": 0.9889248609542847,
+          "singing": 0.00017875657067634165
+        },
+        {
+          "start": 211.932,
+          "seconds": 0.975,
+          "speech": 9.346650040242821e-05,
+          "music": 0.9304907321929932,
+          "singing": 0.00015393388457596302
+        }
+      ],
+      "source": "eguitar.wav",
+      "source_sha256": "8490384d1b6877fd99998549c9a2f28784b8166f4e2051b96acdd7217e0e320e",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "53ec9796df78304b86ec3dc5218e4993c56989dd279a2531c47b40cd1d14e144",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1983337730052881,
+      "metadata_and_hash_seconds": 0.08263984700897709,
+      "first_pass_seconds": 0.11557804199401289,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 103.58,
+          "seconds": 0.975,
+          "speech": 0.0012398750986903906,
+          "music": 0.9494853615760803,
+          "singing": 2.546305040596053e-05
+        },
+        {
+          "start": 219.55,
+          "seconds": 0.975,
+          "speech": 0.002453920664265752,
+          "music": 0.9543519616127014,
+          "singing": 0.00024564756313338876
+        }
+      ],
+      "source": "georose.wav",
+      "source_sha256": "3aba295b24d71b05252969062cddcb67a0c4c0f04444ebb31ef5d0a1b73723da",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "77dc1f51c09dc2d76024966ee105ee57255054f702ddccfb946ef5cf60e7ac0d",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.1623120729927905,
+      "metadata_and_hash_seconds": 0.08286135899834335,
+      "first_pass_seconds": 0.07939109898870811,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 61.562,
+          "seconds": 0.975,
+          "speech": 0.0023042389657348394,
+          "music": 0.9099795818328857,
+          "singing": 0.001206694752909243
+        },
+        {
+          "start": 222.008,
+          "seconds": 0.975,
+          "speech": 7.9663674114272e-05,
+          "music": 0.921244740486145,
+          "singing": 0.00019893242279067636
+        }
+      ],
+      "source": "gismonti.wav",
+      "source_sha256": "785ebb2ee4cf124ffb07b58693037b0c57d6b3e983a459541a5bd8707a660df6",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "e234b08038dff1af65fcb91f8b9968d61aec21fe630179b939bda613a2ab4632",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16385279098176397,
+      "metadata_and_hash_seconds": 0.08334628300508484,
+      "first_pass_seconds": 0.08044182899175212,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 78.423,
+          "seconds": 0.975,
+          "speech": 0.0006565445801243186,
+          "music": 0.6974594593048096,
+          "singing": 0.045815348625183105
+        },
+        {
+          "start": 214.012,
+          "seconds": 0.975,
+          "speech": 2.034761564573273e-05,
+          "music": 0.2374081015586853,
+          "singing": 0.1266942173242569
+        }
+      ],
+      "source": "glass.wav",
+      "source_sha256": "f9429abecd0a032a92a743d6135760e7bb53d20c8cc955d7f4d15df7f5614566",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "b72d2f5dddd73678d6554c0577bcb3a9ed439f497f3a9ba90bc84ed46b02bed9",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16488290400593542,
+      "metadata_and_hash_seconds": 0.08239780500298366,
+      "first_pass_seconds": 0.08243285201024264,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 78.437,
+          "seconds": 0.975,
+          "speech": 6.132062117103487e-05,
+          "music": 0.9804231524467468,
+          "singing": 0.004288876429200172
+        },
+        {
+          "start": 225.43,
+          "seconds": 0.975,
+          "speech": 7.696716784266755e-05,
+          "music": 0.9921689033508301,
+          "singing": 0.002280706074088812
+        }
+      ],
+      "source": "glass1.wav",
+      "source_sha256": "d183ffbc4d0135800926a8cc2346c15efb49e758af03bb5314020d7859e5fc53",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "f2771c58866788433fb6249ea6c4cdd0ef7bb73007eb217efdac91336b4b9a60",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.1997156889992766,
+      "metadata_and_hash_seconds": 0.08625026399386115,
+      "first_pass_seconds": 0.11341077799443156,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 61.384,
+          "seconds": 0.975,
+          "speech": 0.0025497721508145332,
+          "music": 0.2086029052734375,
+          "singing": 0.06075362488627434
+        },
+        {
+          "start": 203.051,
+          "seconds": 0.975,
+          "speech": 8.991018694359809e-05,
+          "music": 0.9381574988365173,
+          "singing": 0.013415038585662842
+        }
+      ],
+      "source": "gravity.wav",
+      "source_sha256": "d787f445afc4cc2524ea5e95379342608c0bdf58ff34354d5b97d05a9f13d270",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "ab5fc71d3d7824d5871dd1d1d1052949c4c031258f6200c729153f5034fcfcf2",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1697914749966003,
+      "metadata_and_hash_seconds": 0.08914440299849957,
+      "first_pass_seconds": 0.08059277999564074,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 101.867,
+          "seconds": 0.975,
+          "speech": 0.0005224227206781507,
+          "music": 0.6827963590621948,
+          "singing": 0.0005201869644224644
+        },
+        {
+          "start": 212.729,
+          "seconds": 0.975,
+          "speech": 5.7709741668077186e-05,
+          "music": 0.957737922668457,
+          "singing": 0.0023076364304870367
+        }
+      ],
+      "source": "gravity2.wav",
+      "source_sha256": "1ad4b53303ab706ffcc51683194602aaa660865d869d11af8eae09acbbcea1d1",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "f1b88e7290a576e14255222eed860d47590b6d0f1a6c3e06168661fcc9a47202",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.35373860801337287,
+      "metadata_and_hash_seconds": 0.17322284399415366,
+      "first_pass_seconds": 0.18040555799962021,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 64.051,
+          "seconds": 0.975,
+          "speech": 6.735880015185103e-05,
+          "music": 0.9361239671707153,
+          "singing": 0.0024188868701457977
+        },
+        {
+          "start": 227.712,
+          "seconds": 0.975,
+          "speech": 2.151276476070052e-06,
+          "music": 0.9970757365226746,
+          "singing": 0.0002135950926458463
+        }
+      ],
+      "source": "guitar.wav",
+      "source_sha256": "f9dd3e8c5b91057628bec88b218573e58b2833a2e39cd344f5eb989c0dab1496",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "b3d23aada52735d6f41b0b3fa6570a338133d0ce052bda16ecaf50777c5b20a7",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.1879242559953127,
+      "metadata_and_hash_seconds": 0.0966921969957184,
+      "first_pass_seconds": 0.09118403599131852,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 63.775,
+          "seconds": 0.975,
+          "speech": 4.475497917155735e-05,
+          "music": 0.9816256165504456,
+          "singing": 0.0002955372619908303
+        },
+        {
+          "start": 238.456,
+          "seconds": 0.975,
+          "speech": 0.0014934969367459416,
+          "music": 0.9088641405105591,
+          "singing": 0.0019429897656664252
+        }
+      ],
+      "source": "hendrix.wav",
+      "source_sha256": "bd01bf8c5bfd7942b86db482df5964118640e9317110d6e9f22d84c46d12c0bc",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "c0ea3c781c677b33f70e4c4fa39f95a068b5286f0efc3223514314065c0d00d9",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16309528599958867,
+      "metadata_and_hash_seconds": 0.08211472199764103,
+      "first_pass_seconds": 0.08092855600989424,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 75.943,
+          "seconds": 0.975,
+          "speech": 6.324661808321252e-05,
+          "music": 0.9947193264961243,
+          "singing": 0.001116754487156868
+        },
+        {
+          "start": 222.789,
+          "seconds": 0.975,
+          "speech": 0.000540312787052244,
+          "music": 0.9621881246566772,
+          "singing": 0.02369520254433155
+        }
+      ],
+      "source": "ipanema.wav",
+      "source_sha256": "7e0e9365fc1f4aa8a157de41e7e294b17a9f1563b59b8fe0739495e2bd28ab6f",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "d995a1dc03d0d88c33d97c7786a881c6c4f2fa9d45ccc1c0b90c649e9d03b94e",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19897895399481058,
+      "metadata_and_hash_seconds": 0.08509326400235295,
+      "first_pass_seconds": 0.11383372198906727,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 82.859,
+          "seconds": 0.975,
+          "speech": 3.8404577935580164e-05,
+          "music": 0.9863904714584351,
+          "singing": 7.443760114256293e-05
+        },
+        {
+          "start": 208.439,
+          "seconds": 0.975,
+          "speech": 0.000684476806782186,
+          "music": 0.9722113013267517,
+          "singing": 0.0010085534304380417
+        }
+      ],
+      "source": "jazz.wav",
+      "source_sha256": "9e0c37b0701161693b3b47413f1e311ed27cb5b65919c3945e0429b16906b61d",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "637a5d7456e6cdfed2748822e100cc1e91d2b0e85e64d701017b0f71dcac2cad",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16212197902495973,
+      "metadata_and_hash_seconds": 0.0811644850182347,
+      "first_pass_seconds": 0.08090360500500537,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 83.546,
+          "seconds": 0.975,
+          "speech": 8.259169408120215e-05,
+          "music": 0.9963133931159973,
+          "singing": 1.3337120435608085e-05
+        },
+        {
+          "start": 216.759,
+          "seconds": 0.975,
+          "speech": 0.00011400959192542359,
+          "music": 0.9948541522026062,
+          "singing": 4.8786965635372326e-05
+        }
+      ],
+      "source": "jazz1.wav",
+      "source_sha256": "4245291acf248892584406a31cd1c638a2063d985095e336697c192b03d126a9",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "697be92946029480622fe3adc2eb707320d1711e8cf982d329bc1768f34ce9be",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.1980255750240758,
+      "metadata_and_hash_seconds": 0.0828843220078852,
+      "first_pass_seconds": 0.11508246301673353,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 60.747,
+          "seconds": 0.975,
+          "speech": 0.000216768603422679,
+          "music": 0.8992743492126465,
+          "singing": 0.0013015659060329199
+        },
+        {
+          "start": 206.291,
+          "seconds": 0.975,
+          "speech": 0.0010381729807704687,
+          "music": 0.8586753010749817,
+          "singing": 0.0026304174680262804
+        }
+      ],
+      "source": "led.wav",
+      "source_sha256": "329e27ea64cdd10ccb14fa4271c473eacc21ffba1194eddda60deba3584e07d9",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "3fcb8248de67f1a3c4d6eaddd8b878e5177e569006b4fcf688c49b75d2b3c3f0",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16204509200179018,
+      "metadata_and_hash_seconds": 0.08132622399716638,
+      "first_pass_seconds": 0.08065568399615586,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 95.666,
+          "seconds": 0.975,
+          "speech": 0.0014550837222486734,
+          "music": 0.48277977108955383,
+          "singing": 0.049825139343738556
+        },
+        {
+          "start": 204.931,
+          "seconds": 0.975,
+          "speech": 0.000821270456071943,
+          "music": 0.8529517650604248,
+          "singing": 0.00568848941475153
+        }
+      ],
+      "source": "loreena.wav",
+      "source_sha256": "bad889c81c7cf23fe94d5917b57675fe4b4f337da0489c1337524e687df75876",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "542e1c05a5108ea5adef0b6a4f8075f589c0c8c011dd40f9d7a75e1f4ca7f6f4",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16340460602077655,
+      "metadata_and_hash_seconds": 0.08258387501700781,
+      "first_pass_seconds": 0.08077034397865646,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 91.638,
+          "seconds": 0.975,
+          "speech": 0.00450047105550766,
+          "music": 0.9580379128456116,
+          "singing": 0.0029209947679191828
+        },
+        {
+          "start": 212.57,
+          "seconds": 0.975,
+          "speech": 0.0006895254482515156,
+          "music": 0.9758529663085938,
+          "singing": 0.00041454090387560427
+        }
+      ],
+      "source": "madradeus.wav",
+      "source_sha256": "5e4431643e8165f3d9138ab6a0aae3f98f6968b342554890b8cb852cfbc95096",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "3d1b9d2f03762591137d65f9436dd133c74dad38f48620c344fc46e30800b5a6",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.20060872501926497,
+      "metadata_and_hash_seconds": 0.0826944730069954,
+      "first_pass_seconds": 0.11785951600177214,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 93.231,
+          "seconds": 0.975,
+          "speech": 0.0002143771416740492,
+          "music": 0.96269690990448,
+          "singing": 0.0037539603654295206
+        },
+        {
+          "start": 234.479,
+          "seconds": 0.975,
+          "speech": 8.165260078385472e-05,
+          "music": 0.9704206585884094,
+          "singing": 0.00026794380391947925
+        }
+      ],
+      "source": "magkas.wav",
+      "source_sha256": "3c5e5bc7a54436da5a17fa31bf5fe9ab5f648aae94310b6b3d7c996f1989dc72",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "33d1ec06b7d3f44ef8468f84794f01e62b391483780d50a6aab04d3a4cb6a40c",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15775735999341123,
+      "metadata_and_hash_seconds": 0.0797466509975493,
+      "first_pass_seconds": 0.07796288799727336,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 70.99,
+          "seconds": 0.975,
+          "speech": 0.00014085783914197236,
+          "music": 0.9870980978012085,
+          "singing": 8.936543599702418e-05
+        },
+        {
+          "start": 201.826,
+          "seconds": 0.975,
+          "speech": 0.0001251070643775165,
+          "music": 0.9930031895637512,
+          "singing": 1.5811332559678704e-05
+        }
+      ],
+      "source": "march.wav",
+      "source_sha256": "d7f5da52a3eebf37c3112025a80dd19caff9148982b631d78ccc029d8d33ef09",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "959e79322ec74301d4aa4c1747f290f6118a5a7b8a37d4569fc293459213970b",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15978776599513367,
+      "metadata_and_hash_seconds": 0.08043614300549962,
+      "first_pass_seconds": 0.07928178500151262,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 88.916,
+          "seconds": 0.975,
+          "speech": 0.00010700790153350681,
+          "music": 0.961508572101593,
+          "singing": 0.0011986717581748962
+        },
+        {
+          "start": 230.092,
+          "seconds": 0.975,
+          "speech": 0.004907261114567518,
+          "music": 0.2331904172897339,
+          "singing": 0.004512283019721508
+        }
+      ],
+      "source": "marlene.wav",
+      "source_sha256": "2bd642430bba1457f5101abd70770291d8048d31d1cab468dc609bb1348c898a",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "313e6cdb2bd2acb0c6c2e7799613eea436d77595dc058fd2bc64f6deea7578d7",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16002987200045027,
+      "metadata_and_hash_seconds": 0.0825126509880647,
+      "first_pass_seconds": 0.07746823801426217,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 73.018,
+          "seconds": 0.975,
+          "speech": 4.775785328092752e-06,
+          "music": 0.9747271537780762,
+          "singing": 7.843392813811079e-05
+        },
+        {
+          "start": 222.739,
+          "seconds": 0.975,
+          "speech": 4.433469075593166e-05,
+          "music": 0.9722801446914673,
+          "singing": 0.0016011442057788372
+        }
+      ],
+      "source": "mingus.wav",
+      "source_sha256": "a0e28fc08ea674df63f8c4c8faf845b5014b418c63319375923a4d9a3adb7857",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "7c327a18a11d216c2b8ae8ab962767da8ba56cf48384890e7af7a2dff1f075a1",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2247630429919809,
+      "metadata_and_hash_seconds": 0.0984482989879325,
+      "first_pass_seconds": 0.12626416102284566,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 71.034,
+          "seconds": 0.975,
+          "speech": 6.530271548399469e-06,
+          "music": 0.9904268980026245,
+          "singing": 0.00010152812319574878
+        },
+        {
+          "start": 202.297,
+          "seconds": 0.975,
+          "speech": 0.0020423925016075373,
+          "music": 0.8557267189025879,
+          "singing": 0.006537275854498148
+        }
+      ],
+      "source": "mingus1.wav",
+      "source_sha256": "1f2108f58ce15ec2ebd4fc1076961551a118a05a9945789911d844c5fc71d6bb",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "79c3da6af92a074b6243de8c4fdb567cbaa9ae4d70c09ffffacff21ba7405a99",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19314638600917533,
+      "metadata_and_hash_seconds": 0.08131564501672983,
+      "first_pass_seconds": 0.11177886798395775,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 76.481,
+          "seconds": 0.975,
+          "speech": 0.00037279422394931316,
+          "music": 0.9850058555603027,
+          "singing": 0.008132324554026127
+        },
+        {
+          "start": 214.513,
+          "seconds": 0.975,
+          "speech": 0.0008673113188706338,
+          "music": 0.9674292802810669,
+          "singing": 0.0005596476839855313
+        }
+      ],
+      "source": "misirlou.wav",
+      "source_sha256": "6f7e0f1c22bd949f8a824e957ee99ba93517a2cabc91fa4d419c43580f1050be",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "02f1cb7f64d64039fb2fad31555f53c4d68172488ed07a5af624e27f17f7d155",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.17400724298204295,
+      "metadata_and_hash_seconds": 0.08772285800660029,
+      "first_pass_seconds": 0.08623750897822902,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 67.805,
+          "seconds": 0.975,
+          "speech": 2.9396722311503254e-05,
+          "music": 0.9944735765457153,
+          "singing": 0.00010622405534377322
+        },
+        {
+          "start": 230.663,
+          "seconds": 0.975,
+          "speech": 1.6906849850784056e-05,
+          "music": 0.9219423532485962,
+          "singing": 8.21803496364737e-06
+        }
+      ],
+      "source": "moanin.wav",
+      "source_sha256": "1c46e2a7034e615da12cf5bf3bef16db58b27d8991c1af85eb24e6f5a5f4bc8e",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "fb09113f621cfb13cd37365974f9f2adf546c322e93038ef6cf87eba0e075ed1",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1690239759918768,
+      "metadata_and_hash_seconds": 0.08544694699230604,
+      "first_pass_seconds": 0.08352660702075809,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 64.083,
+          "seconds": 0.975,
+          "speech": 9.018513082992285e-05,
+          "music": 0.981277585029602,
+          "singing": 0.0014848525170236826
+        },
+        {
+          "start": 196.9,
+          "seconds": 0.975,
+          "speech": 5.5909069487825036e-05,
+          "music": 0.9537402987480164,
+          "singing": 9.877053525997326e-05
+        }
+      ],
+      "source": "narch.wav",
+      "source_sha256": "5ce583c8a9c1e267f485369e3d2643476452efba6059b3b3d564dcbd2be1c67d",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "1cc7744cc17087c9bdfb391da04db41b83173b0e3d6b45373f66e1de61add243",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19932539097499102,
+      "metadata_and_hash_seconds": 0.07956585797364824,
+      "first_pass_seconds": 0.11970831401413307,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 94.824,
+          "seconds": 0.975,
+          "speech": 0.0011581589933484793,
+          "music": 0.900409996509552,
+          "singing": 0.07135165482759476
+        },
+        {
+          "start": 225.352,
+          "seconds": 0.975,
+          "speech": 0.00025384104810655117,
+          "music": 0.8620008230209351,
+          "singing": 0.07449011504650116
+        }
+      ],
+      "source": "ncherry.wav",
+      "source_sha256": "66fd809adef91d00b8a2bc82179a6ee8c84746a859452332fb5917406d1e2da4",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "7472b8ea34026889a3a79f978dd8908013c0183e8c0e4f02ff29aecf65e7c57e",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15841950601316057,
+      "metadata_and_hash_seconds": 0.0803521659981925,
+      "first_pass_seconds": 0.07801956601906568,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 101.22,
+          "seconds": 0.975,
+          "speech": 3.735889185918495e-05,
+          "music": 0.9872296452522278,
+          "singing": 0.0006396262324415147
+        },
+        {
+          "start": 209.791,
+          "seconds": 0.975,
+          "speech": 1.614310713193845e-05,
+          "music": 0.9937317967414856,
+          "singing": 0.0010184174170717597
+        }
+      ],
+      "source": "nearhou.wav",
+      "source_sha256": "eb285862e4f79f72c21f7033c7ef15d411697c5a56afc80b25c35b8839bf9b97",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "c698ebd04c6072b7315234194f3c839d69caf9dedfac34f4262f69a74f013503",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15753408998716623,
+      "metadata_and_hash_seconds": 0.08059726501232944,
+      "first_pass_seconds": 0.0768807040003594,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 89.68,
+          "seconds": 0.975,
+          "speech": 0.0174776092171669,
+          "music": 0.03215285390615463,
+          "singing": 0.00021600998297799379
+        },
+        {
+          "start": 233.09,
+          "seconds": 0.975,
+          "speech": 0.0001679806155152619,
+          "music": 0.20949286222457886,
+          "singing": 0.00018849170010071248
+        }
+      ],
+      "source": "opera.wav",
+      "source_sha256": "f9edda548aa07e283d04e6719be176da4266738a0910086758300b79ea1cc8a4",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "754c121f9b23659b5f9a247ce08175417c4d445c20ecf533883001f0b6baffa6",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1945243389927782,
+      "metadata_and_hash_seconds": 0.08147498898324557,
+      "first_pass_seconds": 0.11299683200195432,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 74.694,
+          "seconds": 0.975,
+          "speech": 6.110469257691875e-06,
+          "music": 0.9198633432388306,
+          "singing": 0.0339323990046978
+        },
+        {
+          "start": 222.536,
+          "seconds": 0.975,
+          "speech": 4.074036041856743e-06,
+          "music": 0.9531066417694092,
+          "singing": 0.04284994676709175
+        }
+      ],
+      "source": "opera1.wav",
+      "source_sha256": "877cb3293958526680352b6c73e06766e359e2cf5919c9bfc83301acaacdc5d9",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "9b3dbe88d6c0a522fb4184b73bfa095afca6fa3409f0a4c41da1b8db2d03368a",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16059773598681204,
+      "metadata_and_hash_seconds": 0.07992602398735471,
+      "first_pass_seconds": 0.08061929800896905,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 65.084,
+          "seconds": 0.975,
+          "speech": 0.00013284417218528688,
+          "music": 0.9920654892921448,
+          "singing": 0.0006060216692276299
+        },
+        {
+          "start": 229.93,
+          "seconds": 0.975,
+          "speech": 1.1470134268165566e-05,
+          "music": 0.9950871467590332,
+          "singing": 3.537665543262847e-05
+        }
+      ],
+      "source": "pop.wav",
+      "source_sha256": "1f8454cafc7a2906ad87d435738071221c2d55ee7079e46d75a3f76f4bcb0e4f",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "aafde92bb261e46e09e43f10b3e85f610879ac1d99d38ffb15b60d2eeb663dae",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2023765479971189,
+      "metadata_and_hash_seconds": 0.08963510999456048,
+      "first_pass_seconds": 0.11268927701166831,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 89.135,
+          "seconds": 0.975,
+          "speech": 0.00011232683027628809,
+          "music": 0.9900113344192505,
+          "singing": 1.6918800611165352e-05
+        },
+        {
+          "start": 200.161,
+          "seconds": 0.975,
+          "speech": 3.4962784411618486e-05,
+          "music": 0.9931631684303284,
+          "singing": 3.2625641324557364e-05
+        }
+      ],
+      "source": "prodigy.wav",
+      "source_sha256": "9e9cc7e4c9abf02bae2e042af61f84182b9760ea9025574b31a7dac9c8dd7f8f",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "6ee26b9c36af89153baf6c8bd28e6351f10cf3aea2842330f9b5c0465f20036c",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19510040900786407,
+      "metadata_and_hash_seconds": 0.0798352189885918,
+      "first_pass_seconds": 0.11521777001325972,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 79.902,
+          "seconds": 0.975,
+          "speech": 0.00046293088234961033,
+          "music": 0.9714481234550476,
+          "singing": 0.005016492214053869
+        },
+        {
+          "start": 199.085,
+          "seconds": 0.975,
+          "speech": 0.0003560629556886852,
+          "music": 0.9050958752632141,
+          "singing": 0.0023485347628593445
+        }
+      ],
+      "source": "redhot.wav",
+      "source_sha256": "3111283d31abf6c875e210249655e26568e1dab4f441132f5f1f97935e565bf5",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "6a65d95f11037d04c756294cc0e2771f7416dba846bd2d825451d2da117932f8",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19935885298764333,
+      "metadata_and_hash_seconds": 0.07762710799579509,
+      "first_pass_seconds": 0.12168493599165231,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 103.309,
+          "seconds": 0.975,
+          "speech": 0.00025810900842770934,
+          "music": 0.9867481589317322,
+          "singing": 0.003229890950024128
+        },
+        {
+          "start": 213.82,
+          "seconds": 0.975,
+          "speech": 0.0001625131262699142,
+          "music": 0.917396068572998,
+          "singing": 0.0092962346971035
+        }
+      ],
+      "source": "rock.wav",
+      "source_sha256": "ac6a2603f875d754d191d5cca49a4c1ef064fefaef8372bbb78f68077affe520",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "de51437820a5ceb8d2a10732529a433cffe95d0f7d561d1902a71a1f3025c6db",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15742641797987744,
+      "metadata_and_hash_seconds": 0.0801805809896905,
+      "first_pass_seconds": 0.07719418199849315,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 89.699,
+          "seconds": 0.975,
+          "speech": 0.0030103852041065693,
+          "music": 0.8804603815078735,
+          "singing": 0.0050114733166992664
+        },
+        {
+          "start": 220.358,
+          "seconds": 0.975,
+          "speech": 0.0005164866452105343,
+          "music": 0.965672492980957,
+          "singing": 0.004645081236958504
+        }
+      ],
+      "source": "rock2.wav",
+      "source_sha256": "2d14d2f5636b786a53b3bba31e502afbdc58c14aba5f5296d0c10c66bf1ef349",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "01783e3286c59678993ae5d5ca1f521ff8261e01027e34bd5d82b51f923b4f5c",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16308320901589468,
+      "metadata_and_hash_seconds": 0.07917546899989247,
+      "first_pass_seconds": 0.0838570490013808,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 68.012,
+          "seconds": 0.975,
+          "speech": 0.0003453453828115016,
+          "music": 0.9074601531028748,
+          "singing": 0.027207283303141594
+        },
+        {
+          "start": 201.178,
+          "seconds": 0.975,
+          "speech": 0.0002752767177298665,
+          "music": 0.9092468619346619,
+          "singing": 0.000911685056053102
+        }
+      ],
+      "source": "russo.wav",
+      "source_sha256": "a6cd3a664286d2e0648c65c9d8eee2b7e971fa000486f3ef8c589f9d6e289eb2",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "90bf99c2db75ec66f9cfb0a28c4199c5674203f833bb0873b2242a514319ecd9",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15829107002355158,
+      "metadata_and_hash_seconds": 0.07893805200001225,
+      "first_pass_seconds": 0.0793043120065704,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 79.979,
+          "seconds": 0.975,
+          "speech": 3.7154663004912436e-05,
+          "music": 0.944391667842865,
+          "singing": 0.0007551767630502582
+        },
+        {
+          "start": 208.507,
+          "seconds": 0.975,
+          "speech": 0.00010506396210985258,
+          "music": 0.9887740612030029,
+          "singing": 4.423801874509081e-05
+        }
+      ],
+      "source": "tony.wav",
+      "source_sha256": "9e16b823e28e0617105caa371e06078e9ed05133277a3828b61ede621419a03a",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "2a0b2e4f08d7555f7e0f0f258f230589d2ab7413cf8709da1c5ad01c6cc4ce8e",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.18902675400022417,
+      "metadata_and_hash_seconds": 0.10856856798636727,
+      "first_pass_seconds": 0.08040830402751453,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 66.628,
+          "seconds": 0.975,
+          "speech": 0.00014156257384456694,
+          "music": 0.9807752370834351,
+          "singing": 0.0005121168214827776
+        },
+        {
+          "start": 199.561,
+          "seconds": 0.975,
+          "speech": 7.280731369974092e-05,
+          "music": 0.9925284385681152,
+          "singing": 8.060609980020672e-05
+        }
+      ],
+      "source": "u2.wav",
+      "source_sha256": "0ad304b567b9506c7a652ff390ee024e7c07851f4b8bad22a211651a393c3910",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "fb1aada218934cf526f577f0cde1e13b46cc4a028f18005fedb905586369341f",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.4605992900033016,
+      "metadata_and_hash_seconds": 0.08702854200964794,
+      "first_pass_seconds": 0.37347571601276286,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 98.487,
+          "seconds": 0.975,
+          "speech": 1.0096610822074581e-05,
+          "music": 0.9834775924682617,
+          "singing": 6.808987382100895e-05
+        },
+        {
+          "start": 195.646,
+          "seconds": 0.975,
+          "speech": 4.987380452803336e-05,
+          "music": 0.9882984161376953,
+          "singing": 0.0001501284132245928
+        }
+      ],
+      "source": "unpoco.wav",
+      "source_sha256": "4e0f2324e2686dca75c7d821b617f672f657091d3cae2f5a1f8c4b4dcb393712",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "b38d7669d3bf269420ea006f05d0dc36dd828f47e08b0fc899e32635b5a38f26",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2898966780048795,
+      "metadata_and_hash_seconds": 0.14759886299725622,
+      "first_pass_seconds": 0.1422230009920895,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 93.209,
+          "seconds": 0.975,
+          "speech": 3.6512265069177374e-05,
+          "music": 0.9434696435928345,
+          "singing": 0.00012851378414779902
+        },
+        {
+          "start": 232.404,
+          "seconds": 0.975,
+          "speech": 4.537973291007802e-05,
+          "music": 0.9690676927566528,
+          "singing": 0.006628482136875391
+        }
+      ],
+      "source": "vlobos.wav",
+      "source_sha256": "ee4150736d4d65068ba4217f70588c0e7cdf8b4290717d26b22feda98706c53a",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "9870c7a7618d373c6371185d5654dadf20cc571c7893922daf61f75d1c6bb93f",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.17044630899908952,
+      "metadata_and_hash_seconds": 0.08936980200815015,
+      "first_pass_seconds": 0.08102766599040478,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 91.489,
+          "seconds": 0.975,
+          "speech": 0.00019029970280826092,
+          "music": 0.9838801622390747,
+          "singing": 0.0002971731883008033
+        },
+        {
+          "start": 202.49,
+          "seconds": 0.975,
+          "speech": 9.63955681072548e-05,
+          "music": 0.9823947548866272,
+          "singing": 0.00011947730672545731
+        }
+      ],
+      "source": "winds.wav",
+      "source_sha256": "10018ae7c03eff1fc390520ff7012e3cd08480fcddbd94d7047f219f90902752",
+      "label": "music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "842b7bd16201e1795efcebcd825ce54ec91c7a7228a4a1e9a017e6caf491bc12",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1605437370017171,
+      "metadata_and_hash_seconds": 0.08121210799436085,
+      "first_pass_seconds": 0.07926437599235214,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 85.565,
+          "seconds": 0.975,
+          "speech": 0.6828756332397461,
+          "music": 0.0002535640960559249,
+          "singing": 0.0003845522878691554
+        },
+        {
+          "start": 196.032,
+          "seconds": 0.975,
+          "speech": 0.9883536696434021,
+          "music": 7.520315557485446e-05,
+          "singing": 0.00015063861792441458
+        }
+      ],
+      "source": "acomic.wav",
+      "source_sha256": "04cb01edea4fe05ae25b1d10b8bef8136909ecc012eb1f0d91ba1511b4fbcec8",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "fec03db72f3eaa295e6f9f98f1200733dcc2bcf690b9784562380ec4d2024475",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1679665380215738,
+      "metadata_and_hash_seconds": 0.08429245499428362,
+      "first_pass_seconds": 0.08332110702758655,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 96.903,
+          "seconds": 0.975,
+          "speech": 0.9925468564033508,
+          "music": 6.0329064581310377e-05,
+          "singing": 8.87358055479126e-06
+        },
+        {
+          "start": 223.331,
+          "seconds": 0.975,
+          "speech": 0.9784314632415771,
+          "music": 0.0003623549418989569,
+          "singing": 2.119939927069936e-05
+        }
+      ],
+      "source": "acomic2.wav",
+      "source_sha256": "29e50abe84ff555603ecaa3cd197a2156c7d72f49b440fdc09ef4bedc2696e04",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "8d795207f80a502e43460fcab7de453998a7b914c48806c7c026709b5eabcd54",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2968113709939644,
+      "metadata_and_hash_seconds": 0.2114572779973969,
+      "first_pass_seconds": 0.08528299099998549,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 89.293,
+          "seconds": 0.975,
+          "speech": 0.990122377872467,
+          "music": 0.00028381895390339196,
+          "singing": 2.2726688257534988e-05
+        },
+        {
+          "start": 229.64,
+          "seconds": 0.975,
+          "speech": 0.9885789155960083,
+          "music": 1.0643638233887032e-05,
+          "singing": 2.6958366561302682e-06
+        }
+      ],
+      "source": "allison.wav",
+      "source_sha256": "08cbaf0509d59aaefda00116d871b138428aa8ae57c687158876e59d849d7ade",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "d0ca36ed8c5ccc0992bc8f6143559f8782d41af5ac3036be47276f5eb11d7aed",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.36556708900025114,
+      "metadata_and_hash_seconds": 0.24761589200352319,
+      "first_pass_seconds": 0.11784669102053158,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 63.027,
+          "seconds": 0.975,
+          "speech": 0.996548056602478,
+          "music": 9.565138498146553e-06,
+          "singing": 2.5499932689854177e-06
+        },
+        {
+          "start": 222.135,
+          "seconds": 0.975,
+          "speech": 0.9958744049072266,
+          "music": 0.00013410636165644974,
+          "singing": 1.758395228534937e-06
+        }
+      ],
+      "source": "amal.wav",
+      "source_sha256": "3ed194272a1792663b6192fa1b541e2850578d4b9e37f3b1b23e3a7b2d664097",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "5ee15c749484fd3c6b66251d1bde601df665cedd01b2c33fac3f8978fce0d4dd",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2163970379915554,
+      "metadata_and_hash_seconds": 0.10719211300602183,
+      "first_pass_seconds": 0.10912383199320175,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 70.704,
+          "seconds": 0.975,
+          "speech": 0.9863358736038208,
+          "music": 3.911830572178587e-05,
+          "singing": 1.4894051219016546e-06
+        },
+        {
+          "start": 210.866,
+          "seconds": 0.975,
+          "speech": 0.01891441084444523,
+          "music": 0.0004424647195264697,
+          "singing": 6.911186119396007e-06
+        }
+      ],
+      "source": "austria.wav",
+      "source_sha256": "85e1b52d32c3962a2a5653e93a540eadc2e10cc028e0f83e8098da57d77c8903",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "24890c6eb23309874c6c2a5255066e15fc036e5df91c17281d016cf9d4aca091",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1733454590139445,
+      "metadata_and_hash_seconds": 0.08715619999566115,
+      "first_pass_seconds": 0.08613505301764235,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 63.554,
+          "seconds": 0.975,
+          "speech": 0.766217827796936,
+          "music": 0.0007888118852861226,
+          "singing": 2.3742863049847074e-05
+        },
+        {
+          "start": 233.562,
+          "seconds": 0.975,
+          "speech": 0.9795925617218018,
+          "music": 0.004344693850725889,
+          "singing": 4.352350879344158e-05
+        }
+      ],
+      "source": "bathroom1.wav",
+      "source_sha256": "6ab33ae04aa8f0e000eddad5d3d0b0b1c0ecf7c95569bb9c49e520599f5c0bf3",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "447ce79542b5fe7e65c8684356ffc206692316aa33a75ddc59b89f78687d3573",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.7931257949967403,
+      "metadata_and_hash_seconds": 0.0873721569951158,
+      "first_pass_seconds": 0.7056968070100993,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 83.281,
+          "seconds": 0.975,
+          "speech": 0.9820846915245056,
+          "music": 0.0003034301334992051,
+          "singing": 1.8778056301016477e-06
+        },
+        {
+          "start": 195.102,
+          "seconds": 0.975,
+          "speech": 0.8292648196220398,
+          "music": 0.015345399267971516,
+          "singing": 9.899072028929368e-05
+        }
+      ],
+      "source": "chant.wav",
+      "source_sha256": "a29a56a8eb26ebf1ecbea65a02907820db6c1b8e1a36c670c588f1e8cb8fb40f",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "e9a37143b418a66827d628a104381bcdbad20bbc891a5394918cc318ed27e337",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.20610683000995778,
+      "metadata_and_hash_seconds": 0.0889769290224649,
+      "first_pass_seconds": 0.11707705198205076,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 95.328,
+          "seconds": 0.975,
+          "speech": 0.9727054238319397,
+          "music": 9.757935913512483e-05,
+          "singing": 5.95899109612219e-06
+        },
+        {
+          "start": 231.51,
+          "seconds": 0.975,
+          "speech": 0.9878745079040527,
+          "music": 3.072186018471257e-06,
+          "singing": 6.184251333252178e-07
+        }
+      ],
+      "source": "charles.wav",
+      "source_sha256": "084299eb37cf78e19acb6d3d4d909a761a896b29579efd66e7696ee788decce9",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "960bfce69fc8e9540a8a8c95cc6c6393aeaf17b7ddc25d91fa263542700d4013",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.17254643799969926,
+      "metadata_and_hash_seconds": 0.0889454010175541,
+      "first_pass_seconds": 0.0835423459939193,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 98.621,
+          "seconds": 0.975,
+          "speech": 0.9789645075798035,
+          "music": 0.0012922168243676424,
+          "singing": 1.962443275260739e-05
+        },
+        {
+          "start": 196.521,
+          "seconds": 0.975,
+          "speech": 0.990618884563446,
+          "music": 0.0001750748633639887,
+          "singing": 4.324643668951467e-05
+        }
+      ],
+      "source": "china.wav",
+      "source_sha256": "da3a8ef8705b95b6209f2935c8808057d1c170942c63e4d21da4fac522f19aaa",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "dd65d3475013ab139b72321f7aa7d57855ed4ca6cca7cd0d21347584349c4de4",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.20055540499743074,
+      "metadata_and_hash_seconds": 0.09701434400631115,
+      "first_pass_seconds": 0.10339301198837347,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 93.266,
+          "seconds": 0.975,
+          "speech": 0.8296545743942261,
+          "music": 0.0002841693349182606,
+          "singing": 9.916795534081757e-05
+        },
+        {
+          "start": 228.636,
+          "seconds": 0.975,
+          "speech": 0.8465856313705444,
+          "music": 0.000286466529360041,
+          "singing": 1.4669346455775667e-05
+        }
+      ],
+      "source": "comedy.wav",
+      "source_sha256": "53791034e608ae9029d553697bc0fb37f9ab49a1c83597a1899cf55433494c6f",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "2fae560cb01c53b9b9d5209d534d4db681f306ea338cf83de5123997de03f52c",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2399038909934461,
+      "metadata_and_hash_seconds": 0.08645208299276419,
+      "first_pass_seconds": 0.15334253798937425,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 102.319,
+          "seconds": 0.975,
+          "speech": 0.9403454065322876,
+          "music": 7.281384750967845e-05,
+          "singing": 8.168745807779487e-06
+        },
+        {
+          "start": 229.97,
+          "seconds": 0.975,
+          "speech": 0.9149993062019348,
+          "music": 0.0006019213469699025,
+          "singing": 0.0005060596158728004
+        }
+      ],
+      "source": "comedy1.wav",
+      "source_sha256": "fdbbf62e9b74692a063aa87220466d9fd294a577fd7376ded7a0ba06831bca4e",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "cf65b2cb98c5bb5a522d2e6978b0dd344959052da0b996464f760967a700083a",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1722838249988854,
+      "metadata_and_hash_seconds": 0.08474758997908793,
+      "first_pass_seconds": 0.08748116900096647,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 96.413,
+          "seconds": 0.975,
+          "speech": 0.9878525137901306,
+          "music": 1.7210273654200137e-05,
+          "singing": 1.3945573300588876e-06
+        },
+        {
+          "start": 212.445,
+          "seconds": 0.975,
+          "speech": 0.991533100605011,
+          "music": 0.00013217500236351043,
+          "singing": 5.122548827785067e-06
+        }
+      ],
+      "source": "conversion.wav",
+      "source_sha256": "d29910aab9147c23ed825c8f41297a0f67acdf2392bbddf2c5c38c98937a2b54",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "39cb3d9498fdd066f3e521a1b8b5c7308c9f9f69e4a56dfc090de16f364f1fd5",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16493626998271793,
+      "metadata_and_hash_seconds": 0.08257787299226038,
+      "first_pass_seconds": 0.08230425301007926,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 87.804,
+          "seconds": 0.975,
+          "speech": 0.09166555851697922,
+          "music": 0.0004615939687937498,
+          "singing": 0.0010932169388979673
+        },
+        {
+          "start": 230.873,
+          "seconds": 0.975,
+          "speech": 0.9956023693084717,
+          "music": 9.254407632397488e-05,
+          "singing": 5.8610362430044916e-06
+        }
+      ],
+      "source": "danie.wav",
+      "source_sha256": "227309764bc18dac33d6293992603502be71dc1f84186430601e5147a5dbf0e6",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "6da80b4c6bddeccc35b620e60845f5bfb2fec7d34f7fdc3c9cf76dcd43c0e6c3",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19577571799163707,
+      "metadata_and_hash_seconds": 0.08219876498333178,
+      "first_pass_seconds": 0.11352369000087492,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 100.931,
+          "seconds": 0.975,
+          "speech": 0.9931281805038452,
+          "music": 9.60035904427059e-05,
+          "singing": 5.551840331463609e-06
+        },
+        {
+          "start": 203.925,
+          "seconds": 0.975,
+          "speech": 0.9968529939651489,
+          "music": 4.350355447968468e-05,
+          "singing": 6.666102308372501e-06
+        }
+      ],
+      "source": "danie1.wav",
+      "source_sha256": "a0625d5cb80ac2948a654e12021f17f4ddf13c1ea49e719687aefc24fb232282",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "33b7b100e087104bed919dead6ce66dd5e295369f01bf26dc8f30d77ecf354b6",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19422919099451974,
+      "metadata_and_hash_seconds": 0.0819884089869447,
+      "first_pass_seconds": 0.11218582800938748,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 83.053,
+          "seconds": 0.975,
+          "speech": 0.979796826839447,
+          "music": 0.003253618720918894,
+          "singing": 7.398441539407941e-06
+        },
+        {
+          "start": 218.796,
+          "seconds": 0.975,
+          "speech": 0.9841470718383789,
+          "music": 0.0007801618776284158,
+          "singing": 4.2133883653150406e-06
+        }
+      ],
+      "source": "dialogue.wav",
+      "source_sha256": "8584dfd1529e82d289c141040654b0ce1d941dba75c007789549248512163f26",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "894426e069b015e615e74ad79d91206b6676c3c39bcfaaa24ad63e462e46ed40",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16352100201766007,
+      "metadata_and_hash_seconds": 0.08339374500792474,
+      "first_pass_seconds": 0.08006877498701215,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 92.482,
+          "seconds": 0.975,
+          "speech": 0.9838125705718994,
+          "music": 0.00040862272726371884,
+          "singing": 7.771568562020548e-06
+        },
+        {
+          "start": 215.485,
+          "seconds": 0.975,
+          "speech": 0.9683457612991333,
+          "music": 0.00027954173856414855,
+          "singing": 1.3958790987089742e-05
+        }
+      ],
+      "source": "dialogue1.wav",
+      "source_sha256": "2bb6599d184d8c30744415115e331d0ced401c6ae7977c880fab371fd87e5f33",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "f3f27b3e112a892af3d5fe592b1609a7b2fadf4c05f7950de7599bc5e81febc1",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.19831397401867434,
+      "metadata_and_hash_seconds": 0.08572143199853599,
+      "first_pass_seconds": 0.11253008199855685,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 63.445,
+          "seconds": 0.975,
+          "speech": 0.9775445461273193,
+          "music": 0.0018742881948128343,
+          "singing": 1.2883392628282309e-05
+        },
+        {
+          "start": 234.881,
+          "seconds": 0.975,
+          "speech": 0.01929095759987831,
+          "music": 6.120897887740284e-05,
+          "singing": 0.0001401467015966773
+        }
+      ],
+      "source": "dialogue2.wav",
+      "source_sha256": "a771b2007b46d7a0afb1a6912bd0cb39c08c528ef4d44e8881f7e925c19da744",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "8b5c647695f6e752b44f7c53bf2af8e631e5abb42648eec4222107f08d83ae74",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.17413977900287136,
+      "metadata_and_hash_seconds": 0.0932658999809064,
+      "first_pass_seconds": 0.0808136030100286,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 75.944,
+          "seconds": 0.975,
+          "speech": 0.9800930619239807,
+          "music": 0.00021822478447575122,
+          "singing": 2.5913626814144664e-05
+        },
+        {
+          "start": 229.397,
+          "seconds": 0.975,
+          "speech": 0.9941507577896118,
+          "music": 0.0002829934819601476,
+          "singing": 4.0294664358953014e-05
+        }
+      ],
+      "source": "diamond.wav",
+      "source_sha256": "c47828f66123596a8a9b73361e4d3f165ded55598c858ad865be5a0734e71d2e",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "8acabbf270fa6f5110968e91fd2e10a4e7bfffd8288475cecfa914c8238809bb",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16757481000968255,
+      "metadata_and_hash_seconds": 0.08225810900330544,
+      "first_pass_seconds": 0.08526346698636189,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 70.17,
+          "seconds": 0.975,
+          "speech": 0.9673783183097839,
+          "music": 0.00010074407327920198,
+          "singing": 3.761018376735592e-07
+        },
+        {
+          "start": 198.707,
+          "seconds": 0.975,
+          "speech": 0.01998344622552395,
+          "music": 0.007515662349760532,
+          "singing": 0.0003254470066167414
+        }
+      ],
+      "source": "ellhnika.wav",
+      "source_sha256": "45daecf64d7afbbf08fc85b03e1349a545c4a63c7c846a32c84ed638fbed0f4d",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "f4ebda14308c00539afd9e278a700c3f8e314344f86c3e153f69242a1a8936c8",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.3349160010111518,
+      "metadata_and_hash_seconds": 0.08239127602428198,
+      "first_pass_seconds": 0.2524524329928681,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 63.888,
+          "seconds": 0.975,
+          "speech": 0.9144468307495117,
+          "music": 0.00015505464398302138,
+          "singing": 3.312924718557042e-06
+        },
+        {
+          "start": 195.497,
+          "seconds": 0.975,
+          "speech": 0.15390995144844055,
+          "music": 2.399104596406687e-05,
+          "singing": 2.0084058633074164e-05
+        }
+      ],
+      "source": "emil.wav",
+      "source_sha256": "3211807c4a616632fca81fa99da4139ed341e65365ef54ae17a50583e7ec3004",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "a84e18680b11f3c69e3f91f4010ac57bc6fd9ed35e8d2807af8f31fafc4d21bb",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2013346570020076,
+      "metadata_and_hash_seconds": 0.08313728199573234,
+      "first_pass_seconds": 0.11814069698448293,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 88.958,
+          "seconds": 0.975,
+          "speech": 0.9950758814811707,
+          "music": 7.766841008560732e-06,
+          "singing": 1.0875555744860321e-06
+        },
+        {
+          "start": 194.685,
+          "seconds": 0.975,
+          "speech": 0.9981262683868408,
+          "music": 2.3642003725399263e-05,
+          "singing": 1.0801689995787456e-06
+        }
+      ],
+      "source": "fem_rock.wav",
+      "source_sha256": "b19a2b80680eefd4d91429ecd14ac5b5b17630115fcf8e5f3a18821424d03561",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "88b267a27e0139c85e5f80a70643fa3f5aebf083fa0912d553c43ee05d4e3c74",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.175639734021388,
+      "metadata_and_hash_seconds": 0.0835341320198495,
+      "first_pass_seconds": 0.09205074000055902,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 76.951,
+          "seconds": 0.975,
+          "speech": 0.9966562390327454,
+          "music": 7.287372136488557e-05,
+          "singing": 8.568184966861736e-06
+        },
+        {
+          "start": 231.022,
+          "seconds": 0.975,
+          "speech": 0.98814857006073,
+          "music": 0.00026432779850438237,
+          "singing": 8.882681868271902e-06
+        }
+      ],
+      "source": "female.wav",
+      "source_sha256": "97c28c66f088a56bd3e2c1bce287e20e58e0d305333fb4c6a4bc1034276d29d4",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "56db7d3092f7c9656c544e006a72dea28fc1a25fc468adda2b2e47c4bd9f7488",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19830545000149868,
+      "metadata_and_hash_seconds": 0.08093076999648474,
+      "first_pass_seconds": 0.11732240801211447,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 64.384,
+          "seconds": 0.975,
+          "speech": 0.9953274726867676,
+          "music": 0.0014839725336059928,
+          "singing": 2.826460331561975e-06
+        },
+        {
+          "start": 194.839,
+          "seconds": 0.975,
+          "speech": 0.9978922605514526,
+          "music": 7.122809620341286e-05,
+          "singing": 6.246398811526888e-07
+        }
+      ],
+      "source": "fire.wav",
+      "source_sha256": "531f1700217bfda71677d810a57b82233506959b091e8115f427b524fa1bcfdd",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "f9611c4e616467aec0a048b4949982a3b62afc0a0c50b1af1f9c19753f1cb955",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.1581001440063119,
+      "metadata_and_hash_seconds": 0.08017563901375979,
+      "first_pass_seconds": 0.0777769680134952,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 61.237,
+          "seconds": 0.975,
+          "speech": 0.9778856635093689,
+          "music": 1.648290708544664e-05,
+          "singing": 0.00010272096551489085
+        },
+        {
+          "start": 203.446,
+          "seconds": 0.975,
+          "speech": 0.9964401721954346,
+          "music": 8.416376658715308e-05,
+          "singing": 3.0874298317939974e-06
+        }
+      ],
+      "source": "geography.wav",
+      "source_sha256": "876d94cad9ffae7603993e0c7a5a06079f7fb9ba5887651cf261eeae74be57c7",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "8dc1812cc32f1c1875478597ec938c2c87641ace34905ffd68fd79a41cea7fc7",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15988268199726008,
+      "metadata_and_hash_seconds": 0.08141599301598035,
+      "first_pass_seconds": 0.07841379099409096,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 74.765,
+          "seconds": 0.975,
+          "speech": 0.9918229579925537,
+          "music": 1.1065167200285941e-05,
+          "singing": 1.4808844071012572e-06
+        },
+        {
+          "start": 227.939,
+          "seconds": 0.975,
+          "speech": 0.999203622341156,
+          "music": 4.144668764638482e-06,
+          "singing": 3.3804050758590165e-07
+        }
+      ],
+      "source": "geography1.wav",
+      "source_sha256": "0cfe3d3fca0d6d17b33e18aae992761923f3525247de694f956f0291f741b5b4",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "c0bf11360afbc70a55f68a097c93f8a5893aafec97a579ebb42b46c67439f13e",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15966306699556299,
+      "metadata_and_hash_seconds": 0.0790384610008914,
+      "first_pass_seconds": 0.08057443599682301,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 68.635,
+          "seconds": 0.975,
+          "speech": 0.9942363500595093,
+          "music": 4.174432615400292e-05,
+          "singing": 1.2150169368396746e-06
+        },
+        {
+          "start": 216.57,
+          "seconds": 0.975,
+          "speech": 0.9957281947135925,
+          "music": 4.14891037507914e-05,
+          "singing": 4.398591045173816e-06
+        }
+      ],
+      "source": "georg.wav",
+      "source_sha256": "28b6027e903a8a449f4ff4b33a624cb72c0ee53f5f46fdab04319c5d2caab32e",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "60da5e36a6d97d00ad4c1c7a6fc595932fe1642b1dbde622ae30553ac201cee3",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19301714800531045,
+      "metadata_and_hash_seconds": 0.08269772300263867,
+      "first_pass_seconds": 0.11026960599701852,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 83.835,
+          "seconds": 0.975,
+          "speech": 0.9404962062835693,
+          "music": 0.0018028095364570618,
+          "singing": 0.00013624313578475267
+        },
+        {
+          "start": 224.946,
+          "seconds": 0.975,
+          "speech": 0.985925555229187,
+          "music": 6.0613358073169366e-05,
+          "singing": 6.99917063684552e-06
+        }
+      ],
+      "source": "god.wav",
+      "source_sha256": "1e70b116185cffe53f0ad43d0d2795b8a798630cf82f52f7fb810549c93534c6",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "12b3d4b36c9205067d1c2da00342242037081b1c43909317a172ffc85d89b8b0",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1597069819981698,
+      "metadata_and_hash_seconds": 0.07705524697666988,
+      "first_pass_seconds": 0.08260200501536019,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 102.763,
+          "seconds": 0.975,
+          "speech": 0.9725397229194641,
+          "music": 3.7565947422990575e-05,
+          "singing": 1.944395808095578e-05
+        },
+        {
+          "start": 200.326,
+          "seconds": 0.975,
+          "speech": 0.9780319333076477,
+          "music": 0.00019828400400001556,
+          "singing": 1.7053154806490056e-05
+        }
+      ],
+      "source": "greek.wav",
+      "source_sha256": "8ffc75683c23ed35801cbee1f4a098f3624b6740b997d5925ca96883d5e9b19a",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "43dcf7c9e8f80fe99e9af1dcb4152fae603af322df690a411db78af574712755",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15940063999732956,
+      "metadata_and_hash_seconds": 0.0797370609943755,
+      "first_pass_seconds": 0.07961380999768153,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 85.623,
+          "seconds": 0.975,
+          "speech": 0.9825867414474487,
+          "music": 0.00044359799358062446,
+          "singing": 1.0900436791416723e-05
+        },
+        {
+          "start": 215.652,
+          "seconds": 0.975,
+          "speech": 0.8489570617675781,
+          "music": 3.638001362560317e-05,
+          "singing": 9.240990948455874e-06
+        }
+      ],
+      "source": "greek1.wav",
+      "source_sha256": "af363843aca0fd358fd91288e54146239f4827a3ce0d7f3d042f3048a61c6578",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "c8c4befbd391e1a0584d9da665d6177432151d3df2a70a6476a5c158f761335b",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16587829901254736,
+      "metadata_and_hash_seconds": 0.08913757899426855,
+      "first_pass_seconds": 0.07669345801696181,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 77.491,
+          "seconds": 0.975,
+          "speech": 0.9968164563179016,
+          "music": 0.0004387671360746026,
+          "singing": 4.002940386271803e-06
+        },
+        {
+          "start": 232.365,
+          "seconds": 0.975,
+          "speech": 0.8181681632995605,
+          "music": 7.674313383176923e-05,
+          "singing": 1.262427213077899e-05
+        }
+      ],
+      "source": "india.wav",
+      "source_sha256": "c47eac82c912649005444becc96e87783a2116122f7dd5c7c3dbc0480c1eb740",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "1d1a4cba5c8f7c355f3245f0fc5ff79c3191765edaacf1f4cf9a7e2b8fad2572",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.2647611220018007,
+      "metadata_and_hash_seconds": 0.07808472600299865,
+      "first_pass_seconds": 0.18662109700380825,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 97.756,
+          "seconds": 0.975,
+          "speech": 0.9851657748222351,
+          "music": 0.002146565355360508,
+          "singing": 1.8833809008356184e-05
+        },
+        {
+          "start": 213.514,
+          "seconds": 0.975,
+          "speech": 0.9822031855583191,
+          "music": 8.272079867310822e-05,
+          "singing": 5.331236479833024e-06
+        }
+      ],
+      "source": "jony.wav",
+      "source_sha256": "2dc239a7ece85f5a3fea5707a2642619c9dfb5eaf981d00f4072ee114e55e7d3",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "9e23865f7dce6e190c0e044e55d50c99bb0d9e3bb0c7ad497c2402b3834a38a3",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.2615968860045541,
+      "metadata_and_hash_seconds": 0.1199256909894757,
+      "first_pass_seconds": 0.14161777700064704,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 62.791,
+          "seconds": 0.975,
+          "speech": 0.9782424569129944,
+          "music": 0.0012988101225346327,
+          "singing": 7.854542673157994e-06
+        },
+        {
+          "start": 212.742,
+          "seconds": 0.975,
+          "speech": 0.9771267175674438,
+          "music": 0.0005336205940693617,
+          "singing": 2.171855612687068e-06
+        }
+      ],
+      "source": "jvoice.wav",
+      "source_sha256": "7627d7f0c38e6e1fb3e0fe55d42c1b863a8a640ec7b13d720def2d2a2d246dd7",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "d59b0d17f555fb86de3aa95ba2b80fe7aea30fc2d9cdc5e627f1f931f9bcda77",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16895566301536746,
+      "metadata_and_hash_seconds": 0.08738706100848503,
+      "first_pass_seconds": 0.08151271700626239,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 96.268,
+          "seconds": 0.975,
+          "speech": 0.992805540561676,
+          "music": 2.0319443137850612e-05,
+          "singing": 3.7713045912823873e-06
+        },
+        {
+          "start": 196.152,
+          "seconds": 0.975,
+          "speech": 0.9812647104263306,
+          "music": 5.50523582205642e-05,
+          "singing": 1.920138493005652e-05
+        }
+      ],
+      "source": "kedar.wav",
+      "source_sha256": "9f3bc2a68b45914e440118585b89dbeaa1b636f892a8faaed4d7f6438abd6029",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "cb1d46d192928c71a86b9b7669fe1b43788cea9c53cabaebe1c8810496a1bcc7",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16151558500132523,
+      "metadata_and_hash_seconds": 0.08200336300069466,
+      "first_pass_seconds": 0.07945825200295076,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 75.602,
+          "seconds": 0.975,
+          "speech": 0.9828534722328186,
+          "music": 0.008229926228523254,
+          "singing": 7.212372111098375e-06
+        },
+        {
+          "start": 238.946,
+          "seconds": 0.975,
+          "speech": 0.9878080487251282,
+          "music": 0.004462499637156725,
+          "singing": 4.155374881520402e-06
+        }
+      ],
+      "source": "kid.wav",
+      "source_sha256": "9c2f96d7469130d28db5d88221820753aadbab021dccdaec73ca9518951f20b7",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "f08113329e4b525338ab5f2dfab78a5aefa364c87d3c2f6a3324ffebcea1937b",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16645341500407085,
+      "metadata_and_hash_seconds": 0.08423849201062694,
+      "first_pass_seconds": 0.0821623129886575,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 87.257,
+          "seconds": 0.975,
+          "speech": 0.9965619444847107,
+          "music": 0.0008592407102696598,
+          "singing": 6.977104476391105e-06
+        },
+        {
+          "start": 221.854,
+          "seconds": 0.975,
+          "speech": 0.9992063045501709,
+          "music": 1.834312206483446e-05,
+          "singing": 1.6060197367551154e-06
+        }
+      ],
+      "source": "lena.wav",
+      "source_sha256": "b7f6574d83facff2cf012b151309e052b29fba7e2d83ae66d297339843269916",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "e7fb82d46da7e88e53d9e1281d1231f2959cf3c03a93c9589b99babb6bd6f5f7",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16380533800111152,
+      "metadata_and_hash_seconds": 0.08397662499919534,
+      "first_pass_seconds": 0.07977802999084815,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 65.197,
+          "seconds": 0.975,
+          "speech": 0.9958497881889343,
+          "music": 6.125340587459505e-05,
+          "singing": 8.202672688639723e-06
+        },
+        {
+          "start": 232.369,
+          "seconds": 0.975,
+          "speech": 0.9993922114372253,
+          "music": 4.8008056182879955e-05,
+          "singing": 3.540570787663455e-07
+        }
+      ],
+      "source": "male.wav",
+      "source_sha256": "c4985b03539a27d0a10915b38f1dc985a3aecf767b1bf98c3704b0e01fd11e11",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "07696b130e5b38a2308b29bfd48756174cc6094729f4420f1026ef6b8f35a72c",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1643325290060602,
+      "metadata_and_hash_seconds": 0.08569670800352469,
+      "first_pass_seconds": 0.07858202501665801,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 90.261,
+          "seconds": 0.975,
+          "speech": 0.0049787224270403385,
+          "music": 0.00025539667694829404,
+          "singing": 1.5049758076202124e-05
+        },
+        {
+          "start": 229.317,
+          "seconds": 0.975,
+          "speech": 0.9805323481559753,
+          "music": 8.096965029835701e-05,
+          "singing": 1.9091366993961856e-06
+        }
+      ],
+      "source": "my_voice.wav",
+      "source_sha256": "52556183c4542db37b4b2c933f7e4f46ce6d5d2f7e646ba2bee6075482bd2593",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "1754e086a9cd55753af2071a112f0266cd089b70b04ab0b9a8172f53dac2ae6c",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1638609530054964,
+      "metadata_and_hash_seconds": 0.08164770001894794,
+      "first_pass_seconds": 0.08214400900760666,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 103.996,
+          "seconds": 0.975,
+          "speech": 0.9849333763122559,
+          "music": 5.70362426515203e-05,
+          "singing": 1.8437369362800382e-05
+        },
+        {
+          "start": 237.126,
+          "seconds": 0.975,
+          "speech": 0.9881161451339722,
+          "music": 0.00034647947177290916,
+          "singing": 1.788028203009162e-05
+        }
+      ],
+      "source": "nether.wav",
+      "source_sha256": "5e467b8ddfbab4979f88b7f2c8674e6e49f1f4e06afef3a0f263ec108822309c",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "cd6f92b7ae1c8a69fe074c7c41539577c5d9d822ccd13d3797e90ff3d9baa7d7",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19180501101072878,
+      "metadata_and_hash_seconds": 0.07914106600219384,
+      "first_pass_seconds": 0.11261005801497959,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 96.538,
+          "seconds": 0.975,
+          "speech": 0.917391300201416,
+          "music": 0.0010711685754358768,
+          "singing": 7.348648978222627e-06
+        },
+        {
+          "start": 238.912,
+          "seconds": 0.975,
+          "speech": 0.9892492294311523,
+          "music": 0.00025660733808763325,
+          "singing": 1.1236769751121756e-05
+        }
+      ],
+      "source": "news1.wav",
+      "source_sha256": "d2e0aef5683a52a52a759605b083de5115310acfdf04ebd699ce7e4104429119",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "2eb4e61379fa737f488cda98604d64e38fce840ec9cd61dda4a52023fd74cec2",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.18609764400753193,
+      "metadata_and_hash_seconds": 0.10545639001065865,
+      "first_pass_seconds": 0.08058780399733223,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 80.513,
+          "seconds": 0.975,
+          "speech": 0.9883130192756653,
+          "music": 0.0062921117059886456,
+          "singing": 1.0597677828627639e-06
+        },
+        {
+          "start": 217.562,
+          "seconds": 0.975,
+          "speech": 0.9974668025970459,
+          "music": 1.024620360112749e-05,
+          "singing": 2.0095281797694042e-05
+        }
+      ],
+      "source": "news2.wav",
+      "source_sha256": "59500d077a9a44f60813ecc83c4eedf3ecc4b1cf15f8deca3fa11542a5786d0c",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "0489063a15059ca40be881be24ee8457ab1f92da6b4910f11a541aa2c8ebe01f",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.20115126299788244,
+      "metadata_and_hash_seconds": 0.08781565699609928,
+      "first_pass_seconds": 0.11327868700027466,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 62.402,
+          "seconds": 0.975,
+          "speech": 0.9955776333808899,
+          "music": 0.0008863227558322251,
+          "singing": 7.382597232208354e-06
+        },
+        {
+          "start": 228.614,
+          "seconds": 0.975,
+          "speech": 0.9946774244308472,
+          "music": 0.00028065076912753284,
+          "singing": 2.635905957504292e-06
+        }
+      ],
+      "source": "nj105.wav",
+      "source_sha256": "b88cf5dcc48ae45b0b38b8bd3a95532c78b402876ca218fed74e9e8ffe36b183",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "30ede2a8fbcac5b1560fc906ddb6ebc78eea7ebac2310d66ef96545335c83687",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.20319274300709367,
+      "metadata_and_hash_seconds": 0.07903381701908074,
+      "first_pass_seconds": 0.12403120199451223,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 100.132,
+          "seconds": 0.975,
+          "speech": 0.9835303425788879,
+          "music": 0.00033852944034151733,
+          "singing": 8.495205111103132e-05
+        },
+        {
+          "start": 211.789,
+          "seconds": 0.975,
+          "speech": 0.9920653700828552,
+          "music": 0.4549418091773987,
+          "singing": 1.1744617722797557e-06
+        }
+      ],
+      "source": "nj105a.wav",
+      "source_sha256": "aca5ec89f19bf9c273aca8163e908fdf0b29cb803f45ca3381e8ff97d7ac1003",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "299cd9e3bc53a07f15f7ca5b8d37e38e907e8188ed1bd9d192789baa85240f8c",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15882773100747727,
+      "metadata_and_hash_seconds": 0.077613850007765,
+      "first_pass_seconds": 0.08109801998944022,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 92.146,
+          "seconds": 0.975,
+          "speech": 0.9991407990455627,
+          "music": 2.7937790036958177e-06,
+          "singing": 3.157847231705091e-06
+        },
+        {
+          "start": 232.367,
+          "seconds": 0.975,
+          "speech": 0.00067924550967291,
+          "music": 0.6597175598144531,
+          "singing": 0.00017514533828943968
+        }
+      ],
+      "source": "oneday.wav",
+      "source_sha256": "654696a1df08955d56b84e99d88eeb434e3b2f1d63be73474793447bea86d072",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "8b6f778735b1512595160fe03ce6b75844948bab451fdecf4d25e423a5a106aa",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19017875799909234,
+      "metadata_and_hash_seconds": 0.07742623699596152,
+      "first_pass_seconds": 0.11269961099606007,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 95.392,
+          "seconds": 0.975,
+          "speech": 0.9777024984359741,
+          "music": 1.8756039935396984e-05,
+          "singing": 3.285404318376095e-06
+        },
+        {
+          "start": 195.923,
+          "seconds": 0.975,
+          "speech": 0.9886031150817871,
+          "music": 0.00014552261563949287,
+          "singing": 4.752214408654254e-06
+        }
+      ],
+      "source": "psychic.wav",
+      "source_sha256": "56147449cff3397a3cf577ab4d792c62f268488cfb0e4568dc7971017214c036",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "54aef65fbf123204fc87461c2e73b7540760412fb5a0ffcde0403c5daaa02d08",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.27077713402104564,
+      "metadata_and_hash_seconds": 0.08513187200878747,
+      "first_pass_seconds": 0.18558959898655303,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 99.326,
+          "seconds": 0.975,
+          "speech": 0.9666357636451721,
+          "music": 0.0001387481315759942,
+          "singing": 2.8474241844378412e-05
+        },
+        {
+          "start": 228.578,
+          "seconds": 0.975,
+          "speech": 0.8757047057151794,
+          "music": 0.0002520357957109809,
+          "singing": 4.829693352803588e-06
+        }
+      ],
+      "source": "pulp.wav",
+      "source_sha256": "5ddfc17d33276fbd9067ce50cb776ffa85f0b792d5dcfdeee07c46bf39c5ab8b",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "8a70b829cc54d33c9f1d16a631ecda2a92c9c59a67d0a99ea15a96adb515225b",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1657008939946536,
+      "metadata_and_hash_seconds": 0.0839267699921038,
+      "first_pass_seconds": 0.0817212620167993,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 81.63,
+          "seconds": 0.975,
+          "speech": 0.9202901721000671,
+          "music": 9.789792238734663e-05,
+          "singing": 1.7114165530074388e-05
+        },
+        {
+          "start": 208.163,
+          "seconds": 0.975,
+          "speech": 0.902954638004303,
+          "music": 0.0001466363901272416,
+          "singing": 1.7507498341728933e-05
+        }
+      ],
+      "source": "pulp1.wav",
+      "source_sha256": "4eaa2c71f8b6c31aabd23819513923711cbf9eebb09d2583dbb3e97caaf2d6af",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "5766bfa1e38022db0090d988fac08eb66812da7290a94d4977f0f6322bdd5338",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.21007013399503194,
+      "metadata_and_hash_seconds": 0.08747701800893992,
+      "first_pass_seconds": 0.12252748900209554,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 84.73,
+          "seconds": 0.975,
+          "speech": 0.8663090467453003,
+          "music": 5.3182844567345455e-05,
+          "singing": 0.0001664355513639748
+        },
+        {
+          "start": 210.565,
+          "seconds": 0.975,
+          "speech": 0.0025263617280870676,
+          "music": 0.0006764927529729903,
+          "singing": 3.687161733978428e-05
+        }
+      ],
+      "source": "pulp2.wav",
+      "source_sha256": "d0cc93d0368b151719a7df364f4bc93ad6e8622b9025436b090bfdb67f270dca",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "b7ba9cdb07c835ab2f291cb0b7a56549df1842c620f6ee1ff9501b05fbd58a19",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.18896288800169714,
+      "metadata_and_hash_seconds": 0.08850209001684561,
+      "first_pass_seconds": 0.10040617297636345,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 83.856,
+          "seconds": 0.975,
+          "speech": 0.8153025507926941,
+          "music": 0.07092033326625824,
+          "singing": 0.00022476028243545443
+        },
+        {
+          "start": 197.091,
+          "seconds": 0.975,
+          "speech": 0.9977148771286011,
+          "music": 6.10325923844357e-06,
+          "singing": 2.250445049867267e-06
+        }
+      ],
+      "source": "relation.wav",
+      "source_sha256": "8826034e877719a3eeefcb3caaff436e61df76bd68388496e95ba37db82178a1",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "da9c502f305fdce21fbca06a92ebf4fc2db4971211cae9bfee47ec8cacdd9b76",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15767769599915482,
+      "metadata_and_hash_seconds": 0.07811557399691083,
+      "first_pass_seconds": 0.0795109259779565,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 71.348,
+          "seconds": 0.975,
+          "speech": 0.9913722276687622,
+          "music": 3.367885074112564e-05,
+          "singing": 1.915586290124338e-05
+        },
+        {
+          "start": 225.343,
+          "seconds": 0.975,
+          "speech": 0.9712125658988953,
+          "music": 0.00031965188100002706,
+          "singing": 0.0002227452932856977
+        }
+      ],
+      "source": "serbian.wav",
+      "source_sha256": "dbf78e7e42b301c88a9c6a1e4ad459d3880aeeb01fa2d194deb03f3b9c27d158",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "122a4d228eb38a74cd27ecab21ddc3de8ba0ce7c549fcd8d3a09b225383261f7",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.1945181629853323,
+      "metadata_and_hash_seconds": 0.08095377299468964,
+      "first_pass_seconds": 0.1134991809958592,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 60.487,
+          "seconds": 0.975,
+          "speech": 0.9895691871643066,
+          "music": 6.309746822807938e-05,
+          "singing": 1.9903569409507327e-05
+        },
+        {
+          "start": 221.184,
+          "seconds": 0.975,
+          "speech": 0.9814262390136719,
+          "music": 0.000469280406832695,
+          "singing": 7.97636039351346e-06
+        }
+      ],
+      "source": "shannon.wav",
+      "source_sha256": "1242b60e14aabc84861f9a1661937e006e3811a79f4a7139c3821c95cf7c1635",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "3828d32463fa40fc58a4d506fa18e6384313d09978da94d0dfac905ccac42ad9",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1631721390003804,
+      "metadata_and_hash_seconds": 0.0805677020107396,
+      "first_pass_seconds": 0.08255363701027818,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 94.921,
+          "seconds": 0.975,
+          "speech": 0.9816001653671265,
+          "music": 0.0001272412482649088,
+          "singing": 2.777974441414699e-05
+        },
+        {
+          "start": 217.606,
+          "seconds": 0.975,
+          "speech": 0.9916397333145142,
+          "music": 0.0005553693044930696,
+          "singing": 3.409382316021947e-06
+        }
+      ],
+      "source": "sleep.wav",
+      "source_sha256": "0dfc86c161c982478c9a01e84a4f75bb56c72ac4ff10e877422b1956b7ac29ce",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "05d87a356b1eccabd1c868f1dc70974d25cba81b1259f3cb13a1a4543a0a135d",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.159265394002432,
+      "metadata_and_hash_seconds": 0.08270863100187853,
+      "first_pass_seconds": 0.07650716599891894,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 92.939,
+          "seconds": 0.975,
+          "speech": 0.9907718896865845,
+          "music": 0.0014610138023272157,
+          "singing": 5.278224762150785e-06
+        },
+        {
+          "start": 211.05,
+          "seconds": 0.975,
+          "speech": 0.9773746728897095,
+          "music": 0.002197394147515297,
+          "singing": 4.4098896978539415e-06
+        }
+      ],
+      "source": "smoke1.wav",
+      "source_sha256": "3fa1c93184e9dd5549268e4c7e36b0958b9d95358fb943eebb67090611eb57ce",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "e9e451e3c0ac53f3a3fb5e1f3569cb71b24c14cd04a70315d74e4929c3aa45f0",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1597176329814829,
+      "metadata_and_hash_seconds": 0.07804353997926228,
+      "first_pass_seconds": 0.0816259200219065,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 84.054,
+          "seconds": 0.975,
+          "speech": 0.9861178398132324,
+          "music": 0.0008917684317566454,
+          "singing": 1.0103072781930678e-05
+        },
+        {
+          "start": 207.437,
+          "seconds": 0.975,
+          "speech": 0.9746235013008118,
+          "music": 0.0033450094051659107,
+          "singing": 7.372844265773892e-05
+        }
+      ],
+      "source": "smoking.wav",
+      "source_sha256": "ed988a338e81be55ba92bcf4e086e2246629ca736519399305bb4bdd90219af4",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "d837fb4ec31c94a5d184954c598834a7157bfece1e0dd790d1d9f2d9a18cdb80",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19209632198908366,
+      "metadata_and_hash_seconds": 0.0843353130039759,
+      "first_pass_seconds": 0.10771310600102879,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 80.696,
+          "seconds": 0.975,
+          "speech": 0.9745468497276306,
+          "music": 0.00874226726591587,
+          "singing": 6.697709977743216e-06
+        },
+        {
+          "start": 197.157,
+          "seconds": 0.975,
+          "speech": 0.9978757500648499,
+          "music": 5.4920896218391135e-05,
+          "singing": 9.096778740058653e-06
+        }
+      ],
+      "source": "stupid.wav",
+      "source_sha256": "3db9f073b4e037f7ff864dc54bd081a1aa8eb2bcaf3e7c1236eeea6b8931fab7",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "3a393f4874cddae7001cefc8777f05aef110c598311989cb3d49a60a47d4f196",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999957,
+      "coverage_fraction": 0.006499999999999986,
+      "wall_seconds": 0.24716752400854602,
+      "metadata_and_hash_seconds": 0.07806192900170572,
+      "first_pass_seconds": 0.16905073399539106,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 60.648,
+          "seconds": 0.975,
+          "speech": 0.9594125747680664,
+          "music": 1.862043427536264e-05,
+          "singing": 7.262099643412512e-06
+        },
+        {
+          "start": 226.029,
+          "seconds": 0.975,
+          "speech": 0.9678113460540771,
+          "music": 0.0014559668488800526,
+          "singing": 1.9508279365254566e-06
+        }
+      ],
+      "source": "teachers.wav",
+      "source_sha256": "08ba5318f7117af1c83829671e69866f6f43de7b537354f537b48c9d9ab39b46",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "0907735d0d50441208b7b9a432cec8e4a75a83543ea9d6d9b26283af30fc5631",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15647236999939196,
+      "metadata_and_hash_seconds": 0.07868348600459285,
+      "first_pass_seconds": 0.07773665100103244,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 103.489,
+          "seconds": 0.975,
+          "speech": 0.9906865954399109,
+          "music": 1.4595944776374381e-05,
+          "singing": 3.5760222090175375e-06
+        },
+        {
+          "start": 219.365,
+          "seconds": 0.975,
+          "speech": 0.9852799773216248,
+          "music": 0.0001752540993038565,
+          "singing": 2.356257027713582e-05
+        }
+      ],
+      "source": "teachers1.wav",
+      "source_sha256": "366e4e8d07dfd848ae0c5f51462c7ef3252eaea8ebc6df687b7d8ca2bef1faee",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "44f55d1d2e4c78040a35db2c99d8345a7b26c639270cea7bbdce3ceb2260be80",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.24070089400629513,
+      "metadata_and_hash_seconds": 0.07981088999076746,
+      "first_pass_seconds": 0.1608305710251443,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 70.09,
+          "seconds": 0.975,
+          "speech": 0.835046112537384,
+          "music": 0.016198622062802315,
+          "singing": 9.555902579450049e-06
+        },
+        {
+          "start": 236.101,
+          "seconds": 0.975,
+          "speech": 0.9939395189285278,
+          "music": 7.439728506142274e-05,
+          "singing": 6.96022470947355e-06
+        }
+      ],
+      "source": "teachers2.wav",
+      "source_sha256": "ada34e3bb4863cd815d0cc506d1b37b88a463ce32548194f9a157c8fde737bb1",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "9084884c1e5f3102d0b172539bfbac99d305eef7158e2ce346dd4a4fb6b1b1eb",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15897983001195826,
+      "metadata_and_hash_seconds": 0.08020658898749389,
+      "first_pass_seconds": 0.07872552101616748,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 78.253,
+          "seconds": 0.975,
+          "speech": 0.9854845404624939,
+          "music": 9.563024650560692e-05,
+          "singing": 9.961525393009651e-06
+        },
+        {
+          "start": 235.897,
+          "seconds": 0.975,
+          "speech": 0.9966315627098083,
+          "music": 4.41692209278699e-05,
+          "singing": 8.240261877290322e-07
+        }
+      ],
+      "source": "thlui.wav",
+      "source_sha256": "5bd79cdc0d24f0eea3d11c559ea2dc21503ec15cd8cb0bd2a51060c8cbf1ed82",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "6fb08522787630759e5d4a943e2326c7f7810550b75a1bd612f477fd11149aff",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.20664515299722552,
+      "metadata_and_hash_seconds": 0.08227555197663605,
+      "first_pass_seconds": 0.12431682701571845,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 66.642,
+          "seconds": 0.975,
+          "speech": 0.9994484186172485,
+          "music": 3.483978161966661e-06,
+          "singing": 1.3017648825552897e-06
+        },
+        {
+          "start": 228.013,
+          "seconds": 0.975,
+          "speech": 0.9989622831344604,
+          "music": 8.129663001454901e-06,
+          "singing": 2.1865298549528234e-06
+        }
+      ],
+      "source": "undergrad.wav",
+      "source_sha256": "d959f158ed7d7397a4d525f81125228ce2e712456d34fdf119563ff46924984a",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "8054e67569b8bd673ea4371d9498e430631d6673117c2250c361dee82e216f21",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1644455709902104,
+      "metadata_and_hash_seconds": 0.08633024001028389,
+      "first_pass_seconds": 0.07806539599550888,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 66.196,
+          "seconds": 0.975,
+          "speech": 0.9777690768241882,
+          "music": 5.2857387345284224e-05,
+          "singing": 6.644839595537633e-05
+        },
+        {
+          "start": 215.467,
+          "seconds": 0.975,
+          "speech": 0.9962462186813354,
+          "music": 2.2844373233965598e-05,
+          "singing": 1.1955125955864787e-06
+        }
+      ],
+      "source": "vegetables.wav",
+      "source_sha256": "0d53692550f2f5ce54f47e964e534f1a6eb21fbfa5f8394e4088477f5825a5d9",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "2b8ee810564c12e74534d4519b533f0beb54151f9454fd1fdbbf960ac0775834",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16527925702393986,
+      "metadata_and_hash_seconds": 0.07914992101723328,
+      "first_pass_seconds": 0.08607584598939866,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 75.35,
+          "seconds": 0.975,
+          "speech": 0.9621880650520325,
+          "music": 0.0009509940282441676,
+          "singing": 1.261898796656169e-05
+        },
+        {
+          "start": 223.39,
+          "seconds": 0.975,
+          "speech": 0.9920214414596558,
+          "music": 0.003492305986583233,
+          "singing": 5.600572421826655e-06
+        }
+      ],
+      "source": "vegetables1.wav",
+      "source_sha256": "53092235dd967f792c93d6c775bc304e02f40c682301367192054ac764ab534f",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "afa6fad6d1ea8b120c2419f68d373bf6018dd126da67dc29f6a770cb6c63bddf",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15961672400590032,
+      "metadata_and_hash_seconds": 0.07999648500117473,
+      "first_pass_seconds": 0.07956903800368309,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 93.765,
+          "seconds": 0.975,
+          "speech": 0.3810139000415802,
+          "music": 0.00023460645752493292,
+          "singing": 3.202676816727035e-05
+        },
+        {
+          "start": 228.238,
+          "seconds": 0.975,
+          "speech": 0.9927912354469299,
+          "music": 0.00038627642788924277,
+          "singing": 6.217234385985648e-06
+        }
+      ],
+      "source": "vegetables2.wav",
+      "source_sha256": "d98998a1044e3031e66d0affb1f4090d9189cc7050749669f2c0f42d33761370",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "504e9fe8739a63653cb08ad5368f927b0d9dac2a3655f28db283fd2970389ae6",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1607657319982536,
+      "metadata_and_hash_seconds": 0.0788614570046775,
+      "first_pass_seconds": 0.08184031199198216,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 85.04,
+          "seconds": 0.975,
+          "speech": 0.9866310358047485,
+          "music": 0.029039548709988594,
+          "singing": 1.7441489035263658e-06
+        },
+        {
+          "start": 233.116,
+          "seconds": 0.975,
+          "speech": 0.6108499765396118,
+          "music": 0.4081639349460602,
+          "singing": 5.9259833506075665e-05
+        }
+      ],
+      "source": "voice.wav",
+      "source_sha256": "0f664f0759c348d02796649053e9b5049fd25b9cea83374ac35722bea835751a",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "99bf8d912888fd406fefbe498bb776a954b4be2d35d865611e9fa4e882c22a5c",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16321326600154862,
+      "metadata_and_hash_seconds": 0.0814040590194054,
+      "first_pass_seconds": 0.08174103999044746,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 89.804,
+          "seconds": 0.975,
+          "speech": 0.9865434765815735,
+          "music": 0.00040002187597565353,
+          "singing": 7.240841569000622e-06
+        },
+        {
+          "start": 229.673,
+          "seconds": 0.975,
+          "speech": 0.9917473196983337,
+          "music": 0.0015210857382044196,
+          "singing": 1.0578866067589843e-06
+        }
+      ],
+      "source": "voices.wav",
+      "source_sha256": "823e40db2f6b7408ceddf350a4137e3ba491594c614eb7815d427a4fe66c1519",
+      "label": "speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "shiur_freifeld.mp3",
+      "sha256": "1b97eef25f4e9f967fe0527dc5f3ffbe587d09ce65b2ae166f85c204aa600458",
+      "encoded_bytes": 7365866,
+      "recording_seconds": 460.102688,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.950000000000017,
+      "coverage_fraction": 0.004238184324626282,
+      "wall_seconds": 0.21468809701036662,
+      "metadata_and_hash_seconds": 0.07644644399988465,
+      "first_pass_seconds": 0.1381907880131621,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 157.525,
+          "seconds": 0.975,
+          "speech": 0.989840030670166,
+          "music": 0.00019378440629225224,
+          "singing": 4.647750029107556e-05
+        },
+        {
+          "start": 352.393,
+          "seconds": 0.975,
+          "speech": 0.9783346652984619,
+          "music": 0.0003343324351590127,
+          "singing": 9.712355677038431e-05
+        }
+      ],
+      "source": "shiur_freifeld.mp3",
+      "source_sha256": "1b97eef25f4e9f967fe0527dc5f3ffbe587d09ce65b2ae166f85c204aa600458",
+      "label": "shiur",
+      "repeated_to_five_minutes": false
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "8686f56c0efff267fea102c84e674aae8d0f2ecbf8cd7a23b71c403e17cb2947",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.1607355049927719,
+      "metadata_and_hash_seconds": 0.07970813597785309,
+      "first_pass_seconds": 0.08097207001992501,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 78.302,
+          "seconds": 0.975,
+          "speech": 0.5593624114990234,
+          "music": 0.152286559343338,
+          "singing": 0.00015375990187749267
+        },
+        {
+          "start": 239.01,
+          "seconds": 0.975,
+          "speech": 0.9416562914848328,
+          "music": 0.014130177907645702,
+          "singing": 2.0978974134777673e-05
+        }
+      ],
+      "source": "shiur_plus_music_-10dB.wav",
+      "source_sha256": "1483891430b070bb1fb488b9af3fe39f9002ff8e0e8382998cec2374dd7d8e91",
+      "label": "constructed_music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "b47b14400d9edd42004224df676be7e755f36345fa391cf3641225d2652f1633",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19032263799454086,
+      "metadata_and_hash_seconds": 0.07800721601233818,
+      "first_pass_seconds": 0.1122626569995191,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 72.157,
+          "seconds": 0.975,
+          "speech": 0.8863309025764465,
+          "music": 0.39161744713783264,
+          "singing": 7.185532740550116e-05
+        },
+        {
+          "start": 210.544,
+          "seconds": 0.975,
+          "speech": 0.905424177646637,
+          "music": 0.02029629796743393,
+          "singing": 2.4437864340143278e-05
+        }
+      ],
+      "source": "shiur_plus_music_-20dB.wav",
+      "source_sha256": "06a4508f5915c4703e9a77c8c7c868d0801c424fc29ea7df10f55dc470c714d3",
+      "label": "constructed_music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "b1b42c147b399a05ad80e462fd996e41fdedee23b06879d3ed643d92b4c138e3",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "music_detected_in_samples",
+      "reason": "Both samples indicate music or singing",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.16160196001874283,
+      "metadata_and_hash_seconds": 0.0822097810159903,
+      "first_pass_seconds": 0.07932440299191512,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 95.915,
+          "seconds": 0.975,
+          "speech": 0.5630923509597778,
+          "music": 0.5719255805015564,
+          "singing": 0.00010803576151374727
+        },
+        {
+          "start": 210.231,
+          "seconds": 0.975,
+          "speech": 0.7239271402359009,
+          "music": 0.6083991527557373,
+          "singing": 1.5038898709462956e-05
+        }
+      ],
+      "source": "shiur_plus_music_0dB.wav",
+      "source_sha256": "1c2ef7ea48e86427523f984a1ddd63dbd8037d0922abcb6f23b223564e91ff43",
+      "label": "constructed_music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "653090ec184c4bf54fe0d193ad87184f74e64ecdd592149d70eadc96fb89068b",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.15674409401253797,
+      "metadata_and_hash_seconds": 0.07880001200828701,
+      "first_pass_seconds": 0.07788378599798307,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 82.448,
+          "seconds": 0.975,
+          "speech": 2.3031390683492248e-10,
+          "music": 1.2868363059165278e-13,
+          "singing": 0.0
+        },
+        {
+          "start": 231.298,
+          "seconds": 0.975,
+          "speech": 2.3031390683492248e-10,
+          "music": 1.2868363059165278e-13,
+          "singing": 0.0
+        }
+      ],
+      "source": "silence.wav",
+      "source_sha256": "c24d031b5eff73ec71b1b583253424c05bab14cfcc9fb9c6ca117d026304b6fd",
+      "label": "non_speech",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "six_minutes_speech_then_15sec_music.wav",
+      "sha256": "25357637f27d4d0bfa076b6d01e229bc2d94f270fc63594692ae44643452742d",
+      "encoded_bytes": 12000044,
+      "recording_seconds": 375.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.950000000000017,
+      "coverage_fraction": 0.005200000000000046,
+      "wall_seconds": 0.18620334001025185,
+      "metadata_and_hash_seconds": 0.07782425201730803,
+      "first_pass_seconds": 0.10832952099735849,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 98.657,
+          "seconds": 0.975,
+          "speech": 0.988178551197052,
+          "music": 0.00011574693053262308,
+          "singing": 4.562292360787978e-06
+        },
+        {
+          "start": 271.666,
+          "seconds": 0.975,
+          "speech": 0.9729363322257996,
+          "music": 0.0005405796109698713,
+          "singing": 5.6808468798408285e-05
+        }
+      ],
+      "source": "six_minutes_speech_then_15sec_music.wav",
+      "source_sha256": "25357637f27d4d0bfa076b6d01e229bc2d94f270fc63594692ae44643452742d",
+      "label": "constructed_music",
+      "repeated_to_five_minutes": false
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "2deb11714db90a010f7bf6ba335953beda19dcb5a87375e8185296886ce35042",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "provisional_speech",
+      "reason": "At least one sample strongly indicates speech",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.18755773900193162,
+      "metadata_and_hash_seconds": 0.07702666200930253,
+      "first_pass_seconds": 0.11047705000964925,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 76.328,
+          "seconds": 0.975,
+          "speech": 0.9988484978675842,
+          "music": 1.2094484191038646e-05,
+          "singing": 2.2193069071363425e-06
+        },
+        {
+          "start": 222.33,
+          "seconds": 0.975,
+          "speech": 1.0475626368133817e-05,
+          "music": 0.9981746077537537,
+          "singing": 0.0005382713279686868
+        }
+      ],
+      "source": "spoken_intro_then_music.wav",
+      "source_sha256": "6a0b86b51b22b7869ccff0e90e63abc3a3df8c355414d7fb204b76841cf98f3b",
+      "label": "constructed_music",
+      "repeated_to_five_minutes": true
+    },
+    {
+      "file": "five-minute-fixture.wav",
+      "sha256": "ffddb772fb5b0398e8609c774f040d58e9024724c8f42212566b7b10fe630c90",
+      "encoded_bytes": 9600078,
+      "recording_seconds": 300.0,
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "decision": "uncertain",
+      "reason": "No sufficiently clear speech evidence",
+      "full_file_approved": false,
+      "sampled_windows": 2,
+      "sampled_seconds": 1.9499999999999886,
+      "coverage_fraction": 0.006499999999999962,
+      "wall_seconds": 0.19042757799616084,
+      "metadata_and_hash_seconds": 0.07934963298612274,
+      "first_pass_seconds": 0.11102320201462135,
+      "target_seconds": 5,
+      "target_met": true,
+      "windows": [
+        {
+          "start": 99.301,
+          "seconds": 0.975,
+          "speech": 0.002620785031467676,
+          "music": 0.0069472286850214005,
+          "singing": 0.0002073319919873029
+        },
+        {
+          "start": 204.295,
+          "seconds": 0.975,
+          "speech": 0.0043513658456504345,
+          "music": 0.019290415570139885,
+          "singing": 0.00021335754718165845
+        }
+      ],
+      "source": "white_noise.wav",
+      "source_sha256": "128375ec7948f8da65696ab1cdbdf9234dbdf05948099ea6d939d369df2ffdf5",
+      "label": "non_speech",
+      "repeated_to_five_minutes": true
+    }
+  ]
+}

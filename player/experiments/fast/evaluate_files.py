@@ -22,5 +22,5 @@ with tempfile.TemporaryDirectory(prefix='inside-two-check-files-') as tmp:
   results.append(result)
   if (n+1)%10==0 or n+1==len(items):print(f'Tested {n+1}/{len(items)} files',flush=True)
 summary={label:{decision:sum(r['label']==label and r['decision']==decision for r in results) for decision in sorted({r['decision'] for r in results})} for label in sorted({r['label'] for r in results})}
-output=dict(policy='two-interior-checks-v1',rules_changed_during_test=False,model_sha256=MODEL_SHA,wall_seconds=time.perf_counter()-begin,summary=summary,files=results)
+output=dict(policy='two-interior-checks-v2-speech-priority',rules_changed_during_test=False,model_sha256=MODEL_SHA,wall_seconds=time.perf_counter()-begin,summary=summary,files=results)
 args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(output,indent=2)+'\n');print(json.dumps(summary,indent=2))

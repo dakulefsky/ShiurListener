@@ -26,6 +26,15 @@ def decode(file,start,deadline):
  a=np.frombuffer(raw,dtype='<f4')[:15600]
  if not np.isfinite(a).all():raise ValueError('Invalid decoded samples')
  return np.pad(a,(0,15600-len(a)))
+def decide_checks(rows):
+ if len(rows)!=2:raise ValueError('Exactly two checks are required')
+ for row in rows:
+  if any(not isinstance(row.get(k),(int,float)) or not np.isfinite(row[k]) or not 0<=row[k]<=1 for k in ['speech','music','singing']):raise ValueError('Invalid classifier scores')
+ hits=sum(max(row['music'],row['singing'])>=.5 for row in rows)
+ if hits==2:return 'music_detected_in_samples','Both samples indicate music or singing'
+ if max(row['speech'] for row in rows)>=.8:return 'provisional_speech','At least one sample strongly indicates speech'
+ if hits==0 and all(row['speech']>=.5 for row in rows):return 'provisional_speech','Both samples indicate speech'
+ return 'uncertain','No sufficiently clear speech evidence'
 def scan(file,model,budget=5):
  if budget<=0:raise TimeoutError('Fast-scan time budget exceeded')
  start=time.perf_counter();deadline=start+budget;file=file.resolve();before=file.stat()
@@ -44,14 +53,13 @@ def scan(file,model,budget=5):
  first=time.perf_counter()
  after=file.stat()
  if after.st_size!=before.st_size or after.st_mtime_ns!=before.st_mtime_ns:raise ValueError('Input changed during analysis')
- rows.sort(key=lambda r:r['start']);hits=sum(max(r['music'],r['singing'])>=.5 for r in rows);speech=sum(r['speech']>=.5 for r in rows)
- decision='music_detected_in_samples' if hits>=2 else 'uncertain' if hits or speech!=2 else 'provisional_speech'
+ rows.sort(key=lambda r:r['start']);decision,reason=decide_checks(rows)
  elapsed=time.perf_counter()-start
  if elapsed>budget:raise TimeoutError('Fast-scan time budget exceeded')
  covered=0.;last_end=0.
  for row in rows:
   end=min(seconds,row['start']+row['seconds']);covered+=max(0,end-max(last_end,row['start']));last_end=max(last_end,end)
- return dict(file=file.name,sha256=digest,encoded_bytes=before.st_size,recording_seconds=seconds,policy='two-interior-checks-v1',scope='sampled_only',decision=decision,full_file_approved=False,sampled_windows=len(rows),sampled_seconds=covered,coverage_fraction=covered/seconds,wall_seconds=elapsed,metadata_and_hash_seconds=prepared-start,first_pass_seconds=first-prepared,target_seconds=budget,target_met=elapsed<=budget,windows=rows)
+ return dict(file=file.name,sha256=digest,encoded_bytes=before.st_size,recording_seconds=seconds,policy='two-interior-checks-v2-speech-priority',scope='sampled_only',decision=decision,reason=reason,full_file_approved=False,sampled_windows=len(rows),sampled_seconds=covered,coverage_fraction=covered/seconds,wall_seconds=elapsed,metadata_and_hash_seconds=prepared-start,first_pass_seconds=first-prepared,target_seconds=budget,target_met=elapsed<=budget,windows=rows)
 def main():
  p=argparse.ArgumentParser();p.add_argument('--model',type=pathlib.Path,required=True);p.add_argument('--output',type=pathlib.Path,required=True);p.add_argument('files',type=pathlib.Path,nargs='+');args=p.parse_args();begin=time.perf_counter()
  if sha(args.model)!=MODEL_SHA:raise ValueError('Unexpected model checksum')
