@@ -1,36 +1,50 @@
-// Windows console launcher for the bundled, local Python runtime.
+// GUI launcher for the bundled companion; reopening shows its existing window.
 package main
 
 import (
- "bufio"
- "fmt"
- "os"
- "os/exec"
- "path/filepath"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"runtime"
+	"syscall"
+	"unsafe"
 )
 
-func fail(err error) {
- fmt.Fprintln(os.Stderr, "\nCould not start Sidekick:", err)
- fmt.Fprintln(os.Stderr, "Extract the entire ZIP first, then run Sidekick.exe from the extracted folder.\nPress Enter to close.")
- _, _ = bufio.NewReader(os.Stdin).ReadString('\n')
- os.Exit(1)
+var user = syscall.NewLazyDLL("user32.dll")
+
+func ptr(value string) *uint16 { p, _ := syscall.UTF16PtrFromString(value); return p }
+func fail(message string) {
+	text, title := ptr(message), ptr("נגן שיעורים / Shiur Player")
+	user.NewProc("MessageBoxW").Call(0, uintptr(unsafe.Pointer(text)), uintptr(unsafe.Pointer(title)), 0x10)
+	runtime.KeepAlive(text)
+	runtime.KeepAlive(title)
+	os.Exit(1)
 }
 func main() {
- executable, err := os.Executable()
- if err != nil { fail(err) }
- directory := filepath.Dir(executable)
- python := filepath.Join(directory,"runtime","python","python.exe")
- script := filepath.Join(directory,"companion.py")
- for _, file := range []string{python,script,filepath.Join(directory,"runtime","vlc","libvlc.dll")} {
-  if _, err := os.Stat(file); err != nil { fail(err) }
- }
- fmt.Println("Sidekick — portable shiur player")
- fmt.Println("Python and VLC are bundled. Keep this window open while listening.")
- arguments := append([]string{"-I","-u",script},os.Args[1:]...)
- command := exec.Command(python,arguments...)
- command.Dir = directory
- command.Stdin = os.Stdin
- command.Stdout = os.Stdout
- command.Stderr = os.Stderr
- if err := command.Run(); err != nil { fail(err) }
+	className := ptr("ShiurPlayerSetupWindow")
+	existing, _, _ := user.NewProc("FindWindowW").Call(uintptr(unsafe.Pointer(className)), 0)
+	runtime.KeepAlive(className)
+	if existing != 0 {
+		user.NewProc("PostMessageW").Call(existing, 0x800B, 0, 0)
+		return
+	}
+	executable, err := os.Executable()
+	if err != nil {
+		fail(err.Error())
+	}
+	directory := filepath.Dir(executable)
+	python := filepath.Join(directory, "runtime", "python", "pythonw.exe")
+	script := filepath.Join(directory, "companion.py")
+	for _, file := range []string{python, script, filepath.Join(directory, "desktop.py"), filepath.Join(directory, "runtime", "vlc", "libvlc.dll")} {
+		if _, err := os.Stat(file); err != nil {
+			fail("Extract the entire ZIP first. Missing file: " + file)
+		}
+	}
+	args := append([]string{"-I", "-u", script}, os.Args[1:]...)
+	command := exec.Command(python, args...)
+	command.Dir = directory
+	command.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: 0x08000000}
+	if err := command.Run(); err != nil {
+		fail("The player could not start. Close any older companion first.\n" + err.Error())
+	}
 }

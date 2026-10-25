@@ -20,7 +20,7 @@ void main() {
       '$root/plugin',
       '--force',
       '--output',
-      '$root/sidekick-1.0.0.otzplugin',
+      '$root/sidekick-1.1.0.otzplugin',
     ]);
     expect(code, PluginPackagerCliExitCode.success);
   });

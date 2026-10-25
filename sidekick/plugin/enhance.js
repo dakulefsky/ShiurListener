@@ -1,0 +1,1 @@
+ShiurUI.enhance();ShiurLocale.apply();

@@ -1,48 +1,57 @@
-SIDEKICK 1.0.0 — WINDOWS x64
+נגן שיעורים / SHIUR PLAYER — COMPANION 1.1.0 (WINDOWS x64)
 
-This is Sidekick, the separate companion application. It includes its own Otzaria
-plugin, Python and a reduced VLC runtime. No separate runtime installation needed.
+UPDATE BOTH PARTS
+Close the OLD command-prompt companion once before updating. Extract the ENTIRE
+new ZIP into a new folder. Keep the runtime folders beside Sidekick.exe.
 
-UPDATING
-Close the old companion window first. Extract the ENTIRE new ZIP into a new
-folder. Do not delete Sidekick's data folder or uninstall its Otzaria plugin.
-Saved positions and folders are reused. Your Inside player is separate.
+1. Open Sidekick.exe. This version opens a normal app window, not a command prompt.
+2. Use the Hebrew/English selector at the top if desired.
+3. Click Choose recordings folder / בחירת תיקיית שיעורים. Select the folder
+   containing your MP3/M4A/WAV recordings, not the folder containing Sidekick.exe.
+   The app shows the full folder path and the number of recordings found.
+4. If you add audio to that folder later, click Rescan folder / סריקה מחדש.
+5. Click Copy code. Install the included sidekick-1.1.0.otzplugin as an UPDATE
+   inside Otzaria. Restart Otzaria once, then open נגן שיעורים, paste the code and click Connect / חיבור.
+6. Choose a recording or press Play. Play selects the first available recording
+   if none is selected. Empty libraries show folder-selection instructions.
 
-1. Open Sidekick.exe in the extracted folder.
-2. Choose your recordings folder. Keep Sidekick's console window open.
-3. Copy the pairing code shown there.
-4. In Otzaria, install the included sidekick-1.0.0.otzplugin as an update.
-5. Open the Sidekick tab and approve its local connection permission if asked.
-6. Paste the code into the connection card and press חיבור.
-7. Choose a recording. The connection card collapses after a successful connection.
+CLOSING WINDOWS
+The app's X button or Hide and keep listening hides its setup window while audio
+continues. Run Sidekick.exe again, use Open desktop app in the plugin, or press
+Library / connection on the floating bar to reopen it. Exit player in the setup
+window actually stops the app and saves progress. Closing Otzaria does not stop it.
+There is no command window to keep open in this version.
 
-The large Play/Pause button, skip buttons, speed and volume are together at the
-top. Timer, automatic next recording and bookmarks are in an expandable section.
-The folder library is underneath. No organizational folders are pre-created.
-Use הגדרות חיבור in the header to show connection settings again.
+LANGUAGE AND NAMES
+The visible Hebrew name is נגן שיעורים. In English it is Shiur Player.
+Sidekick remains only our nickname and the EXE filename. Both the desktop window
+and the Otzaria controller offer Hebrew/English. Language, chosen folder, named
+collections and saved per-recording positions are retained. A restart creates a
+new connection code; remembered pairing is optional.
 
-A Windows floating bar has larger, rounded controls. Drag its title bar to move
-it. Closing the bar hides it; playback continues. Show/hide it from the player
-or with Ctrl+Alt+Shift+F. Ctrl+Alt+Shift+P toggles playback from other programs.
-Ctrl+Alt+Shift+Left/Right skips. Conflicts are reported in the shortcut help.
+Recordings are referenced in their existing folder. Rescan does not copy, alter
+or delete audio files. Update without uninstalling the plugin or deleting
+%LOCALAPPDATA%\ShiurPlayerCompanion. Inside is a separate player with separate data.
 
-Closing Otzaria leaves Sidekick playing. Close Sidekick's console window to stop
-it. Each restart creates a new pairing code. Remembered pairing is optional.
-Progress remains at %LOCALAPPDATA%\ShiurPlayerCompanion\state.json.
+TROUBLESHOOTING
+If you still see a command window, the OLD EXE is running. Close it and launch
+Sidekick.exe from this new extracted ZIP. Update the plugin from the SAME ZIP.
+If zero recordings are shown, check the selected path and supported audio file
+extensions, then rescan. Organizational collections are not folders on disk.
+If an older companion is already using the local port, close it before starting
+this version. The launcher reports missing files in a message box.
 
-WINDOWS TESTING STATUS
-This is an unsigned experimental Windows build. UI/connection/playback-command
-and persistence tests pass with a simulated decoder. Floating-bar commands and
-window flags pass with mocked Windows APIs. The ZIP and x64 launcher are checked.
-The Windows application and its appearance/speaker output have not been tested
-on a Windows desktop here. The audio backend is unchanged from the earlier
-companion. Its earlier real VLC checks ran on Linux with dummy audio output.
+TESTING
+Backend/browser tests cover rescanning, first-run folder selection, saved progress,
+Hebrew/English persistence, pairing, playback commands and continued background
+playback. Native setup-window and floating controls are tested with Windows API
+mocks. The executable is verified as Windows GUI x64, and runtime files/licenses
+are preserved. Real WAV/MP3 decoding passed on Linux with dummy audio output.
+Actual Windows GUI rendering and physical audio output remain unverified here.
 
-Keep the runtime folders beside Sidekick.exe. If the recordings folder picker
-fails, run: Sidekick.exe --folder "C:\Your\Shiurim"
-If the port is busy, close any other companion instance before starting it.
+Python and reduced VLC are bundled; no separate installation is needed.
+Runtime licenses/source links are included in THIRD-PARTY-NOTICES.txt.
+There is no browser viewer or URL-opening control. Bundled Python is general
+purpose; the program is not a device-wide browser/Internet lockdown tool.
 
-The service accepts local recording IDs only and listens at 127.0.0.1:18473.
-There is no browser viewer or URL-opening control. This is not a device lockdown
-tool: the bundled Python interpreter is general purpose. Runtime licenses and
-source URLs are in THIRD-PARTY-NOTICES.txt and the runtime folders.
+After successful pairing, the plugin code form and native setup window hide automatically. Connection settings and Open desktop app reopen them. Audio continues.

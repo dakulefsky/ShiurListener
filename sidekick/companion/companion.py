@@ -41,26 +41,39 @@ class VLC:
 
 class Player:
     def __init__(self,root,data_dir,backend):
-        self.root=pathlib.Path(root).resolve();self.data_dir=pathlib.Path(data_dir);self.data_dir.mkdir(parents=True,exist_ok=True)
+        self.root=pathlib.Path(root).resolve() if root else None;self.data_dir=pathlib.Path(data_dir);self.data_dir.mkdir(parents=True,exist_ok=True)
         self.file=self.data_dir/'state.json';self.lock=threading.RLock();self.backend=backend;self.error='';self.pending=None;self.was_playing=False
-        self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'skipSeconds':15,'folders':[]}
+        self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'skipSeconds':15,'folders':[],'language':'he'}
         if self.file.exists():
             try:self.saved.update(json.loads(self.file.read_text('utf-8')))
             except (ValueError,OSError):raise RuntimeError('Cannot read saved companion state. Back up state.json before resetting it.')
-        self.paths={};self.tracks=[]
-        for path in sorted(self.root.rglob('*')):
-            if not path.is_file() or path.suffix.lower() not in EXTENSIONS:continue
-            real=path.resolve()
-            if not real.is_relative_to(self.root):continue
-            relative=path.relative_to(self.root).as_posix()
-            import hashlib
-            ident=hashlib.sha256((str(self.root)+'/'+relative).encode()).hexdigest()[:24]
-            self.paths[ident]=real;self.tracks.append({'id':ident,'name':path.name,'source':relative})
-        self.saved['queue']=[i for i in self.saved['queue'] if i in self.paths]
-        if self.saved['currentId'] not in self.paths:self.saved['currentId']=None
         self.active=None;self.last_save=0;self.previous_status='stopped';self.hotkey_status=[];self.floating_bar=None;self.sleep_deadline=None;self.sleep_minutes=0;self.sleep_paused=False
+        self.paths={};self.tracks=[];self.library_revision=0;self.choose_folder=None;self.show_window=None;self.hide_window=None
         self.saved.setdefault('folders',[]);self.saved.setdefault('skipSeconds',15)
-        for folder in self.saved['folders']:folder['trackIds']=[i for i in folder['trackIds'] if i in self.paths]
+        selected=self.root or (pathlib.Path(self.saved['libraryRoot']) if self.saved.get('libraryRoot') else None)
+        if selected and selected.is_dir():self.scan(selected)
+    def scan(self,root=None):
+        with self.lock:
+            selected=pathlib.Path(root).resolve() if root else self.root
+            if selected is None:raise ValueError('Choose a recordings folder first.')
+            if not selected.is_dir():raise ValueError('The recordings folder is missing or disconnected.')
+            paths={};tracks=[]
+            import hashlib
+            for path in sorted(selected.rglob('*')):
+                if not path.is_file() or path.suffix.lower() not in EXTENSIONS:continue
+                real=path.resolve()
+                if not real.is_relative_to(selected):continue
+                relative=path.relative_to(selected).as_posix()
+                ident=hashlib.sha256((str(selected)+'/'+relative).encode()).hexdigest()[:24]
+                paths[ident]=real;tracks.append({'id':ident,'name':path.name,'source':relative})
+            self.capture()
+            if self.active and self.active not in paths:self.backend.stop();self.active=None;self.pending=None
+            self.root=selected;self.paths=paths;self.tracks=tracks;self.library_revision+=1;self.error=''
+            self.saved['libraryRoot']=str(selected)
+            self.saved['queue']=[i for i in self.saved['queue'] if i in paths]
+            if self.saved['currentId'] not in paths:self.saved['currentId']=None
+            self.persist()
+            return self.snapshot()
     def persist(self):
         temporary=self.file.with_suffix('.tmp');temporary.write_text(json.dumps(self.saved,ensure_ascii=False),'utf-8');os.replace(temporary,self.file)
     def capture(self):
@@ -72,7 +85,7 @@ class Player:
     def snapshot(self):
         raw=self.capture();ident=self.saved['currentId'];progress=self.saved['tracks'].get(ident,{})
         if not self.active:raw={'position':progress.get('position',0),'duration':progress.get('duration',0),'status':'paused'}
-        return {**raw,'currentId':ident,'speed':self.saved['speed'],'volume':self.saved['volume'],'autoNext':self.saved['autoNext'],'queue':self.saved['queue'],'error':self.error,'skipSeconds':self.saved['skipSeconds'],'folders':self.saved['folders'],'hotkeys':self.hotkey_status,'sleepMinutes':self.sleep_minutes,'sleepRemaining':max(0,int(self.sleep_deadline-time.monotonic()+.999)) if self.sleep_deadline else 0,'floatingAvailable':bool(self.floating_bar and self.floating_bar.hwnd),'floatingStatus':self.floating_bar.status if self.floating_bar else ''}
+        return {**raw,'currentId':ident,'speed':self.saved['speed'],'volume':self.saved['volume'],'autoNext':self.saved['autoNext'],'queue':self.saved['queue'],'error':self.error,'skipSeconds':self.saved['skipSeconds'],'folders':self.saved['folders'],'hotkeys':self.hotkey_status,'sleepMinutes':self.sleep_minutes,'sleepRemaining':max(0,int(self.sleep_deadline-time.monotonic()+.999)) if self.sleep_deadline else 0,'floatingAvailable':bool(self.floating_bar and self.floating_bar.hwnd),'floatingStatus':self.floating_bar.status if self.floating_bar else '', 'loaded':self.active is not None,'libraryCount':len(self.tracks),'folderName':self.root.name if self.root else '', 'hasFolder':self.root is not None,'libraryRevision':self.library_revision,'language':self.saved.get('language','he')}
     def library(self):return [{**t,**self.saved['tracks'].get(t['id'],{})} for t in self.tracks]
     def load(self,ident,position=None,autoplay=False):
         if ident not in self.paths:raise ValueError('Unknown recording. Restart the companion to rescan your selected folder.')
@@ -92,6 +105,19 @@ class Player:
         with self.lock:
             op=data.get('op')
             if not isinstance(op,str):raise ValueError('Command op is required.')
+            if op=='rescan':return self.scan()
+            if op=='choose_folder':
+                if not self.choose_folder:raise ValueError('Open the companion window to choose a recordings folder.')
+                self.choose_folder();return self.snapshot()
+            if op=='show_window':
+                if self.show_window:self.show_window()
+                return self.snapshot()
+            if op=='hide_window':
+                if self.hide_window:self.hide_window()
+                return self.snapshot()
+            if op=='language':
+                if data.get('value') not in ('he','en'):raise ValueError('Choose Hebrew or English.')
+                self.saved['language']=data['value'];self.persist();return self.snapshot()
             if op=='toggle':
                 raw=self.backend.state() if self.active else {'status':'paused'}
                 op='pause' if (self.pending and self.pending['autoplay']) or (not self.pending and raw['status']=='playing') else 'play'
@@ -148,7 +174,9 @@ class Player:
             elif op=='play':
                 self.sleep_paused=False
                 if not self.active:
-                    if not self.saved['currentId']:raise ValueError('Select a recording first.')
+                    if not self.saved['currentId']:
+                        if not self.tracks:raise ValueError('No recordings found. Choose a recordings folder, then rescan.')
+                        self.saved['currentId']=self.tracks[0]['id'];self.saved['queue']=[t['id'] for t in self.tracks]
                     self.load(self.saved['currentId'],autoplay=True)
                 elif self.pending:self.pending['autoplay']=True
                 else:self.backend.play()
@@ -226,30 +254,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--folder');parser.add_argument('--data-dir');parser.add_argument('--no-floating-bar',action='store_true');args=parser.parse_args()
-    folder=args.folder
-    if not folder:
-        if sys.platform=='win32':
-            # Embedded Python excludes tkinter; use the native Windows folder picker.
-            import base64,subprocess
-            script="""[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
-Add-Type -AssemblyName System.Windows.Forms
-$picker = New-Object System.Windows.Forms.FolderBrowserDialog
-$picker.Description = 'Select your shiur recordings folder'
-$picker.ShowNewFolderButton = $false
-if ($picker.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { [Console]::Write($picker.SelectedPath) }
-$picker.Dispose()
-"""
-            powershell=pathlib.Path(os.environ.get('SystemRoot','C:/Windows'))/'System32/WindowsPowerShell/v1.0/powershell.exe'
-            result=subprocess.run([str(powershell),'-NoProfile','-STA','-NonInteractive','-EncodedCommand',base64.b64encode(script.encode('utf-16le')).decode('ascii')],capture_output=True,text=True,encoding='utf-8',creationflags=subprocess.CREATE_NO_WINDOW,check=True)
-            folder=result.stdout.strip()
-        else:
-            import tkinter as tk
-            from tkinter import filedialog
-            ui=tk.Tk();ui.withdraw();folder=filedialog.askdirectory(title='Select your shiur recordings folder');ui.destroy()
-    if not folder:return
-    if not pathlib.Path(folder).is_dir():raise RuntimeError('Select an existing recordings folder.')
     data_dir=args.data_dir or str(pathlib.Path(os.environ.get('LOCALAPPDATA',pathlib.Path.home()/'.local/share'))/'ShiurPlayerCompanion')
-    backend=VLC();player=Player(folder,data_dir,backend);token=secrets.token_urlsafe(24)
+    backend=VLC();player=Player(args.folder,data_dir,backend);token=secrets.token_urlsafe(24)
     server=Server(('127.0.0.1',PORT),player,token)
     threading.Thread(target=server.serve_forever,daemon=True).start()
     import importlib.util
@@ -258,15 +264,27 @@ $picker.Dispose()
     bar_spec=importlib.util.spec_from_file_location('shiur_floating_bar',pathlib.Path(__file__).with_name('floating_bar.py'));bar_module=importlib.util.module_from_spec(bar_spec);bar_spec.loader.exec_module(bar_module)
     if args.no_floating_bar:player.saved['floatingVisible']=False
     bar=bar_module.FloatingBar(player);player.floating_bar=bar;bar.start();hotkeys.start()
-    print('\nSHIUR PLAYER COMPANION\nKeep this window open. Closing it stops audio.\n')
-    print('Pairing code (paste into the Otzaria plugin):\n\n'+token+'\n',flush=True)
-    print(f'{len(player.tracks)} recordings found. Listening only on 127.0.0.1:{PORT}.\nPress Ctrl+C to stop. No audio starts automatically.',flush=True)
     try:
-        while True:player.tick();time.sleep(.15)
+        if sys.platform=='win32':
+            desktop_spec=importlib.util.spec_from_file_location('shiur_desktop',pathlib.Path(__file__).with_name('desktop.py'));desktop=importlib.util.module_from_spec(desktop_spec);desktop_spec.loader.exec_module(desktop)
+            stop=threading.Event()
+            def ticker():
+                while not stop.wait(.15):
+                    try:player.tick()
+                    except Exception as error:player.error=str(error)
+            worker=threading.Thread(target=ticker,daemon=True);worker.start()
+            try:desktop.DesktopWindow(player,token).run()
+            finally:stop.set();worker.join(timeout=2)
+        else:
+            print('Shiur Player: pairing code '+token,flush=True)
+            while True:player.tick();time.sleep(.15)
     except KeyboardInterrupt:pass
     finally:
         hotkeys.close();bar.close();server.shutdown()
         with player.lock:player.capture();player.persist();backend.close()
 if __name__=='__main__':
     try:main()
-    except Exception as e:print('\nCompanion could not start: '+str(e),file=sys.stderr);sys.exit(1)
+    except Exception as e:
+        if sys.platform=='win32':ctypes.windll.user32.MessageBoxW(None,str(e),'נגן שיעורים / Shiur Player',0x10)
+        else:print('Companion could not start: '+str(e),file=sys.stderr)
+        sys.exit(1)

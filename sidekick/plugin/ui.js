@@ -13,7 +13,7 @@ const icons={
 };
 function icon(name){return `<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.headphones}</svg>`;}
 function decorate(id,name){const el=document.getElementById(id);if(!el)return;const text=el.textContent.replace(/^＋\s*/, '');el.replaceChildren();el.insertAdjacentHTML('beforeend',icon(name));const label=document.createElement('span');label.textContent=text;el.append(label);}
-function setPlay(el,paused){el.innerHTML=icon(paused?'play':'pause')+'<span>'+(paused?'ניגון':'השהיה')+'</span>';el.setAttribute('aria-label',paused?'ניגון':'השהיה');}
+function setPlay(el,paused){if(!el)return;el.innerHTML=icon(paused?'play':'pause')+'<span>'+(paused?'ניגון':'השהיה')+'</span>';el.setAttribute('aria-label',paused?'ניגון':'השהיה');}
 function applyTheme(theme){
  if(!theme?.colorScheme)return;
  root.ShiurUI.currentTheme=theme;document.dispatchEvent(new CustomEvent('shiur-theme',{detail:theme}));
@@ -32,7 +32,7 @@ function enhance(){
  [['add-file','plus'],['add-folder','folder'],['open-companion','headphones'],['new-playlist','plus'],['bookmark','bookmark'],['companion-mark','bookmark']].forEach(([id,name])=>decorate(id,name));
  [['previous','previous'],['next','next'],['companion-previous','previous'],['companion-next','next']].forEach(([id,name])=>{const el=document.getElementById(id);if(el)el.innerHTML=icon(name);});
  
- document.getElementById('add-file').classList.add('primary');
+ document.getElementById('add-file')?.classList.add('primary');
  document.getElementById('open-companion').classList.add('companion-entry');
  setPlay(document.getElementById('play'),true);setPlay(document.getElementById('companion-play'),true);
 }

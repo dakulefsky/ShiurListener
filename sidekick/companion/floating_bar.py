@@ -3,9 +3,10 @@ import ctypes,sys,threading,pathlib
 
 def display(state,tracks):
  track=next((t for t in tracks if t['id']==state['currentId']),None)
- title=track['name'] if track else 'בחרו שיעור באוצריא'
+ english=state.get('language')=='en'
+ title=track['name'] if track else ('Choose a recordings folder' if english else 'בחרו תיקיית שיעורים')
  n=state.get('skipSeconds',15)
- return title,('השהיה' if state['status']=='playing' else 'ניגון'),f'−{n}',f'+{n}'
+ return title,('Pause' if state['status']=='playing' else 'Play') if english else ('השהיה' if state['status']=='playing' else 'ניגון'),f'−{n}',f'+{n}'
 
 def timing(state):
  def fmt(value):
@@ -45,6 +46,7 @@ class FloatingBar:
   create=bind(user,'CreateWindowExW',w.HWND,[w.DWORD,w.LPCWSTR,w.LPCWSTR,w.DWORD,ctypes.c_int,ctypes.c_int,ctypes.c_int,ctypes.c_int,w.HWND,w.HMENU,w.HINSTANCE,w.LPVOID])
   default=bind(user,'DefWindowProcW',LRESULT,[w.HWND,w.UINT,w.WPARAM,w.LPARAM]);register=bind(user,'RegisterClassW',w.ATOM,[ctypes.POINTER(WNDCLASS)])
   self.post=bind(user,'PostMessageW',w.BOOL,[w.HWND,w.UINT,w.WPARAM,w.LPARAM]);show=bind(user,'ShowWindow',w.BOOL,[w.HWND,ctypes.c_int]);destroy=bind(user,'DestroyWindow',w.BOOL,[w.HWND]);settext=bind(user,'SetWindowTextW',w.BOOL,[w.HWND,w.LPCWSTR]);invalidate=bind(user,'InvalidateRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT),w.BOOL])
+  enable=bind(user,'EnableWindow',w.BOOL,[w.HWND,w.BOOL])
   getrect=bind(user,'GetWindowRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT)]);metrics=bind(user,'GetSystemMetrics',ctypes.c_int,[ctypes.c_int])
   getmessage=bind(user,'GetMessageW',ctypes.c_int,[ctypes.POINTER(w.MSG),w.HWND,w.UINT,w.UINT]);translate=bind(user,'TranslateMessage',w.BOOL,[ctypes.POINTER(w.MSG)]);dispatch=bind(user,'DispatchMessageW',LRESULT,[ctypes.POINTER(w.MSG)]);quitmessage=bind(user,'PostQuitMessage',None,[ctypes.c_int])
   timer=bind(user,'SetTimer',ctypes.c_size_t,[w.HWND,ctypes.c_size_t,w.UINT,ctypes.c_void_p]);killtimer=bind(user,'KillTimer',w.BOOL,[w.HWND,ctypes.c_size_t]);send=bind(user,'SendMessageW',LRESULT,[w.HWND,w.UINT,w.WPARAM,w.LPARAM])
@@ -68,7 +70,11 @@ class FloatingBar:
    background=brush(color(palette.get('surface'),'#faf8f3'))
    if resources:delete(resources[0]);resources[0]=background
    else:resources.append(background)
+   for ident in (101,102,103):
+    if ident in controls:enable(controls[ident],bool(tracks) if ident==102 else state.get('loaded',False))
    if 104 in controls:settext(controls[104],timing(state))
+   if self.hwnd:settext(self.hwnd,'Shiur Player' if state.get('language')=='en' else 'נגן שיעורים')
+   if 105 in controls:settext(controls[105],'Library / connection' if state.get('language')=='en' else 'ספרייה וחיבור')
    values=display(state,tracks)
    if values!=last:
     last=values
@@ -94,6 +100,10 @@ class FloatingBar:
     if msg==0x0113:update();return 0
     if msg==0x0111:
      ident=wp&0xffff
+     if (wp>>16)==0 and ident==105:
+      callback=getattr(self.player,'show_window',None)
+      if callback:callback()
+      return 0
      if (wp>>16)==0 and ident in (101,102,103):self.player.command({'op':'toggle'} if ident==102 else {'op':'skip','direction':-1 if ident==101 else 1});update();return 0
     if msg==0x0014:
      rect=w.RECT(0,0,1000,1000);b=brush(color(palette.get('surface'),'#faf8f3'));fill(wp,ctypes.byref(rect),b);delete(b);return 1
@@ -123,12 +133,13 @@ class FloatingBar:
    # Topmost tool window; native title bar provides dragging, close and accessibility.
    position=self.player.saved.get('floatingPosition',[80,80]);x,y=position if isinstance(position,list) and len(position)==2 and all(isinstance(v,int) for v in position) else [80,80]
    left,top,width,height=(metrics(i) for i in [76,77,78,79])
-   if width>0 and height>0:x=max(left,min(x,left+max(0,width-410)));y=max(top,min(y,top+max(0,height-182)))
-   self.hwnd=create(0x08000088,name,'Sidekick · נגן מלווה',0x00C80000,x,y,410,182,None,None,instance,None)
+   if width>0 and height>0:x=max(left,min(x,left+max(0,width-410)));y=max(top,min(y,top+max(0,height-224)))
+   self.hwnd=create(0x08000088,name,'נגן שיעורים',0x00C80000,x,y,410,224,None,None,instance,None)
    if not self.hwnd:raise OSError(ctypes.get_last_error(),'Could not create floating bar.')
    controls[100]=create(0,'STATIC','בחרו שיעור באוצריא',0x50004002,14,12,366,26,self.hwnd,100,instance,None)
    controls[104]=create(0,'STATIC','0:00 / 0:00',0x50000001,14,108,366,22,self.hwnd,104,instance,None)
    for ident,x,width in [(101,14,98),(102,124,132),(103,268,98)]:controls[ident]=create(0,'BUTTON',labels[ident],0x5000000B,x,48,width,46,self.hwnd,ident,instance,None)
+   controls[105]=create(0,'BUTTON','ספרייה וחיבור',0x50010000,14,140,352,30,self.hwnd,105,instance,None)
    if not all(controls.values()):raise RuntimeError('Could not create floating controls.')
    for handle in controls.values():send(handle,0x0030,font,1)
    update();timer(self.hwnd,1,500,None);show(self.hwnd,4 if visible else 0);self.status='ready';self.ready.set()

@@ -28,6 +28,30 @@ class Tests(unittest.TestCase):
   try:
    with urllib.request.urlopen(req,timeout=5) as response:return response.status,json.load(response)
   except urllib.error.HTTPError as e:return e.code,json.load(e)
+ def test_first_launch_needs_no_folder_and_remembers_selection(self):
+  player=companion.Player(None,self.root/'new-data',FakeVLC())
+  self.assertFalse(player.snapshot()['hasFolder']);self.assertEqual(player.snapshot()['libraryCount'],0)
+  player.scan(self.audio)
+  self.assertEqual(player.snapshot()['libraryCount'],2)
+  restored=companion.Player(None,self.root/'new-data',FakeVLC())
+  self.assertEqual(restored.root,self.audio);self.assertEqual(restored.snapshot()['libraryCount'],2)
+ def test_rescan_finds_new_files_without_losing_positions(self):
+  ident=self.player.tracks[0]['id'];self.player.saved['tracks'][ident]={'position':65.432,'duration':120};self.player.persist()
+  (self.audio/'Added.mp3').write_bytes(b'fake')
+  self.player.command({'op':'rescan'})
+  self.assertEqual(len(self.player.tracks),3);self.assertEqual(self.player.saved['tracks'][ident]['position'],65.432)
+  self.assertEqual(self.player.snapshot()['folderName'],'audio')
+ def test_play_can_select_first_recording_and_language_persists(self):
+  self.player.command({'op':'play'});self.player.tick()
+  self.assertEqual(self.backend.status,'playing');self.assertIsNotNone(self.player.saved['currentId'])
+  self.player.command({'op':'language','value':'en'})
+  restored=companion.Player(self.audio,self.root/'data',FakeVLC());self.assertEqual(restored.snapshot()['language'],'en')
+ def test_empty_library_requests_folder_instead_of_a_playback_error(self):
+  empty=self.root/'empty';empty.mkdir();player=companion.Player(empty,self.root/'empty-data',FakeVLC())
+  self.assertEqual(player.snapshot()['libraryCount'],0)
+  with self.assertRaisesRegex(ValueError,'folder'):player.command({'op':'play'})
+  calls=[];player.choose_folder=lambda:calls.append('choose');player.command({'op':'choose_folder'});self.assertEqual(calls,['choose'])
+  self.assertIsNone(player.saved['currentId'])
  def test_bundled_vlc_discovery(self):
   import unittest.mock,os
   bundled=self.root/'app/runtime/vlc';bundled.mkdir(parents=True);(bundled/'libvlc.dll').write_bytes(b'fake')
@@ -105,8 +129,8 @@ class Tests(unittest.TestCase):
   try:
    with sync_playwright() as p:
     browser=p.chromium.launch(headless=True);page=browser.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.expose_binding('httpBridge',bridge);page.add_init_script(mock);page.goto(f'http://127.0.0.1:{web.server_port}/')
-    expect(page.locator('#add-file')).to_be_enabled();page.locator('#open-companion').click();page.locator('#companion-token').fill('wrong');page.locator('#companion-connect').click();expect(page.locator('#companion-status')).to_contain_text('Pairing required')
-    page.locator('#companion-remember').check();page.locator('#companion-token').fill('test-pairing-code');page.locator('#companion-connect').click();expect(page.locator('#companion-tracks .track')).to_have_count(2)
+    expect(page.locator('#interface-language')).to_be_enabled();page.locator('#open-companion').click();page.locator('#companion-token').fill('wrong');page.locator('#companion-connect').click();expect(page.locator('#companion-status')).to_contain_text('Pairing required')
+    page.locator('#companion-remember').check();page.locator('#companion-token').fill('test-pairing-code');page.locator('#companion-connect').click();expect(page.locator('#companion-tracks .track')).to_have_count(2);expect(page.locator('#sidekick-connection')).to_be_hidden()
     self.assertEqual(page.evaluate("JSON.parse(localStorage.getItem('companion-connection-v1')).token"),'test-pairing-code')
     page.reload();expect(page.locator('#companion-status')).to_contain_text('מחובר');page.locator('#open-companion').click();expect(page.locator('#companion-tracks .track')).to_have_count(2)
     page.locator('#companion-remember').uncheck();page.wait_for_function("JSON.parse(localStorage.getItem('companion-connection-v1')).token===null")
@@ -135,6 +159,20 @@ class Tests(unittest.TestCase):
     page.wait_for_timeout(200);self.assertEqual(self.player.saved['currentId'],self.player.tracks[1]['id']);self.assertEqual(self.backend.status,'playing')
     page.evaluate("testEmit('plugin.resumed')");expect(page.locator('#companion-title')).to_have_text('Second.wav')
     page.locator('#companion-stop').click();page.wait_for_timeout(100);self.assertEqual(self.backend.status,'stopped')
-    self.assertFalse(errors,errors);page.evaluate("document.querySelector('#sidekick-connection').open=false;document.querySelector('#sidekick-options').open=false");page.screenshot(path=str(ROOT/'companion-preview.png'),full_page=True);page.set_viewport_size({'width':390,'height':900});page.screenshot(path=str(ROOT/'sidekick-mobile-preview.png'),full_page=True);page.set_viewport_size({'width':1280,'height':950});page.evaluate("ShiurUI.applyTheme({mode:'dark',colorScheme:{primary:'#ddbb8a',onPrimary:'#402d11',surface:'#181713',onSurface:'#e8e2d8',outline:'#938d82',surfaceContainer:'#27251f'}})");page.screenshot(path=str(ROOT/'sidekick-dark-preview.png'),full_page=True);browser.close()
+    (self.audio/'Added.mp3').write_bytes(b'new recording')
+    page.locator('#companion-refresh').click();expect(page.locator('#companion-tracks .track')).to_have_count(3)
+    page.locator('#interface-language').select_option('en');expect(page.locator('header h1')).to_have_text('Shiur Player')
+    expect(page.locator('html')).to_have_attribute('dir','ltr');expect(page.locator('#choose-recordings-folder')).to_have_text('Choose recordings folder')
+    page.locator('#open-companion').click();page.locator('#companion-remember').check();page.locator('#companion-connect').click();page.wait_for_function("JSON.parse(localStorage.getItem('companion-connection-v1')).token==='test-pairing-code'")
+    page.reload();expect(page.locator('header h1')).to_have_text('Shiur Player');expect(page.locator('#companion-tracks .track')).to_have_count(3)
+    expect(page.locator('#companion-status')).to_contain_text('Connected')
+    self.player.command({'op':'language','value':'he'});expect(page.locator('header h1')).to_have_text('נגן שיעורים')
+    page.reload();expect(page.locator('#companion-tracks .track')).to_have_count(3);expect(page.locator('header h1')).to_have_text('נגן שיעורים')
+    page.locator('#interface-language').select_option('en');expect(page.locator('header h1')).to_have_text('Shiur Player')
+    page.locator('#open-companion').click();page.evaluate("document.querySelector('#sidekick-options').open=true;document.querySelector('#sidekick-connection').open=true;document.querySelector('#companion-panel .keyboard-help').open=true");page.wait_for_timeout(1200)
+    untranslated=page.evaluate('''()=>{const walk=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),bad=[];for(let n;n=walk.nextNode();)if(n.parentElement.getClientRects().length&&!n.parentElement.closest('script,style,[data-user-text],#interface-language')&&/[\u0590-\u05ff]/.test(n.nodeValue))bad.push(n.nodeValue);return bad;}''')
+    self.assertFalse(untranslated,untranslated)
+    page.locator('#interface-language').select_option('he');expect(page.locator('header h1')).to_have_text('נגן שיעורים');expect(page.locator('html')).to_have_attribute('dir','rtl');expect(page.locator('#open-companion')).to_contain_text('הגדרות חיבור')
+    self.assertFalse(errors,errors);page.evaluate("document.querySelector('#sidekick-connection').open=false;document.querySelector('#sidekick-connection').hidden=true;document.querySelector('#companion-panel .keyboard-help').open=false;document.querySelector('#sidekick-options').open=false");page.screenshot(path=str(ROOT/'companion-preview.png'),full_page=True);page.set_viewport_size({'width':390,'height':900});page.screenshot(path=str(ROOT/'sidekick-mobile-preview.png'),full_page=True);page.set_viewport_size({'width':1280,'height':950});page.evaluate("ShiurUI.applyTheme({mode:'dark',colorScheme:{primary:'#ddbb8a',onPrimary:'#402d11',surface:'#181713',onSurface:'#e8e2d8',outline:'#938d82',surfaceContainer:'#27251f'}})");page.screenshot(path=str(ROOT/'sidekick-dark-preview.png'),full_page=True);browser.close()
   finally:running=False;worker.join(timeout=2);web.shutdown();web.server_close()
 if __name__=='__main__':unittest.main(verbosity=2)

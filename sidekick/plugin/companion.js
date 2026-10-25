@@ -1,7 +1,7 @@
 /* Companion protocol v1. All requests go through Otzaria's native HTTP bridge. */
 (function(){
 'use strict';
-let hostReady=false,token='',tracks=[],snapshot=null,polling=false,visible=false,timer=null,marks={},lastError='',folderView='all',folderSignature='',hotkeySignature='';
+let hostReady=false,token='',tracks=[],snapshot=null,polling=false,visible=false,timer=null,marks={},lastError='',folderView='all',folderSignature='',hotkeySignature='',libraryRevision=-1,connected=false,languageChosen=false;
 const $=id=>document.getElementById(id),base='http://127.0.0.1:18473';
 const section=document.createElement('section');section.id='companion-panel';section.hidden=true;section.style.cssText='margin:16px 32px 32px';
 section.innerHTML=`<div class="section-head"><h2>נגן מלווה · האזנה ברקע</h2><button id="companion-back">חזרה לנגן הרגיל</button></div>
@@ -13,7 +13,7 @@ section.innerHTML=`<div class="section-head"><h2>נגן מלווה · האזנה
 document.querySelector('main').after(section);
 section.style.cssText='';
 const setup=document.createElement('details');setup.id='sidekick-connection';setup.open=true;
-setup.innerHTML='<summary>חיבור לנגן המלווה</summary><div class="setup-steps"><p><strong>1</strong> פתחו את Sidekick במחשב ובחרו את תיקיית השיעורים.</p><p><strong>2</strong> העתיקו את קוד החיבור מהחלון שלו והדביקו כאן.</p><p><strong>3</strong> לחצו על חיבור. השאירו את Sidekick פועל בזמן ההאזנה.</p></div>';
+setup.innerHTML='<summary>חיבור לנגן המלווה</summary><div class="setup-steps"><p><strong>1</strong> פתחו את נגן השיעורים במחשב.</p><p><strong>2</strong> העתיקו את קוד החיבור מהחלון שלו והדביקו כאן.</p><p><strong>3</strong> לחצו על חיבור. אין צורך להשאיר את חלון האפליקציה גלוי.</p></div>';
 setup.append(section.querySelector(':scope > .actions'));
 section.querySelectorAll(':scope > p:not([id])').forEach(p=>p.remove());
 section.querySelector(':scope > .section-head h2').textContent='השיעורים שלכם, גם בזמן הלימוד';
@@ -24,8 +24,11 @@ player.querySelector('.player-options').append($('companion-skip').closest('labe
 const extras=document.createElement('details');extras.id='sidekick-options';extras.innerHTML='<summary>טיימר, המשך אוטומטי וסימניות</summary>';
 let option=player.querySelector('.autonext');while(option){const next=option.nextSibling;extras.append(option);option=next;}player.append(extras);
 const tools=document.createElement('div');tools.className='sidekick-tools';for(const id of ['companion-floating','companion-refresh','companion-stop'])tools.append($(id));player.append(tools);
-$('companion-title').dir='auto';$('companion-token').placeholder='הדביקו את קוד החיבור';
-const tell=(text,error=false)=>{$('companion-status').textContent=text;$('companion-status').classList.toggle('error',error);if(error)setup.open=true;};
+$('companion-title').dir='auto';$('companion-title').dataset.userText='';$('companion-token').placeholder='הדביקו את קוד החיבור';
+const libraryTools=document.createElement('div');libraryTools.className='folder-toolbar';libraryTools.innerHTML='<button id="choose-recordings-folder" class="primary">בחירת תיקיית שיעורים</button><button id="show-companion-window">חלון הנגן במחשב</button><p id="recordings-folder-label" class="muted"></p>';
+grid.querySelector('.library').prepend(libraryTools);
+function updateControls(){$('companion-play').disabled=!connected||!tracks.length;for(const id of ['companion-previous','companion-next','companion-back15','companion-forward15'])$(id).disabled=!connected||!snapshot?.loaded;for(const id of ['choose-recordings-folder','show-companion-window','companion-refresh','companion-new-folder'])$(id).disabled=!connected;}
+const tell=(text,error=false)=>{$('companion-status').textContent=text;$('companion-status').classList.toggle('error',error);if(error&&!connected){setup.hidden=false;setup.open=true;}ShiurLocale.apply();};
 const guard=fn=>(...args)=>Promise.resolve().then(()=>fn(...args)).catch(e=>tell(e.message,true));
 const format=s=>ShiurCore.format(s);
 async function request(path,body){
@@ -44,8 +47,9 @@ async function command(op,extra={}){snapshot=await request('/v1/command',{op,...
 async function syncFloatingTheme(theme){if(!token||!hostReady||!theme?.colorScheme)return;await command('floating_theme',{theme:{...theme.colorScheme,fontFamily:theme.typography?.uiFontFamily||'Rubik'}});}
 document.addEventListener('shiur-theme',event=>{if(token)guard(()=>syncFloatingTheme(event.detail))();});
 function renderState(){
- if(!snapshot)return;
+ if(!snapshot)return;ShiurLocale.set(snapshot.language||ShiurLocale.language);updateControls();$('recordings-folder-label').textContent=snapshot.folderName?('תיקיית מקור: '+snapshot.folderName):'טרם נבחרה תיקיית שמע';
  const t=tracks.find(t=>t.id===snapshot.currentId);
+ if(t)$('companion-title').dataset.userText='';else delete $('companion-title').dataset.userText;
  $('companion-title').textContent=t?.name||'בחרו שיעור';ShiurUI.setPlay($('companion-play'),snapshot.status!=='playing');
  if(document.activeElement!==$('companion-seek')){$('companion-seek').max=snapshot.duration;$('companion-seek').value=snapshot.position;}
  $('companion-time').textContent=`${format(snapshot.position)} / ${format(snapshot.duration)}`;
@@ -61,29 +65,31 @@ function renderState(){
  if(snapshot.error)tell(snapshot.error,true);
  $('companion-floating').disabled=!snapshot.floatingAvailable;$('companion-floating').title=snapshot.floatingStatus||'';
  renderMarks();
- for(const row of $('companion-tracks').children)row.classList.toggle('selected',row.dataset.id===snapshot.currentId);
+ for(const row of $('companion-tracks').children)row.classList.toggle('selected',row.dataset.id===snapshot.currentId);ShiurLocale.apply();
 }
 function renderTracks(){
  const container=$('companion-tracks');container.replaceChildren();const q=$('companion-search').value.toLowerCase();
  const folder=(snapshot?.folders||[]).find(f=>f.id===folderView);const viewTracks=folder?folder.trackIds.map(id=>tracks.find(t=>t.id===id)).filter(Boolean):tracks;
  const filter=$('companion-filter').value;const shown=viewTracks.filter(t=>(t.name+' '+t.source).toLowerCase().includes(q)).filter(t=>filter==='all'||(filter==='continue'&&t.position>0&&(!t.duration||t.position<t.duration-.5))||(filter==='unplayed'&&!t.position)||(filter==='done'&&t.duration>0&&t.position>=t.duration-.5));$('companion-count').textContent=`${shown.length} שיעורים`;
  for(const t of shown){
-  const row=document.createElement('article');row.className='track';row.dataset.id=t.id;const info=document.createElement('div');const play=document.createElement('button');play.className='track-title';play.textContent=t.name;play.dir='auto';play.onclick=guard(async()=>{await command('load',{id:t.id,queue:viewTracks.map(t=>t.id)});await command('play');});const source=document.createElement('small');source.textContent=t.source;source.dir='auto';const progress=document.createElement('small');progress.dataset.progress='';progress.dir='ltr';progress.textContent=t.position?`${format(t.position)} / ${format(t.duration)}`:'טרם הושמע';info.append(play,source,progress);row.append(info);
-  const actions=document.createElement('div');actions.className='actions';const select=document.createElement('select');select.setAttribute('aria-label',`הוספת ${t.name} לתיקייה`);select.add(new Option('＋ לתיקייה',''));for(const f of snapshot?.folders||[])select.add(new Option(f.name,f.id));select.disabled=!(snapshot?.folders||[]).length;select.onchange=guard(async()=>{const id=select.value;if(id)await command('folder_add',{id,trackId:t.id});select.value='';});actions.append(select);
+  const row=document.createElement('article');row.className='track';row.dataset.id=t.id;const info=document.createElement('div');const play=document.createElement('button');play.className='track-title';play.textContent=t.name;play.dir='auto';play.dataset.userText='';play.onclick=guard(async()=>{await command('load',{id:t.id,queue:viewTracks.map(t=>t.id)});await command('play');});const source=document.createElement('small');source.textContent=t.source;source.dir='auto';source.dataset.userText='';const progress=document.createElement('small');progress.dataset.progress='';progress.dir='ltr';progress.textContent=t.position?`${format(t.position)} / ${format(t.duration)}`:'טרם הושמע';info.append(play,source,progress);row.append(info);
+  const actions=document.createElement('div');actions.className='actions';const select=document.createElement('select');select.setAttribute('aria-label',`הוספת ${t.name} לתיקייה`);select.add(new Option('＋ לתיקייה',''));for(const f of snapshot?.folders||[]){const o=new Option(f.name,f.id);o.dataset.userText='';select.add(o);}select.disabled=!(snapshot?.folders||[]).length;select.onchange=guard(async()=>{const id=select.value;if(id)await command('folder_add',{id,trackId:t.id});select.value='';});actions.append(select);
   if(folder){const remove=document.createElement('button');remove.textContent='הסרה מהתיקייה';remove.className='remove';remove.onclick=guard(()=>command('folder_remove',{id:folder.id,trackId:t.id}));actions.append(remove);}row.append(actions);container.append(row);
  }
- if(!container.children.length){const p=document.createElement('p');p.textContent=folder?'התיקייה ריקה. הוסיפו שיעורים מהספרייה באמצעות תפריט ״לתיקייה״.':'אין שיעורים להצגה. לשינוי תיקיית המקור או לסריקה מחדש יש להפעיל מחדש את הנגן המלווה.';container.append(p);}
+ updateControls();
+ if(!container.children.length){const p=document.createElement('p');p.textContent=folder?'התיקייה ריקה. הוסיפו שיעורים מהספרייה באמצעות תפריט ״לתיקייה״.':'אין שיעורים להצגה. בחרו את תיקיית השמע במחשב, או הוסיפו אליה קבצים ולחצו על סריקה מחדש.';container.append(p);}
+ ShiurLocale.apply();
 }
 function renderFolders(){
  const folders=snapshot?.folders||[];if(folderView!=='all'&&!folders.some(f=>f.id===folderView))folderView='all';
- const select=$('companion-folder');select.replaceChildren(new Option('כל השיעורים','all'));folders.forEach(f=>select.add(new Option(f.name,f.id)));select.value=folderView;$('companion-rename-folder').hidden=$('companion-delete-folder').hidden=folderView==='all';
+ const select=$('companion-folder');select.replaceChildren(new Option('כל השיעורים','all'));folders.forEach(f=>{const o=new Option(f.name,f.id);o.dataset.userText='';select.add(o);});select.value=folderView;$('companion-rename-folder').hidden=$('companion-delete-folder').hidden=folderView==='all';ShiurLocale.apply();
 }
-function askFolder(title,initial=''){return new Promise(resolve=>{const d=$('text-dialog');$('dialog-title').textContent=title;$('dialog-input').value=initial;d.returnValue='cancel';d.addEventListener('close',()=>resolve(d.returnValue==='save'?$('dialog-input').value.trim():null),{once:true});d.showModal();$('dialog-input').focus();});}
+function askFolder(title,initial=''){return new Promise(resolve=>{const d=$('text-dialog');$('dialog-title').textContent=title;$('dialog-input').value=initial;d.returnValue='cancel';d.addEventListener('close',()=>resolve(d.returnValue==='save'?$('dialog-input').value.trim():null),{once:true});ShiurLocale.apply();d.showModal();$('dialog-input').focus();});}
 function renderHotkeys(){const box=$('companion-hotkeys');box.replaceChildren();for(const item of snapshot?.hotkeys||[]){const line=document.createElement('p');line.dir='auto';line.textContent=(item.label||item.name)+': '+(item.registered?'פעיל':item.error||'לא זמין');if(!item.registered)line.className='error';box.append(line);}}
 $('companion-folder').onchange=()=>{folderView=$('companion-folder').value;renderFolders();renderTracks();};
 $('companion-new-folder').onclick=guard(async()=>{if(!snapshot)throw Error('יש להתחבר לנגן המלווה תחילה.');const name=await askFolder('תיקייה חדשה');if(name){await command('folder_create',{name});folderView=snapshot.folders[snapshot.folders.length-1].id;renderFolders();renderTracks();}});
 $('companion-rename-folder').onclick=guard(async()=>{const folder=snapshot?.folders.find(f=>f.id===folderView);if(folder){const name=await askFolder('שינוי שם התיקייה',folder.name);if(name)await command('folder_rename',{id:folder.id,name});}});
-$('companion-delete-folder').onclick=guard(async()=>{if(folderView==='all')return;const d=$('confirm-dialog');$('confirm-title').textContent='למחוק את התיקייה? השיעורים יישארו בספרייה.';d.returnValue='cancel';const yes=await new Promise(resolve=>{d.addEventListener('close',()=>resolve(d.returnValue==='yes'),{once:true});d.showModal();});if(yes)await command('folder_delete',{id:folderView});});
+$('companion-delete-folder').onclick=guard(async()=>{if(folderView==='all')return;const d=$('confirm-dialog');$('confirm-title').textContent='למחוק את התיקייה? השיעורים יישארו בספרייה.';d.returnValue='cancel';const yes=await new Promise(resolve=>{d.addEventListener('close',()=>resolve(d.returnValue==='yes'),{once:true});ShiurLocale.apply();d.showModal();});if(yes)await command('folder_delete',{id:folderView});});
 document.addEventListener('keydown',event=>{
  if(!visible||!snapshot||event.ctrlKey||event.altKey||event.metaKey||event.repeat||event.isComposing||document.querySelector('dialog[open]')||event.target.closest('input,select,textarea,button,summary,[contenteditable="true"]'))return;
  const key=/^Key[A-Z]$/.test(event.code)?event.code.slice(3).toLowerCase():event.key.toLowerCase();let task;
@@ -96,26 +102,31 @@ document.addEventListener('keydown',event=>{
 });
 function renderMarks(){
  const box=$('companion-marks');box.replaceChildren();if(!snapshot?.currentId)return;
- for(const mark of marks[snapshot.currentId]||[]){const row=document.createElement('div');row.className='bookmark-row';const b=document.createElement('button');b.textContent=`${format(mark.position)} · ${mark.name}`;b.onclick=guard(()=>command('seek',{value:mark.position}));const del=document.createElement('button');del.textContent='×';del.setAttribute('aria-label','מחיקת סימנייה');del.onclick=guard(async()=>{marks[snapshot.currentId]=marks[snapshot.currentId].filter(m=>m.id!==mark.id);await saveMarks();renderMarks();});row.append(b,del);box.append(row);}
+ for(const mark of marks[snapshot.currentId]||[]){const row=document.createElement('div');row.className='bookmark-row';const b=document.createElement('button');b.dataset.userText='';b.textContent=`${format(mark.position)} · ${mark.name}`;b.onclick=guard(()=>command('seek',{value:mark.position}));const del=document.createElement('button');del.textContent='×';del.setAttribute('aria-label','מחיקת סימנייה');del.onclick=guard(async()=>{marks[snapshot.currentId]=marks[snapshot.currentId].filter(m=>m.id!==mark.id);await saveMarks();renderMarks();});row.append(b,del);box.append(row);}
+ ShiurLocale.apply();
 }
 async function saveMarks(){const r=await window.Otzaria.call('storage.set',{key:'companion-bookmarks-v1',value:marks});if(!r.success)throw Error('שמירת הסימניות נכשלה.');}
 async function refresh(){
  if(polling||!token||!visible)return;polling=true;
- try{snapshot=await request('/v1/state');renderState();if(lastError){tell('מחובר. ההאזנה תימשך גם כשהתוסף מוסתר.');lastError='';}}
+ try{snapshot=await request('/v1/state');if(snapshot.libraryRevision!==libraryRevision){const lib=await request('/v1/library');tracks=lib.tracks;libraryRevision=snapshot.libraryRevision;renderTracks();}renderState();if(lastError){tell('מחובר. ההאזנה תימשך גם כשהתוסף מוסתר.');lastError='';}}
  catch(e){lastError=e.message;tell('החיבור לנגן המלווה אבד. בדקו שהחלון שלו פתוח. '+e.message,true);}
  finally{polling=false;}
 }
-$('open-companion').onclick=()=>{visible=true;setup.open=true;document.querySelector('.notice').hidden=true;document.querySelector('main').hidden=true;section.hidden=false;document.querySelector('#audio').pause();if(!timer)timer=setInterval(refresh,1000);};
+$('open-companion').onclick=()=>{visible=true;setup.hidden=false;setup.open=true;document.querySelector('.notice').hidden=true;document.querySelector('main').hidden=true;section.hidden=false;document.querySelector('#audio').pause();if(!timer)timer=setInterval(refresh,1000);};
 $('companion-back').onclick=guard(async()=>{try{if(token)await command('pause');}catch(e){$('status').textContent='לא ניתן להשהות את הנגן המלווה. אפשר לעצור אותו בחלון שלו.';$('status').classList.add('error');}finally{visible=false;section.hidden=true;document.querySelector('.notice').hidden=false;document.querySelector('main').hidden=false;}});
 async function connect(){
  token=$('companion-token').value.trim();if(!token)throw Error('הדביקו את קוד הצימוד מהנגן המלווה.');
- const library=await request('/v1/library');tracks=library.tracks;renderTracks();snapshot=await request('/v1/state');renderState();await syncFloatingTheme(ShiurUI.currentTheme);const saved=await window.Otzaria.call('storage.set',{key:'companion-connection-v1',value:{token:$('companion-remember').checked?token:null}});if(!saved.success)throw Error('החיבור הצליח, אך לא ניתן לשמור את ההעדפה.');setup.open=false;tell(`מחובר · ${tracks.length} שיעורים. ההאזנה תימשך גם כשהתוסף מוסתר.`);
+ const library=await request('/v1/library');tracks=library.tracks;snapshot=await request('/v1/state');if(typeof snapshot.libraryRevision!=='number')throw Error('עדכנו גם את התוכנה במחשב מה־ZIP החדש.');connected=true;libraryRevision=snapshot.libraryRevision;const preference=await window.Otzaria.call('storage.get',{key:'interface-language-v1'});if(languageChosen&&preference.success&&['he','en'].includes(preference.data))snapshot=await request('/v1/command',{op:'language',value:preference.data});renderTracks();renderState();await syncFloatingTheme(ShiurUI.currentTheme);const saved=await window.Otzaria.call('storage.set',{key:'companion-connection-v1',value:{token:$('companion-remember').checked?token:null}});if(!saved.success)throw Error('החיבור הצליח, אך לא ניתן לשמור את ההעדפה.');setup.open=false;setup.hidden=true;await command('hide_window');tell(`מחובר · ${tracks.length} שיעורים. ההאזנה תימשך גם כשהתוסף מוסתר.`);
 }
 $('companion-connect').onclick=guard(connect);
 $('companion-remember').onchange=guard(async()=>{if(!$('companion-remember').checked){const r=await window.Otzaria.call('storage.set',{key:'companion-connection-v1',value:{token:null}});if(!r.success)throw Error('לא ניתן למחוק את החיבור השמור.');}});
 $('companion-filter').onchange=renderTracks;
 $('companion-sleep').onchange=guard(()=>command('sleep_timer',{minutes:Number($('companion-sleep').value)}));
-$('companion-refresh').onclick=guard(async()=>{const lib=await request('/v1/library');tracks=lib.tracks;renderTracks();await refresh();});
+$('companion-refresh').textContent='סריקה מחדש';
+$('companion-refresh').onclick=guard(async()=>{await command('rescan');const lib=await request('/v1/library');tracks=lib.tracks;renderTracks();await refresh();});
+$('choose-recordings-folder').onclick=guard(async()=>{await command('choose_folder');tell('פתיחת התיקייה נעשית בחלון הנגן במחשב.');});
+$('show-companion-window').onclick=guard(()=>command('show_window'));
+$('interface-language').onchange=guard(async()=>{const value=$('interface-language').value;languageChosen=true;ShiurLocale.set(value);await window.Otzaria.call('storage.set',{key:'interface-language-v1',value});if(connected)await command('language',{value});});
 $('companion-floating').onclick=guard(()=>command('floating_toggle'));
 $('companion-stop').onclick=guard(()=>command('stop'));
 $('companion-play').onclick=guard(()=>command(snapshot?.status==='playing'?'pause':'play'));
@@ -126,6 +137,6 @@ $('companion-seek').onchange=guard(()=>command('seek',{value:Number($('companion
 $('companion-speed').onchange=guard(()=>command('speed',{value:Number($('companion-speed').value)}));$('companion-volume').onchange=guard(()=>command('volume',{value:Number($('companion-volume').value)}));
 $('companion-auto').onchange=guard(()=>command('autonext',{value:$('companion-auto').checked}));$('companion-search').oninput=renderTracks;
 $('companion-mark').onclick=guard(async()=>{if(!snapshot?.currentId)throw Error('בחרו שיעור תחילה.');snapshot=await request('/v1/state');const name=$('companion-mark-name').value.trim()||'סימנייה';(marks[snapshot.currentId]||=[]).push({id:crypto.randomUUID(),position:snapshot.position,name});await saveMarks();$('companion-mark-name').value='';renderMarks();});
-if(window.Otzaria){window.Otzaria.on('plugin.boot',guard(async()=>{hostReady=true;const r=await window.Otzaria.call('storage.get',{key:'companion-bookmarks-v1'});if(!r.success)throw Error('טעינת הסימניות נכשלה.');marks=r.data||{};const connection=await window.Otzaria.call('storage.get',{key:'companion-connection-v1'});if(connection.success&&typeof connection.data?.token==='string'&&connection.data.token){$('companion-token').value=connection.data.token;$('companion-remember').checked=true;try{await connect();}catch(e){tell('החיבור השמור אינו זמין. הפעילו את הנגן או הדביקו קוד צימוד עדכני. '+e.message,true);}}}));window.Otzaria.on('plugin.suspended',()=>{visible=false;});window.Otzaria.on('plugin.resumed',()=>{visible=!section.hidden;refresh();});}
-$('open-companion').click();
+if(window.Otzaria){window.Otzaria.on('plugin.boot',guard(async()=>{hostReady=true;const lang=await window.Otzaria.call('storage.get',{key:'interface-language-v1'});if(lang.success)ShiurLocale.set(lang.data);const r=await window.Otzaria.call('storage.get',{key:'companion-bookmarks-v1'});if(!r.success)throw Error('טעינת הסימניות נכשלה.');marks=r.data||{};const connection=await window.Otzaria.call('storage.get',{key:'companion-connection-v1'});if(connection.success&&typeof connection.data?.token==='string'&&connection.data.token){$('companion-token').value=connection.data.token;$('companion-remember').checked=true;try{await connect();}catch(e){tell('החיבור השמור אינו זמין. הפעילו את הנגן או הדביקו קוד צימוד עדכני. '+e.message,true);}}}));window.Otzaria.on('plugin.suspended',()=>{visible=false;});window.Otzaria.on('plugin.resumed',()=>{visible=!section.hidden;refresh();});}
+updateControls();$('open-companion').click();ShiurLocale.apply();
 })();
