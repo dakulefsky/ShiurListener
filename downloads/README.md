@@ -49,3 +49,7 @@ Download **shiur-player-1.4.3.otzplugin**. The manifest credits **DanTheMAn** as
 ## נגן שיעורים 1.4.4 — publishing review
 
 Download **shiur-player-1.4.4.otzplugin**. Author **DanTheMAn**, project homepage and explicit experimental stability are included. The official validator built the archive and validated its contents against the current SDK specification: zero errors, warnings or design findings. [Upload requirements and sources](../player/STORE_UPLOAD.md). No store submission was performed.
+
+## נגן שיעורים 1.4.5 — author spelling
+
+Download **shiur-player-1.4.5.otzplugin**. The author is exactly **DanTheMan**. All other manifest settings and playback behavior are retained. The official validator passes with zero errors or warnings. [Screenshot](../previews/shiur-player-plugin-1.4.5.png).

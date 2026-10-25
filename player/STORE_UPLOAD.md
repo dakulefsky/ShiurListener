@@ -1,4 +1,4 @@
-# Store upload review — נגן שיעורים 1.4.4
+# Store upload review — נגן שיעורים 1.4.5
 
 Reviewed on October 25, 2026 against the official SDK documentation, official validator and store upload code. This review concerns the Otzaria plugin, not the standalone Windows app.
 
@@ -11,9 +11,9 @@ Sources: [SDK manifest documentation](https://github.com/Otzaria/otzaria/blob/de
 | `schemaVersion` | Basic manifest requirement; must be 1 | `1` |
 | `id` | Unique, stable plugin identifier | `org.shiurplayer.local` |
 | `name` | Required; at most 14 characters | `נגן שיעורים` (11 characters) |
-| `author` | Required for store upload; at most 100 characters | `DanTheMAn` |
+| `author` | Required for store upload; at most 100 characters | `DanTheMan` |
 | `description` | Required for store upload; at most 150 characters | Present, 73 characters |
-| `version` | Required; `X.Y.Z`, with optional build metadata | `1.4.4` |
+| `version` | Required; `X.Y.Z`, with optional build metadata | `1.4.5` |
 | `entrypoint` | Required; existing local entry file | `index.html` |
 | `minAppVersion` | Required; must cover the APIs/permissions used and be at least the store floor, currently 0.9.89 | `0.9.98`, checked against the current SDK spec |
 | `sdkVersion` | Basic manifest requirement | `1.x` |
@@ -24,7 +24,7 @@ Sources: [SDK manifest documentation](https://github.com/Otzaria/otzaria/blob/de
 
 Network access remains disabled. Permissions remain `fs.user_files.read`, `app.startup_contributions`, and `reader.toolbar`. The ID and storage keys are unchanged, so this remains an update to the existing plugin.
 
-The original pre-1.4.3 manifest omitted the store-required `author`. Version 1.4.3 already corrected that and passed validation. Version 1.4.4 adds the recommended homepage and makes stability explicit; neither field should be misrepresented as mandatory.
+The original pre-1.4.3 manifest omitted the store-required `author`. Version 1.4.3 already corrected that and passed validation. Version 1.4.4 adds the recommended homepage and makes stability explicit; neither field should be misrepresented as mandatory. Version 1.4.5 corrects the author capitalization to `DanTheMan`.
 
 ## What was validated
 
@@ -45,7 +45,7 @@ These are developer checks; installed-plugin users need no Node/Python installat
 
 The store separately requires an account/login, a long description, at least one screenshot (at most 10), and the publisher's explicit consent to receive user bug reports at the account email. A new listing also waits for administrator approval. These are upload-form requirements, not extra manifest fields. They cannot be satisfied by inventing fields such as `reportsConsent` inside `manifest.json`.
 
-Use [this screenshot](../previews/shiur-player-plugin-1.4.4.png) if suitable. It is a capture of the actual plugin interface in Chromium with sample recordings and a simulated host bridge, not a capture from an installed Otzaria desktop app.
+Use [this screenshot](../previews/shiur-player-plugin-1.4.5.png) if suitable. It is a capture of the actual plugin interface in Chromium with sample recordings and a simulated host bridge, not a capture from an installed Otzaria desktop app.
 
 Suggested long description:
 
