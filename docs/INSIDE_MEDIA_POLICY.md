@@ -15,3 +15,8 @@ Expose narrowly scoped play/pause/seek/rate/status operations. Floating controls
 A waveform by itself does not establish whether content is a shiur. Offline audio classification could estimate speech/music, using repeated windows across the recording, but is probabilistic: singing, introductions, background music and silence complicate decisions; podcasts and spoken non-Torah content can also pass. A detector would need a chosen model, measured accuracy on representative Hebrew/Yiddish shiurim and music, thresholds, CPU/storage measurements and a policy for uncertain cases. No classifier has been added or evaluated in this release. It should not be represented as a reliable music ban.
 
 If administrators require a stronger content restriction, restrict playback to a curated approved catalog or authenticated content manifest, with verification enforced by the host. That trades arbitrary personal-file import for source control. A publisher signature establishes the source/approval process, not semantic truth about the recording.
+
+## Detailed handoff
+
+- [Hebrew host restriction specification](INSIDE_RESTRICTIONS_FOR_DEVELOPERS.he.md)
+- [Offline sound-analysis experiment plan](INSIDE_SOUND_ANALYSIS_PLAN.md)
