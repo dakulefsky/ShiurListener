@@ -180,6 +180,30 @@ func makeLink(file, target, working string, ole *syscall.LazyDLL) error {
 	if failed(iconResult) {
 		return fmt.Errorf("Could not set the player shortcut icon")
 	}
+	// Associate the installed shortcut with the GUI process, rather than pythonw.exe.
+	storeIID := guid{0x886D8EEB, 0x8CF2, 0x4446, [8]byte{0x8D, 0x02, 0xCD, 0xBA, 0x1D, 0xBD, 0xCF, 0x99}}
+	var store uintptr
+	if failed(comMethod(link, 0, uintptr(unsafe.Pointer(&storeIID)), uintptr(unsafe.Pointer(&store)))) {
+		return fmt.Errorf("Could not configure shortcut taskbar identity")
+	}
+	defer comMethod(store, 2)
+	key := struct {
+		Format guid
+		ID     uint32
+	}{guid{0x9F4C2855, 0x9F79, 0x4B39, [8]byte{0xA8, 0xD0, 0xE1, 0xD4, 0x2D, 0xE1, 0xD5, 0xF3}}, 5}
+	// PROPVARIANT, VT_LPWSTR, x64 layout. The UTF-16 buffer is borrowed for SetValue.
+	appID := wide("ShiurPlayer.Standalone")
+	value := struct {
+		Type         uint16
+		Reserved     [3]uint16
+		Text         uintptr
+		UnionPadding uintptr
+	}{Type: 31, Text: uintptr(unsafe.Pointer(appID))}
+	propertyResult := comMethod(store, 6, uintptr(unsafe.Pointer(&key)), uintptr(unsafe.Pointer(&value)))
+	runtime.KeepAlive(appID)
+	if failed(propertyResult) || failed(comMethod(store, 7)) {
+		return fmt.Errorf("Could not save shortcut taskbar identity")
+	}
 	persistIID := guid{0x0000010B, 0, 0, [8]byte{0xC0, 0, 0, 0, 0, 0, 0, 0x46}}
 	var persist uintptr
 	if failed(comMethod(link, 0, uintptr(unsafe.Pointer(&persistIID)), uintptr(unsafe.Pointer(&persist)))) {

@@ -241,6 +241,7 @@ class PlayerWindow:
   self.brand_small=self.brand_image.subsample(2,2)
   tk.Label(brand,image=self.brand_small,bg=SIDEBAR).pack(side='left',padx=(0,10))
   self.root.iconphoto(True,self.brand_image)
+  if sys.platform=='win32':self.root.iconbitmap(default=str(pathlib.Path(__file__).parent/'assets/shiur-player.ico'))
   self.label(brand,'Shiur Player',16,anchor='w').pack(side='left')
   bottom=tk.Frame(self.sidebar,bg=SIDEBAR);bottom.pack(side='bottom',fill='x',padx=10,pady=(6,12))
   self.folder_label=self.label(bottom,'No folder selected',9,MUTED,wraplength=170,anchor='w');self.folder_label.pack(fill='x',padx=12,pady=(6,8))

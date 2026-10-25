@@ -5,6 +5,7 @@ runtime=pathlib.Path(__file__).resolve().parent/'runtime'
 if (runtime/'tcl/tcl8.6').is_dir():
  os.environ['TCL_LIBRARY']=str(runtime/'tcl/tcl8.6')
  os.environ['TK_LIBRARY']=str(runtime/'tcl/tk8.6')
+from windows_identity import configure_taskbar
 from engine import Player,VLC
 from controller import LibraryController
 from floating_bar import FloatingBar
@@ -14,6 +15,7 @@ from window import PlayerWindow
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--folder');parser.add_argument('--data-dir');args=parser.parse_args()
  if sys.platform!='win32':raise RuntimeError('This desktop build is for Windows.')
+ configure_taskbar()
  data=args.data_dir or str(pathlib.Path(os.environ.get('LOCALAPPDATA',pathlib.Path.home()))/'ShiurPlayerStandalone')
  backend=VLC();player=None;bar=None;keys=None;worker=None;stop=threading.Event()
  try:
