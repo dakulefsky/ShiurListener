@@ -40,8 +40,10 @@ def layout(width,height,collapsed=False,hovered=False):
          103:(pad+back+play+2*gap,34,back,row_height),106:(width-pad-speed,34,speed,row_height),
          104:(pad,bottom,width-2*pad,20),107:(pad,height-10,width-2*pad,8)}
 
-def hit_test(x,y,width,height,collapsed=False):
- """Win32 hit targets: resize edges in expanded mode; empty surface drags."""
+def hit_test(x,y,width,height,collapsed=False,hovered=False):
+ """Return HTCLIENT over controls so Windows can route clicks to child buttons."""
+ for ident,(left,top,w,h) in layout(width,height,collapsed,hovered).items():
+  if ident in (101,102,103,105,106,107,108) and left<=x<left+w and top<=y<top+h:return 1
  if not collapsed:
   left=x<6;right=x>=width-6;top=y<6;bottom=y>=height-6
   if top and left:return 13
@@ -52,7 +54,7 @@ def hit_test(x,y,width,height,collapsed=False):
   if right:return 11
   if top:return 12
   if bottom:return 15
- return 2
+ return 2 # Only empty surface is draggable.
 
 class HoverIntent:
  """Delay layout changes and ignore pointer noise while clicking or dragging."""
@@ -209,7 +211,8 @@ class FloatingBar:
     if msg==0x0084:
      rect=w.RECT();getrect(hwnd,ctypes.byref(rect))
      x=ctypes.c_short(lp&0xffff).value-rect.left;y=ctypes.c_short((lp>>16)&0xffff).value-rect.top
-     return hit_test(x,y,rect.right-rect.left,rect.bottom-rect.top,collapsed)
+     client=w.RECT();clientrect(hwnd,ctypes.byref(client))
+     return hit_test(x,y,client.right,client.bottom,collapsed,hovered)
     if msg==0x0005:resize();return 0
     if msg==0x0231:sizing=True;return 0
     if msg==0x0232:

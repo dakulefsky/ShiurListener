@@ -1,8 +1,8 @@
-# Shiur Player 0.9.2
+# Shiur Player 0.9.3
 
 An English-only local Windows x64 desktop player with a light interface, rounded controls, violet accents and a dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
 
-Close the old player and run **shiur-player-setup-0.9.2.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
+Close the old player and run **shiur-player-setup-0.9.3.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
 
 Click **Check for updates** in the app for subsequent releases. Checks run only when requested. The app fetches a small release JSON from this repository, validates its version/URL/size/SHA-256, downloads the installer in a worker thread, saves playback state and starts setup. Setup waits for the old player process to exit before selecting and starting the new version. Program files use separate version directories and an atomic `active.json` pointer, leaving the previous version selected if extraction/activation fails. User data and audio recordings are outside the installation tree. Previous program versions are retained; old portable copies are not removed.
 
@@ -65,23 +65,23 @@ Both main and mini speed buttons use 1 → 1.5 → 2 → 0.5 → 1×, regardless
 
 Favorites controls are removed from the interface; existing profile metadata is retained. Rename recording in More or the right-click menu renames the actual audio file and migrates its saved position, bookmarks, collections and queue entries. The audio extension stays unchanged; conflicting or invalid names are rejected. Renaming an active recording briefly reloads it at its saved place and preserves paused/playing state.
 
-## Tiny floating player (0.9.2)
+## Tiny floating player (0.9.3)
 
-Click the minus button in the floating mini player to collapse it into a 144 × 44 draggable pill. Play/pause remains available; click the expand arrow to restore the previous mini-player size. Drag the empty left edge to reposition the pill. Collapsing does not pause playback. The collapsed preference and position are saved, and the expanded size is kept separately. Included in the 0.9.2 installer; native Windows visual testing remains required.
+Click the minus button in the floating mini player to collapse it into a 144 × 44 draggable pill. Play/pause remains available; click the expand arrow to restore the previous mini-player size. Drag the empty left edge to reposition the pill. Collapsing does not pause playback. The collapsed preference and position are saved, and the expanded size is kept separately. Included in the 0.9.3 installer; native Windows visual testing remains required.
 
-### Hover controls and individual speeds (0.9.2)
+### Hover controls and individual speeds (0.9.3)
 
-Hover over the tiny pill to reveal backward/forward skip buttons using the configured 10/15/60-second interval. Moving away hides them again; hovering does not issue playback commands. Each recording saves its playback speed independently, including changes from the mini player, and restores it after switching recordings or restarting. Recordings without a saved speed start at 1×. The speed cycle remains 1× → 1.5× → 2× → 0.5× → 1×. Included in the 0.9.2 installer; native Windows visual verification remains outstanding.
+Hover over the tiny pill to reveal backward/forward skip buttons using the configured 10/15/60-second interval. Moving away hides them again; hovering does not issue playback commands. Each recording saves its playback speed independently, including changes from the mini player, and restores it after switching recordings or restarting. Recordings without a saved speed start at 1×. The speed cycle remains 1× → 1.5× → 2× → 0.5× → 1×. Included in the 0.9.3 installer; native Windows visual verification remains outstanding.
 
-### Frameless mini-player design (0.9.2)
+### Frameless mini-player design (0.9.3)
 
-The floating panel now removes the native Windows caption and frame, uses a light neutral surface with a violet transport control, draws transport/expand icons directly, and highlights secondary controls on hover. Empty panel space drags; expanded edges/corners resize. Rounded corners use Windows 11 DWM when available, with a rounded-region fallback for older Windows. Native button labels remain available for accessibility despite icon drawing. Existing custom floating themes remain supported. No additional runtime dependency is needed. Included in the 0.9.2 installer; native Windows visual verification remains outstanding.
+The floating panel now removes the native Windows caption and frame, uses a light neutral surface with a violet transport control, draws transport/expand icons directly, and highlights secondary controls on hover. Empty panel space drags; expanded edges/corners resize. Rounded corners use Windows 11 DWM when available, with a rounded-region fallback for older Windows. Native button labels remain available for accessibility despite icon drawing. Existing custom floating themes remain supported. No additional runtime dependency is needed. Included in the 0.9.3 installer; native Windows visual verification remains outstanding.
 
-### Full-app visual refresh (0.9.2)
+### Full-app visual refresh (0.9.3)
 
 The library, sidebar, search field, playback dock, queue, settings, listening tools and text-entry dialogs now share the mini-player’s violet accent and soft neutral palette. Library, search and playback areas use rounded surfaces; settings use keyboard-operable switches. Text-entry dialogs use matching controls and preserve cancellation/number validation. Existing playback, saved positions, individual recording speeds, backups and keyboard shortcuts remain in place. The main app retains standard OS window controls for minimizing, maximizing and resizing; the floating player remains frameless.
 
-Screenshots of the running development UI with demonstration library data: [main window](../previews/shiur-player-modern-development.png), [settings](../previews/shiur-player-modern-settings.png), [listening tools](../previews/shiur-player-modern-tools.png), [queue](../previews/shiur-player-modern-queue.png). These were captured on a Linux virtual display with Tk 8.6; they are not Windows screenshots. This refresh is included in the 0.9.2 installer.
+Screenshots of the running development UI with demonstration library data: [main window](../previews/shiur-player-modern-development.png), [settings](../previews/shiur-player-modern-settings.png), [listening tools](../previews/shiur-player-modern-tools.png), [queue](../previews/shiur-player-modern-queue.png). These were captured on a Linux virtual display with Tk 8.6; they are not Windows screenshots. This refresh is included in the 0.9.3 installer.
 
 ## 0.9.1 taskbar identity
 
@@ -92,3 +92,7 @@ The GUI sets a stable Windows AppUserModelID before creating windows, and setup 
 The main playback dock has Collapse player / Expand player controls. Its compact view keeps the title, play/pause and speed available, frees library space, and remembers the choice across restarts. Playback does not stop when collapsing.
 
 Tiny-player hover now waits 200 ms before revealing skips and 450 ms before hiding them, ignores brief crossings and holds its layout while clicking or dragging. Hover resizing no longer rebuilds the native window frame; leaving restores the original position when expansion had to shift away from a screen edge. An explicit WM_PAINT handler clears invalidated background areas, and unchanged layouts do not repeatedly show/move controls. Automated timing, transport, painting and actual Tk collapse/restore checks pass; native Windows pointer/rendering verification remains outstanding.
+
+## 0.9.3 mini-player click routing
+
+Corrects WM_NCHITTEST: clickable control rectangles return HTCLIENT before resize/drag handling. Only empty surface returns HTCAPTION. The parent previously treated button areas as a draggable caption, which could stop Windows from routing pointer input to child controls. Tests now exercise the registered native window procedure’s hit targets for play/pause, skip, speed, expand, Open and seek, in addition to command notifications. Actual physical Windows mouse interaction remains unverified here.

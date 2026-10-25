@@ -21,6 +21,12 @@ class TestBar(unittest.TestCase):
   for point,target in [((1,1),13),((359,1),14),((1,149),16),((359,149),17),((1,50),10),((359,50),11),((80,1),12),((80,149),15),((80,20),2)]:
    self.assertEqual(module.hit_test(*point,360,150),target)
   self.assertEqual(module.hit_test(1,1,144,44,collapsed=True),2)
+ def test_buttons_are_client_targets_not_window_drag_targets(self):
+  for width,height,collapsed,hovered in [(360,150,False,False),(144,44,True,False),(252,44,True,True)]:
+   for ident,(x,y,w,h) in module.layout(width,height,collapsed,hovered).items():
+    if ident in (101,102,103,105,106,107,108):
+     self.assertEqual(module.hit_test(x+w//2,y+h//2,width,height,collapsed,hovered),1,f'Control {ident} must receive clicks')
+   self.assertEqual(module.hit_test(8,20,width,height,collapsed,hovered),2)
  def test_hover_waits_for_intent_and_ignores_brief_crossings(self):
   intent=module.HoverIntent()
   self.assertFalse(intent.update(True,0))
@@ -81,7 +87,12 @@ class TestBar(unittest.TestCase):
     if not parent:registered_style.append(ex);window_sizes.append((width,height,style))
     return next_handle
    def message(pointer,*args):
-    if not messages:return 0
+    if not messages:
+     for ident,(x,y,width,height) in module.layout(404,140).items():
+      if ident in (101,102,103,105,106,107,108):
+       packed=((96+y+height//2)&0xffff)<<16 | ((72+x+width//2)&0xffff)
+       self.assertEqual(callbacks['proc'](11,0x0084,0,packed),1,f'Native control {ident} must be clickable')
+     return 0
     msg,wp=messages.pop(0)
     if msg==0x113 and wp:
      fake_clock[0]=wp*.25;cursor_position[:]=[80,100] if wp<=3 else [0,0]
