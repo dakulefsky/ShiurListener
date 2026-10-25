@@ -76,3 +76,9 @@ Hover over the tiny pill to reveal backward/forward skip buttons using the confi
 ### Frameless mini-player design (development)
 
 The floating panel now removes the native Windows caption and frame, uses a light neutral surface with a violet transport control, draws transport/expand icons directly, and highlights secondary controls on hover. Empty panel space drags; expanded edges/corners resize. Rounded corners use Windows 11 DWM when available, with a rounded-region fallback for older Windows. Native button labels remain available for accessibility despite icon drawing. Existing custom floating themes remain supported. No additional runtime dependency is needed. Native visual verification and installer packaging remain outstanding.
+
+### Full-app visual refresh (development)
+
+The library, sidebar, search field, playback dock, queue, settings, listening tools and text-entry dialogs now share the mini-player’s violet accent and soft neutral palette. Library, search and playback areas use rounded surfaces; settings use keyboard-operable switches. Text-entry dialogs use matching controls and preserve cancellation/number validation. Existing playback, saved positions, individual recording speeds, backups and keyboard shortcuts remain in place. The main app retains standard OS window controls for minimizing, maximizing and resizing; the floating player remains frameless.
+
+Screenshots of the running development UI with demonstration library data: [main window](../previews/shiur-player-modern-development.png), [settings](../previews/shiur-player-modern-settings.png), [listening tools](../previews/shiur-player-modern-tools.png), [queue](../previews/shiur-player-modern-queue.png). These were captured on a Linux virtual display with Tk 8.6; they are not Windows screenshots. This source refresh is not included in the current installer.

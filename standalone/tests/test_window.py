@@ -7,6 +7,59 @@ from controller import LibraryController
 import test_player
 @unittest.skipUnless(os.environ.get('DISPLAY') or sys.platform=='win32','Needs a desktop display')
 class Tests(unittest.TestCase):
+ def test_queue_actions_fit_at_minimum_window_size(self):
+  from window import SoftButton
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.show_queue()
+   pop=window.queue_window;pop.geometry('600x430');window.root.update()
+   buttons=[child for frame in pop.winfo_children() for child in frame.winfo_children() if isinstance(child,SoftButton)]
+   self.assertEqual(len(buttons),4)
+   for button in buttons:
+    self.assertGreater(button.winfo_height(),1)
+    self.assertLessEqual(button.winfo_rooty()+button.winfo_height(),pop.winfo_rooty()+pop.winfo_height())
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+ def test_modern_switch_keyboard_does_not_pause_playback(self):
+  import tkinter as tk
+  from window import SoftToggle
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   fixture.library.play();fixture.player.tick()
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.update()
+   value=tk.BooleanVar(window.root,value=False);calls=[]
+   switch=SoftToggle(window.dock,'Automatic next',value,lambda:calls.append(value.get()));switch.pack(fill='x')
+   window.root.update();switch.focus_force();window.root.update()
+   switch.event_generate('<KeyPress-space>');switch.event_generate('<KeyRelease-space>');window.root.update()
+   self.assertTrue(value.get());self.assertEqual(calls,[True]);self.assertEqual(fixture.backend.status,'playing')
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+ def test_modern_input_validates_then_accepts_and_escape_cancels(self):
+  import tkinter as tk
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.update()
+   def descendants(widget):
+    for child in widget.winfo_children():
+     yield child
+     yield from descendants(child)
+   def submit():
+    pop=next(w for w in window.root.winfo_children() if isinstance(w,tk.Toplevel))
+    entry=next(w for w in descendants(pop) if isinstance(w,tk.Entry))
+    entry.delete(0,'end');entry.insert(0,'181');pop.event_generate('<Return>');window.root.update()
+    self.assertTrue(pop.winfo_exists())
+    entry.delete(0,'end');entry.insert(0,'30');pop.event_generate('<Return>')
+   window.root.after(100,submit)
+   self.assertEqual(window.ask_value('Timer','Minutes',minvalue=0,maxvalue=180),30)
+   def cancel():
+    pop=next(w for w in window.root.winfo_children() if isinstance(w,tk.Toplevel));pop.event_generate('<Escape>')
+   window.root.after(100,cancel)
+   self.assertIsNone(window.ask_value('Name','Name your collection'))
+  finally:
+   if window:window.close()
+   fixture.tearDown()
  def test_minimize_opens_bar_and_restore_hides_only_automatic_bar(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   class Bar:
