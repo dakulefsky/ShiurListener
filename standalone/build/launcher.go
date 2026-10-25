@@ -21,13 +21,15 @@ func fail(message string) {
 	os.Exit(1)
 }
 func main() {
-	className := ptr("Shiur Player — Your listening library")
-	existing, _, _ := user.NewProc("FindWindowW").Call(0, uintptr(unsafe.Pointer(className)))
-	runtime.KeepAlive(className)
-	if existing != 0 {
-		user.NewProc("ShowWindow").Call(existing, 9)
-		user.NewProc("SetForegroundWindow").Call(existing)
-		return
+	for _, title := range []string{"Shiur Player", "Shiur Player — Your listening library"} {
+		className := ptr(title)
+		existing, _, _ := user.NewProc("FindWindowW").Call(0, uintptr(unsafe.Pointer(className)))
+		runtime.KeepAlive(className)
+		if existing != 0 {
+			user.NewProc("ShowWindow").Call(existing, 9)
+			user.NewProc("SetForegroundWindow").Call(existing)
+			return
+		}
 	}
 	executable, err := os.Executable()
 	if err != nil {

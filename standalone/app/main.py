@@ -19,9 +19,9 @@ def main():
  try:
   player=Player(args.folder,data,backend);controller=LibraryController(player);player.saved['language']='en'
   player.saved.setdefault('floatingVisible',False)
-  player.saved.setdefault('floatingTheme',{'primary':'#4263EB','onPrimary':'#FFFFFF','surface':'#FFFFFF','onSurface':'#202A3B','surfaceContainer':'#EDF1F8','fontFamily':'Rubik'})
-  if player.saved['floatingTheme'].get('primary') in ('#245C49','#4169E1','#214CDB','#526BFF'):
-   player.saved['floatingTheme'].update(primary='#4263EB',surface='#FFFFFF',onSurface='#202A3B',surfaceContainer='#EDF1F8')
+  player.saved.setdefault('floatingTheme',{'primary':'#6558D3','onPrimary':'#FFFFFF','surface':'#FFFFFF','onSurface':'#242332','surfaceContainer':'#E9E7F0','fontFamily':'Rubik'})
+  if player.saved['floatingTheme'].get('primary') in ('#245C49','#4169E1','#214CDB','#526BFF','#4263EB'):
+   player.saved['floatingTheme'].update(primary='#6558D3',surface='#FFFFFF',onSurface='#242332',surfaceContainer='#E9E7F0')
   bar=FloatingBar(player);player.floating_bar=bar
   def shortcuts(enabled):
    nonlocal keys

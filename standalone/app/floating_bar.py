@@ -297,7 +297,7 @@ class FloatingBar:
     bar_width=min(bar_width,max(1,width));bar_height=min(bar_height,max(1,height))
     x=max(left,min(x,left+max(0,width-bar_width)));y=max(top,min(y,top+max(0,height-bar_height)))
    # Frameless popup: custom hit targets retain resizing without a Windows title bar.
-   self.hwnd=create(0x08000088,name,'Shiur Player',(0x82000000 if collapsed else FRAMELESS_STYLE),x,y,bar_width,bar_height,None,None,instance,None)
+   self.hwnd=create(0x08000088,name,'Shiur Player Mini',(0x82000000 if collapsed else FRAMELESS_STYLE),x,y,bar_width,bar_height,None,None,instance,None)
    if not self.hwnd:raise OSError(ctypes.get_last_error(),'Could not create floating bar.')
    for ident in (100,104):controls[ident]=create(0,'STATIC','',0x50004000,0,0,1,1,self.hwnd,ident,instance,None)
    # SS_OWNERDRAW | SS_NOTIFY: clickable, without claiming a keyboard tab stop.

@@ -63,11 +63,13 @@ func setup() error {
 	} else if notice("Install Shiur Player for your Windows account?\n\nYour recordings and saved positions will be kept. No administrator access or separate runtime installation is needed.", 0x21) != 1 {
 		return nil
 	}
-	title := wide("Shiur Player — Your listening library")
-	existing, _, _ := user.NewProc("FindWindowW").Call(0, uintptr(unsafe.Pointer(title)))
-	runtime.KeepAlive(title)
-	if existing != 0 {
-		return fmt.Errorf("Close the currently running Shiur Player, then run this setup file again. Your listening positions will be kept.")
+	for _, caption := range []string{"Shiur Player", "Shiur Player — Your listening library"} {
+		title := wide(caption)
+		existing, _, _ := user.NewProc("FindWindowW").Call(0, uintptr(unsafe.Pointer(title)))
+		runtime.KeepAlive(title)
+		if existing != 0 {
+			return fmt.Errorf("Close the currently running Shiur Player, then run this setup file again. Your listening positions will be kept.")
+		}
 	}
 	local := os.Getenv("LOCALAPPDATA")
 	if local == "" {

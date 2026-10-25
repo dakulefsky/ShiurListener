@@ -1,8 +1,8 @@
-# Shiur Player 0.8.2
+# Shiur Player 0.9.0
 
-An English-only local Windows x64 desktop player with a light interface, rounded controls, blue accents and a dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
+An English-only local Windows x64 desktop player with a light interface, rounded controls, violet accents and a dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
 
-Close the old player and run **shiur-player-setup-0.8.2.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
+Close the old player and run **shiur-player-setup-0.9.0.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
 
 Click **Check for updates** in the app for subsequent releases. Checks run only when requested. The app fetches a small release JSON from this repository, validates its version/URL/size/SHA-256, downloads the installer in a worker thread, saves playback state and starts setup. Setup waits for the old player process to exit before selecting and starting the new version. Program files use separate version directories and an atomic `active.json` pointer, leaving the previous version selected if extraction/activation fails. User data and audio recordings are outside the installation tree. Previous program versions are retained; old portable copies are not removed.
 
@@ -16,7 +16,7 @@ Create and name collections yourself. Select a recording, click **Add to collect
 
 See [the instructions](READ%20ME%20FIRST.txt) for keyboard shortcuts. State stays at `%LOCALAPPDATA%\ShiurPlayerStandalone\state.json`; earlier Inside/Sidekick profiles remain separate.
 
-![Actual desktop-toolkit preview on Linux](../previews/shiur-player-0.8.2.png)
+![Actual desktop-toolkit preview on Linux](../previews/shiur-player-modern-development.png)
 
 ## New in 0.8.0
 
@@ -65,20 +65,20 @@ Both main and mini speed buttons use 1 → 1.5 → 2 → 0.5 → 1×, regardless
 
 Favorites controls are removed from the interface; existing profile metadata is retained. Rename recording in More or the right-click menu renames the actual audio file and migrates its saved position, bookmarks, collections and queue entries. The audio extension stays unchanged; conflicting or invalid names are rejected. Renaming an active recording briefly reloads it at its saved place and preserves paused/playing state.
 
-## Tiny floating player (development)
+## Tiny floating player (0.9.0)
 
-Click the minus button in the floating mini player to collapse it into a 144 × 44 draggable pill. Play/pause remains available; click the expand arrow to restore the previous mini-player size. Drag the empty left edge to reposition the pill. Collapsing does not pause playback. The collapsed preference and position are saved, and the expanded size is kept separately. This source change has not yet been included in a Windows installer; native Windows visual testing remains required.
+Click the minus button in the floating mini player to collapse it into a 144 × 44 draggable pill. Play/pause remains available; click the expand arrow to restore the previous mini-player size. Drag the empty left edge to reposition the pill. Collapsing does not pause playback. The collapsed preference and position are saved, and the expanded size is kept separately. Included in the 0.9.0 installer; native Windows visual testing remains required.
 
-### Hover controls and individual speeds (development)
+### Hover controls and individual speeds (0.9.0)
 
-Hover over the tiny pill to reveal backward/forward skip buttons using the configured 10/15/60-second interval. Moving away hides them again; hovering does not issue playback commands. Each recording saves its playback speed independently, including changes from the mini player, and restores it after switching recordings or restarting. Recordings without a saved speed start at 1×. The speed cycle remains 1× → 1.5× → 2× → 0.5× → 1×. These changes are not yet packaged in an installer or visually verified on Windows.
+Hover over the tiny pill to reveal backward/forward skip buttons using the configured 10/15/60-second interval. Moving away hides them again; hovering does not issue playback commands. Each recording saves its playback speed independently, including changes from the mini player, and restores it after switching recordings or restarting. Recordings without a saved speed start at 1×. The speed cycle remains 1× → 1.5× → 2× → 0.5× → 1×. Included in the 0.9.0 installer; native Windows visual verification remains outstanding.
 
-### Frameless mini-player design (development)
+### Frameless mini-player design (0.9.0)
 
-The floating panel now removes the native Windows caption and frame, uses a light neutral surface with a violet transport control, draws transport/expand icons directly, and highlights secondary controls on hover. Empty panel space drags; expanded edges/corners resize. Rounded corners use Windows 11 DWM when available, with a rounded-region fallback for older Windows. Native button labels remain available for accessibility despite icon drawing. Existing custom floating themes remain supported. No additional runtime dependency is needed. Native visual verification and installer packaging remain outstanding.
+The floating panel now removes the native Windows caption and frame, uses a light neutral surface with a violet transport control, draws transport/expand icons directly, and highlights secondary controls on hover. Empty panel space drags; expanded edges/corners resize. Rounded corners use Windows 11 DWM when available, with a rounded-region fallback for older Windows. Native button labels remain available for accessibility despite icon drawing. Existing custom floating themes remain supported. No additional runtime dependency is needed. Included in the 0.9.0 installer; native Windows visual verification remains outstanding.
 
-### Full-app visual refresh (development)
+### Full-app visual refresh (0.9.0)
 
 The library, sidebar, search field, playback dock, queue, settings, listening tools and text-entry dialogs now share the mini-player’s violet accent and soft neutral palette. Library, search and playback areas use rounded surfaces; settings use keyboard-operable switches. Text-entry dialogs use matching controls and preserve cancellation/number validation. Existing playback, saved positions, individual recording speeds, backups and keyboard shortcuts remain in place. The main app retains standard OS window controls for minimizing, maximizing and resizing; the floating player remains frameless.
 
-Screenshots of the running development UI with demonstration library data: [main window](../previews/shiur-player-modern-development.png), [settings](../previews/shiur-player-modern-settings.png), [listening tools](../previews/shiur-player-modern-tools.png), [queue](../previews/shiur-player-modern-queue.png). These were captured on a Linux virtual display with Tk 8.6; they are not Windows screenshots. This source refresh is not included in the current installer.
+Screenshots of the running development UI with demonstration library data: [main window](../previews/shiur-player-modern-development.png), [settings](../previews/shiur-player-modern-settings.png), [listening tools](../previews/shiur-player-modern-tools.png), [queue](../previews/shiur-player-modern-queue.png). These were captured on a Linux virtual display with Tk 8.6; they are not Windows screenshots. This refresh is included in the 0.9.0 installer.

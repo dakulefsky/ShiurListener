@@ -1,7 +1,7 @@
-SHIUR PLAYER 0.8.2 — WINDOWS INSTALLER AND IN-APP UPDATES
+SHIUR PLAYER 0.9.0 — WINDOWS INSTALLER AND IN-APP UPDATES
 
 ONE-TIME SETUP
-Close the older player. Run shiur-player-setup-0.8.2.exe and click OK.
+Close the older player. Run shiur-player-setup-0.9.0.exe and click OK.
 There is no ZIP to extract. Setup creates desktop and Start menu shortcuts.
 No administrator access, Python installation or VLC installation is needed.
 Use the Shiur Player shortcut to open the app on future days.
@@ -56,7 +56,7 @@ and embedded package contents were verified structurally. The actual Windows
 setup UI, shortcuts, restart flow and speaker output remain untested here.
 This is an unsigned per-user installer. Licenses are included with the app.
 
-NEW IN 0.8.2
+NEW IN 0.9.0
 Unplayed and Finished views are in the sidebar. More and right-click
 include Rename recording, Play next and Add to queue. Queue opens the editable play order.
 Listening tools has A-B section repeat, jump to time, skip interval and sleep
@@ -64,3 +64,9 @@ timer presets, including pause at the end of the current recording.
 Settings & backup exports/restores positions, collections and bookmarks to JSON.
 Restore pauses audio and keeps a safety backup. Audio files are not included.
 Ctrl+J jumps to time; Ctrl+M toggles mini player; in the list Ctrl+Q adds selected recordings to the queue. Mini progress is clickable.
+
+NEW IN 0.9.0
+Rounded violet-and-neutral interface throughout the app. Each recording remembers
+its own speed. In the floating player, click minus to collapse to a tiny pill.
+Hover over the pill to reveal skip buttons, or click the expand arrow to restore
+its previous size. Drag empty space to move it. No extra software is required.
