@@ -4,21 +4,23 @@ A Hebrew local-shiur player for Otzaria 0.9.98 or newer.
 
 ## Download
 
-- **[Plugin-only player 1.4.0](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-1.4.0.otzplugin)** — redesigned controls, recovery actions, saved positions and a bundled sound check. Install directly in Otzaria; no companion is required.
+- **[Inside 1.4.1 — plugin-only player](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/inside-1.4.1.otzplugin)** — redesigned controls, recovery actions, saved positions and a bundled sound check. Install directly in Otzaria; no companion is required.
 - [Sidekick 1.0.0 — Windows companion ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/sidekick-windows-x64-1.0.0.zip) — redesigned connection and playback controls, a refreshed floating bar, bundled runtimes and its Otzaria plugin.
-- [Plugin source and developer documents](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-source-1.4.0.zip).
+- [Plugin source and developer documents](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/inside-source-1.4.1.zip).
 - [Checksums](downloads/SHA256SUMS.txt).
+
+The old Hebrew message about sound being blocked “במופע הרקע” comes from the older background player, not Inside 1.4/1.4.1. Version 1.4.1 visibly labels the correct player; its audio engine is unchanged from 1.4.0. Install the update and fully restart Otzaria so an old page or background instance is not left running. Keep existing plugin data.
 
 ## Install the plugin-only player
 
-1. Install **shiur-player-1.4.0.otzplugin** as an update in Otzaria. Keep existing plugin data; do not uninstall first.
-2. Restart Otzaria once and allow reading user-selected files.
+1. Install **inside-1.4.1.otzplugin** as an update in Otzaria. Keep existing plugin data; do not uninstall first.
+2. Fully quit Otzaria (including its tray instance if it stays running), reopen it, and open **Inside** from the plugin list. Confirm that the heading says **Inside 1.4.1**. Allow reading user-selected files.
 3. Click **הוספת שיעור** or **ייבוא תיקייה**. Wait for **מוכן לניגון**, then press **ניגון**.
 4. If there is a problem, use **ניסיון נוסף**, or open **עזרה** and click **השמעת צליל בדיקה**. The help panel includes a direct audio strip. Expanded error details include the player version.
 
 The first new recording loads silently; selecting a recording does not automatically start sound. Existing folders, bookmarks and per-shiur positions are retained on update. The new layout puts playback controls first and moves less-used actions into menus.
 
-![Player 1.4.0](previews/player-1.4.0.png)
+![Inside 1.4.1](previews/inside-1.4.1.png)
 
 For reading while listening, right-click the player tab, choose **הצג לצד**, then choose an open book. Keep the player pane visible. **נגן קטן** reduces the controls. Hiding the player or minimizing Otzaria may pause it.
 
@@ -46,7 +48,7 @@ Sidekick plays independently of the visible Otzaria tab. Both plugins can remain
 
 Version 1.4.0 passes eight persistence regressions, real-WAV Chromium tests with click restrictions enabled, and a test using Otzaria's actual JavaScript bridge with a file-origin page and separate loopback media server. Startup retry, preservation after failed library reads, old-WebView UUID compatibility and missing-recording recovery are covered. The actual Otzaria packager validates its manifest and design.
 
-The exact cause of the user's original installation failure has not been established without its error message. The updated build has not been run in an installed Windows/macOS/Linux Otzaria application. Browser playback tests do not verify physical speaker output.
+The supplied background-policy error was traced to the old 1.2 background player. Inside 1.4.1 clearly labels the visible-page player, and an additional WAV playback/resume test passed through Otzaria's actual Dart file server. The updated build has not been run in an installed Windows/macOS/Linux Otzaria application. Browser playback tests do not verify physical speaker output.
 
 The companion Windows executable, floating bar and global shortcuts also remain unverified on a Windows computer. Its service and VLC decoding checks ran on Linux; VLC checks used a dummy audio output.
 

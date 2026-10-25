@@ -1,7 +1,7 @@
 """Stock Otzaria JS bridge, file:// UI, CSP and separate loopback media origin.
 This exercises Chromium rather than a Windows WebView2 installation.
 """
-import functools,http.server,json,os,pathlib,re,shutil,tempfile,threading,wave
+import functools,http.server,json,os,pathlib,re,shutil,tempfile,threading,wave,urllib.parse
 from playwright.sync_api import sync_playwright,expect
 from test_direct_player import MOCK,Quiet
 ROOT=pathlib.Path(__file__).resolve().parents[1]
@@ -24,8 +24,9 @@ def main():
   with wave.open(str(root/'sample.wav'),'wb') as f:
    f.setnchannels(1);f.setsampwidth(2);f.setframerate(8000);f.writeframes((ROOT/'plugin/sound-check.wav').read_bytes()[44:]*60)
   server=http.server.ThreadingHTTPServer(('127.0.0.1',0),functools.partial(Media,directory=tmp));threading.Thread(target=server.serve_forever,daemon=True).start()
-  media=f'http://127.0.0.1:{server.server_port}/f/org.shiurplayer.local/test-token'
-  csp=f"default-src 'self' file: data: blob: http://127.0.0.1:{server.server_port}/f/org.shiurplayer.local/ 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; base-uri 'self'; form-action 'self'"
+  media=os.environ.get('INSIDE_REAL_MEDIA_URL',f'http://127.0.0.1:{server.server_port}/f/org.shiurplayer.local/test-token')
+  media_port=urllib.parse.urlparse(media).port
+  csp=f"default-src 'self' file: data: blob: http://127.0.0.1:{media_port}/f/org.shiurplayer.local/ 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; base-uri 'self'; form-action 'self'"
   p=plugin/'index.html';p.write_text(p.read_text().replace('<head>','<head><meta http-equiv="Content-Security-Policy" content="'+csp+'">'))
   native='''const nativeCall=window.Otzaria.call;window.flutter_inappwebview={callHandler:async(name,request)=>{
  if(name!=='otzaria_rpc')throw Error('Unknown handler');

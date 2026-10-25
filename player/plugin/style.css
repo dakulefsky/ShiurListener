@@ -128,3 +128,5 @@ body.compact-mode h1{font-size:1rem}
 body.compact-mode .status-area{padding-inline:12px}
 body.compact-mode .keyboard-help{margin-inline:12px}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+.build-version{font-size:.68em;font-weight:450;color:var(--color-on-surface-variant);margin-inline-start:.3em}

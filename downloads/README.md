@@ -13,3 +13,7 @@ These builds are experimental. Browser/service/package checks pass; actual Otzar
 ## Sidekick 1.0.0 facelift
 
 Use **sidekick-windows-x64-1.0.0.zip** for the updated companion, with **Sidekick.exe** and **sidekick-1.0.0.otzplugin** inside. Close the old companion first, extract the whole ZIP, and install the plugin as an update to preserve its data. The old companion ZIP is retained as an older build. [Setup and testing](../sidekick/README.md).
+
+## Inside 1.4.1
+
+Use **inside-1.4.1.otzplugin**. It clearly shows Inside 1.4.1 in its heading and uses the same visible-page audio engine as 1.4.0. The reported message about blocked sound “במופע הרקע” was traced to the older 1.2 background player. Install as an update, fully quit Otzaria, reopen it, and open Inside from the plugins list. Confirm its heading. Do not uninstall or clear saved data. An integration check with the real Otzaria file server passed.

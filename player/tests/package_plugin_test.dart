@@ -29,9 +29,9 @@ void main() {
       '$root/plugin',
       '--force',
       '--output',
-      '$root/shiur-player-1.4.0.otzplugin',
+      '$root/inside-1.4.1.otzplugin',
     ]);
     expect(code, PluginPackagerCliExitCode.success);
-    expect(File('$root/shiur-player-1.4.0.otzplugin').existsSync(), isTrue);
+    expect(File('$root/inside-1.4.1.otzplugin').existsSync(), isTrue);
   });
 }
