@@ -79,3 +79,15 @@ The actual-file-server integration test also needs ffmpeg to generate its real W
 ## 1.4.6: minimum recording duration
 
 Only recordings of at least five minutes can play. Unknown/non-finite duration is blocked, including through direct controls. Short shiurim also fail; long music can pass. The fixed diagnostic sound remains available. This does not enforce host-level media restrictions or identify speech/music. See [the developer policy note](../docs/INSIDE_MEDIA_POLICY.md). Author remains DanTheMan; plugin ID and saved data keys are unchanged.
+
+## 1.5.0: bundled offline speech/music filter
+
+The plugin now bundles YAMNet, TensorFlow.js 4.9.0 and the TensorFlow Lite WebAssembly runtime. No Python, companion app, cloud analysis, CDN access, or first-run model download is required. Imported recordings stay muted and unplayable until minimum-duration validation and local analysis finish. Progress is shown in Hebrew. Clear music and overall uncertain results are blocked; predominantly speech can pass under the balanced experimental rule. Three consecutive music-hit frames (approximately 2.9 seconds) or at least 10% music-hit coverage blocks the recording. This is one pretrained detector plus aggregation, not a second independently trained classifier. Brief candidates below these thresholds can pass.
+
+Approved analysis is cached locally against the complete file SHA-256 and policy version; new content is re-read and rehashed before cache lookup. This is plugin-level filtering, not tamper-resistant host enforcement. Existing saved positions are reused. The fixed bundled sound-check tone is separate from imported recordings.
+
+Current resource limits: 40 MiB encoded file, at most 90 minutes, and at most 48 million decoded channel samples. Decode uses a browser OfflineAudioContext at 16 kHz. The full decoded recording is held in memory; long stereo recordings can exceed the sample limit before 90 minutes. There is no streaming decoder or full process-resource isolation. Unsupported decoding, missing runtimes, model checksum mismatch and failed analysis do not permit playback.
+
+Actual Chromium tests ran with all requests outside the local test server blocked: a full spoken recording was analyzed and played, a five-minute music recording was blocked, short files were blocked, saved positions and keyboard controls remained functional. Twenty-four Node tests pass. The official validator accepts source and archive with no errors/warnings/design violations. Actual installed Otzaria/WebView support and physical sound still need a device check; unsupported environments report an error instead of bypassing analysis.
+
+Developer browser tests require Playwright and FFmpeg plus local reference files selected through `SHIUR_TEST_SPEECH` and `SHIUR_TEST_MUSIC`. Neither reference recording is bundled or uploaded by the plugin.

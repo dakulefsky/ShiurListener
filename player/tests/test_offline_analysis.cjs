@@ -1,0 +1,13 @@
+const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
+function api(extra={}){const c=vm.createContext({console,setTimeout,clearTimeout,URL,Float32Array,Uint8Array,document:{baseURI:'http://local/',getElementById(){return null}},...extra});vm.runInContext(fs.readFileSync('player/plugin/offline-analysis.js','utf8'),c);return c.OfflineSpeechAnalysis;}
+const row=(start,music=0)=>({start,seconds:.975,speech:.95,music,singing:0});
+test('short music section blocks even in predominantly spoken recording',()=>{const a=Array.from({length:600},(_,i)=>row(i*.975));for(let i=300;i<304;i++)a[i].music=.9;const r=api().decide(a);assert.equal(r.decision,'block');assert.equal(r.segments.length,1)});
+test('speech can pass, silence cannot',()=>{assert.equal(api().decide([row(0)]).decision,'allow');assert.equal(api().decide([{...row(0),speech:0}]).decision,'uncertain')});
+test('invalid scores fail closed',()=>{assert.throws(()=>api().decide([{...row(0),speech:NaN}]))});
+test('missing runtime fails rather than allowing playback',async()=>{const bytes=new Uint8Array([1]);const instance=api({fetch:async()=>({ok:true,headers:{get(){return null}},body:{getReader(){let done=false;return {async read(){if(done)return {done:true};done=true;return {done:false,value:bytes}}}}}}),crypto:{subtle:{async digest(){return bytes.buffer}}},ShiurProtocol:{async rpc(){return null}},OfflineAudioContext:class{async decodeAudioData(){return {duration:301,length:4816000,numberOfChannels:1}}}});await assert.rejects(instance.analyze('http://local/file'),/רכיבי/)});
+test('cancelling an in-progress scan never produces approval',async()=>{
+ let instance;const bytes=new Uint8Array([1]),samples=new Float32Array(15600*310),digest=Uint8Array.from(Buffer.from('e193da5676a2fdb7a3702c10fba62aa27d76f64e4534467443811c1a2ff1667d','hex'));
+ const scores=new Float32Array(521);scores[0]=.95;
+ instance=api({document:{baseURI:'http://local/',getElementById(){return {set textContent(s){if(s.includes('1%'))instance.cancel()}}}},fetch:async()=>({ok:true,headers:{get(){return null}},async arrayBuffer(){return bytes.buffer},body:{getReader(){let done=false;return {async read(){if(done)return {done:true};done=true;return {done:false,value:bytes}}}}}}),crypto:{subtle:{async digest(){return digest.buffer}}},ShiurProtocol:{async rpc(){return null}},OfflineAudioContext:class{async decodeAudioData(){return {duration:302.25,length:samples.length,numberOfChannels:1,getChannelData(){return samples}}}},tf:{tensor1d(){return {dispose(){}}}},tflite:{setWasmPath(){},async loadTFLiteModel(){return {predict(){return {dataSync(){return scores},dispose(){}}}}}}});
+ await assert.rejects(instance.analyze('http://local/file'),/בוטלה/);
+});

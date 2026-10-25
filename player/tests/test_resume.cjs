@@ -10,7 +10,7 @@ function fixture({granted=true,entries={}}={}){
  const store=new Map(Object.entries(clone(entries)));
  const audio={currentTime:0,duration:600,readyState:0,paused:true,ended:false,playbackRate:1,volume:1,addEventListener(){},pause(){this.paused=true;}};
  let failKey=null;
- const context=vm.createContext({console,crypto:{randomUUID},navigator:{},window:{addEventListener(){}},document:{addEventListener(){}},setInterval:()=>1,clearInterval(){},setTimeout,clearTimeout,Otzaria:{on(){},async call(method,args={}){
+ const context=vm.createContext({console,OfflineSpeechAnalysis:{async analyze(){return {decision:"allow"}}},crypto:{randomUUID},navigator:{},window:{addEventListener(){}},document:{addEventListener(){}},setInterval:()=>1,clearInterval(){},setTimeout,clearTimeout,Otzaria:{on(){},async call(method,args={}){
   if(method==='app.getGrantedPermissions')return {success:true,data:{permissions:granted?['fs.user_files.read']:[]}};
   if(method==='storage.get')return {success:true,data:store.has(args.key)?clone(store.get(args.key)):null};
   if(method==='storage.remove'){store.delete(args.key);return {success:true,data:true};}

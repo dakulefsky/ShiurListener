@@ -3,7 +3,7 @@ function fixture(duration){
  const events={};const audio={duration,currentTime:0,readyState:1,paused:true,muted:false,volume:1,playbackRate:1,
  addEventListener(name,fn){(events[name]??=new Set()).add(fn)},removeEventListener(name,fn){events[name]?.delete(fn)},
  pause(){this.paused=true},removeAttribute(){this.src=''},load(){if(this.src)queueMicrotask(()=>{for(const fn of [...(events.loadedmetadata||[])])fn()})},play(){this.paused=false;return Promise.resolve()}};
- const context=vm.createContext({console,ShiurCore:{uuid:()=> 'session'},navigator:{},window:{addEventListener(){}},setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},Otzaria:{async call(method){return {success:true,data:method==='app.getGrantedPermissions'?{permissions:['fs.user_files.read']}:method==='fs.resolveFileUrl'?{url:'local-file'}:null}}}});
+ const context=vm.createContext({console,OfflineSpeechAnalysis:{async analyze(){return {decision:"allow"}}},ShiurCore:{uuid:()=> 'session'},navigator:{},window:{addEventListener(){}},setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},Otzaria:{async call(method){return {success:true,data:method==='app.getGrantedPermissions'?{permissions:['fs.user_files.read']}:method==='fs.resolveFileUrl'?{url:'local-file'}:null}}}});
  for(const file of ['protocol.js','local-audio.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../plugin',file),'utf8'),context);
  return {audio,events,engine:new context.LocalAudioEngine(audio)};
 }

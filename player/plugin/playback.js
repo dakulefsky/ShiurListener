@@ -27,7 +27,7 @@ class VisiblePlayback {
   const revision=++this.revision,queue=this.queue;
   return this.local.serial(async()=>{if(revision!==this.revision)return false;await this.local.execute({op:'load',track,queue,positionMs:Math.round(position*1000)});await this.local.publish();return revision===this.revision;});
  }
- cancel(){this.revision++;}
+ cancel(){this.revision++;globalThis.OfflineSpeechAnalysis?.cancel();}
  clear(){this.cancel();return this.send('clear');}
  play(){
   // Keep audio.play() in the original click handler, before any storage awaits.

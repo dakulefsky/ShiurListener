@@ -33,3 +33,7 @@ The first review deliverable should be an annotated timeline and comparison agai
 ## Decision point
 
 If administrators accept probabilistic filtering, we can choose a model and threshold after reviewing these results and implement an offline host-side gate. If they require a guarantee of approved Torah content, use a curated catalog and an approval process instead. Speech detection alone cannot identify the subject or legitimacy of speech.
+
+## Integration update
+
+Inside 1.5.0 now includes an experimental offline browser implementation using the balanced rule, with bundled model/runtime assets. See the player README for actual tests, limits and the distinction from the proposed host-enforced design.

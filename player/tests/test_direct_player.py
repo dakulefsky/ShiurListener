@@ -1,5 +1,5 @@
 """Real visible-page audio under Chromium's strict user-click policy."""
-import contextlib,functools,http.server,json,math,pathlib,shutil,struct,tempfile,threading,wave
+import os,subprocess,contextlib,functools,http.server,json,math,pathlib,shutil,struct,tempfile,threading,wave
 from playwright.sync_api import sync_playwright,expect
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 MOCK=r'''(() => {
@@ -17,7 +17,7 @@ window.Otzaria={on(topic,fn){(handlers[topic]||=[]).push(fn);if(topic==='plugin.
  else if(method==='fs.listUserFolder')data={entries:[{type:'file',name:'First.wav',path:'First.wav'},{type:'file',name:'Second.wav',path:'Second.wav'}]};
  else if(method==='fs.resolveFileUrl'||method==='fs.openFolderFile'){
   if(window.fileRevoked||window.fileMissing)return {success:false,error:{message:'File unavailable'}};
-  data={url:location.origin+(window.shortFile?'/short.wav':'/sample.wav')};
+  data={url:location.origin+(window.shortFile?'/short.wav':window.musicFile?'/music.wav':'/sample.wav')};
  }else return {success:false,error:{message:'Unexpected method: '+method}};
  return {success:true,data};
 }};
@@ -25,7 +25,7 @@ window.Otzaria={on(topic,fn){(handlers[topic]||=[]).push(fn);if(topic==='plugin.
 class Quiet(http.server.SimpleHTTPRequestHandler):
  def log_message(self,*_):pass
  def do_GET(self):
-  if self.path.split('?')[0] not in ('/sample.wav','/short.wav'):return super().do_GET()
+  if self.path.split('?')[0] not in ('/sample.wav','/short.wav','/music.wav'):return super().do_GET()
   data=(pathlib.Path(self.directory)/self.path.split('?')[0].lstrip('/')).read_bytes();start,end=0,len(data)-1;ranged=self.headers.get('Range')
   if ranged:
    bounds=ranged.removeprefix('bytes=').split('-');start=int(bounds[0] or 0)
@@ -37,11 +37,10 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
 def main():
  with tempfile.TemporaryDirectory() as directory:
   for file in (ROOT/'plugin').iterdir():shutil.copy(file,directory)
-  with wave.open(str(pathlib.Path(directory)/'sample.wav'),'wb') as wav:
-   wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(8000)
-   tone=b''.join(struct.pack('<h',int(2000*math.sin(2*math.pi*220*n/8000))) for n in range(8000));wav.writeframes(tone*600)
+  subprocess.run(['ffmpeg','-v','error','-stream_loop','-1','-i',os.environ.get('SHIUR_TEST_SPEECH','/workspace/inside-audio-experiment/shiur_freifeld.mp3'),'-t','600','-ac','1','-ar','8000',str(pathlib.Path(directory)/'sample.wav')],check=True)
   with wave.open(str(pathlib.Path(directory)/'short.wav'),'wb') as wav:
-   wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(8000);wav.writeframes(tone*10)
+   wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(8000);wav.writeframes(b'\x00\x00'*80000)
+  subprocess.run(['ffmpeg','-v','error','-stream_loop','-1','-i',os.environ.get('SHIUR_TEST_MUSIC','/workspace/inside-audio-experiment/data/music_wav/opera.wav'),'-t','300','-ac','1','-ar','8000',str(pathlib.Path(directory)/'music.wav')],check=True)
   server=http.server.ThreadingHTTPServer(('127.0.0.1',0),functools.partial(Quiet,directory=directory));threading.Thread(target=server.serve_forever,daemon=True).start()
   url=f'http://127.0.0.1:{server.server_port}/'
   try:
@@ -49,9 +48,14 @@ def main():
     # No autoplay exemption: this reproduces the policy that blocked the old build.
     browser=p.chromium.launch(headless=True,args=['--autoplay-policy=document-user-activation-required','--disable-features=PreloadMediaEngagementData,MediaEngagementBypassAutoplayPolicies'])
     context=browser.new_context(viewport={'width':1440,'height':1000});context.add_init_script(MOCK)
-    page=context.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(url)
+    outside=[]
+    def restrict(route):
+     if route.request.url.startswith(url):route.continue_()
+     else:outside.append(route.request.url);route.abort()
+    context.route('**/*',restrict)
+    page=context.new_page();page.set_default_timeout(120000);expect.set_options(timeout=120000);errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(url)
     expect(page.locator('#add-folder')).to_be_enabled()
-    expect(page.locator('header h1')).to_contain_text('נגן שיעורים');expect(page.locator('header h1')).to_contain_text('1.4.6')
+    expect(page.locator('header h1')).to_contain_text('נגן שיעורים');expect(page.locator('header h1')).to_contain_text('1.5.0')
     expect(page.locator('#welcome')).to_be_visible();assert page.locator('#audio').get_attribute('controls') is not None
     assert 'nodownload' in page.locator('#audio').get_attribute('controlslist')
     page.locator('#add-folder').click();expect(page.locator('.track')).to_have_count(2)
@@ -118,6 +122,10 @@ def main():
     page.evaluate("bridge.emit('plugin.resumed')");page.evaluate('window.shortFile=true')
     page.locator('#add-file').click();expect(page.locator('#status')).to_contain_text('חמש דקות')
     assert page.locator('#audio').evaluate('(a)=>a.paused && a.muted && !a.getAttribute("src")')
+    page.evaluate('window.shortFile=false;window.musicFile=true')
+    page.locator('#add-file').click();expect(page.locator('#status')).to_contain_text('מוזיקה')
+    assert page.locator('#audio').evaluate('(a)=>a.paused && a.muted && !a.getAttribute("src")')
+    assert not outside,outside
     assert not errors,errors
     manifest=json.loads((ROOT/'plugin/manifest.json').read_text())
     assert 'background' not in manifest['contributes']
