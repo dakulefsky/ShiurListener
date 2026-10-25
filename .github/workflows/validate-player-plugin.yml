@@ -1,0 +1,22 @@
+name: Validate Otzaria player plugin
+on:
+  push:
+    paths: ['player/**', '.github/workflows/validate-player-plugin.yml']
+  pull_request:
+    paths: ['player/**', '.github/workflows/validate-player-plugin.yml']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check store manifest metadata
+        run: node player/build/check_store_manifest.cjs
+      - name: Validate and build with the official Otzaria validator
+        uses: Otzaria/otzaria-plugin-validator@64ee7c7806a03fcba16c111a7b6c3185e4d92804 # v1.19.1
+        with:
+          path: player/plugin
+          fail-on-warnings: 'true'
+          build: 'true'
+          publish: 'false'

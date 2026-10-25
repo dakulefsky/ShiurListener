@@ -1,19 +1,23 @@
-# נגן שיעורים 1.4.3
+# נגן שיעורים 1.4.4
 
-Author: **DanTheMAn**. Version 1.4.3 adds the author to the manifest; playback is unchanged.
+Author: **DanTheMAn**. Version 1.4.4 retains the author, adds the project homepage and explicitly declares `stability: experimental`. Playback is unchanged.
 
 A Hebrew Otzaria player for local shiurim, with a simpler layout, separate saved listening positions and recovery controls. Install the plugin directly; no companion, Python or VLC installation is needed.
 
 
+## Store upload requirements
+
+See [the publishing review](STORE_UPLOAD.md) for the official sources, field requirements, validation results and first-upload requirements. This package was built and checked with the official Otzaria validator; the repository now checks manifest metadata and runs the official validator in CI with store publishing explicitly disabled.
+
 ## Recognizing the correct player
 
-The heading must say **נגן שיעורים 1.4.3**, including in compact mode. The Hebrew error “מנוע הדפדפן של אוצריא חסם שמע ללא לחיצה במופע הרקע. בגרסה זו נדרש שינוי מדיניות באוצריא.” was found in the old 1.2 background player's `background.js`; it is absent from the visible-page player. Seeing it means that older UI/code is running.
+The heading must say **נגן שיעורים 1.4.4**, including in compact mode. The Hebrew error “מנוע הדפדפן של אוצריא חסם שמע ללא לחיצה במופע הרקע. בגרסה זו נדרש שינוי מדיניות באוצריא.” was found in the old 1.2 background player's `background.js`; it is absent from the visible-page player. Seeing it means that older UI/code is running.
 
-Install this package as an update, fully quit Otzaria (including its tray instance if it remains running), reopen it and open **נגן שיעורים** from the plugin list. Do not uninstall or clear data. If the heading does not say נגן שיעורים 1.4.3, the new page is not running yet. This update replaces the former Inside display name with נגן שיעורים in the plugin list, tab, page heading and error details. The plugin ID and storage keys are unchanged. The audio engine is unchanged.
+Install this package as an update, fully quit Otzaria (including its tray instance if it remains running), reopen it and open **נגן שיעורים** from the plugin list. Do not uninstall or clear data. If the heading does not say נגן שיעורים 1.4.4, the new page is not running yet. This update replaces the former Inside display name with נגן שיעורים in the plugin list, tab, page heading and error details. The plugin ID and storage keys are unchanged. The audio engine is unchanged.
 
 ## Install and listen
 
-1. Download `shiur-player-1.4.3.otzplugin` and install it in Otzaria as an update. Do not uninstall the existing plugin or clear its data first.
+1. Download `shiur-player-1.4.4.otzplugin` and install it in Otzaria as an update. Do not uninstall the existing plugin or clear its data first.
 2. Restart Otzaria once and allow the plugin to read user-selected files. Otzaria 0.9.98 or newer is required.
 3. Click **הוספת שיעור** to choose one recording, or **ייבוא תיקייה** to import a recordings folder. The first new recording loads silently.
 4. Wait for **מוכן לניגון**, then press the large **ניגון** button. Selecting another recording loads it; press Play to begin sound.
@@ -68,6 +72,6 @@ Browser tests need Python Playwright and Chromium. The host-bridge test reads `l
 SHIUR_PLUGIN_ROOT=/path/to/ShiurListener/player flutter test /path/to/ShiurListener/player/tests/package_plugin_test.dart
 ```
 
-No Otzaria native source is modified for 1.4.3. The developer handoff identifies the inspected upstream commit and separates current features from proposed host work.
+No Otzaria native source is modified for 1.4.4. The developer handoff identifies the inspected upstream commit and separates current features from proposed host work.
 
 The actual-file-server integration test also needs ffmpeg to generate its real WAV fixture. From the Otzaria checkout, run `SHIUR_PLUGIN_ROOT=/path/to/ShiurListener/player OTZARIA_SOURCE_ROOT=/path/to/otzaria flutter test /path/to/ShiurListener/player/tests/real_host_media_test.dart`. These remain development prerequisites only.

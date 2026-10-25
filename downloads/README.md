@@ -45,3 +45,7 @@ Download **shiur-player-windows-x64-0.4.0.zip**. Select several recordings and a
 ## נגן שיעורים 1.4.3 — author metadata
 
 Download **shiur-player-1.4.3.otzplugin**. The manifest credits **DanTheMAn** as author. Install as an update. Plugin ID, permissions, saved-data keys and playback code are unchanged.
+
+## נגן שיעורים 1.4.4 — publishing review
+
+Download **shiur-player-1.4.4.otzplugin**. Author **DanTheMAn**, project homepage and explicit experimental stability are included. The official validator built the archive and validated its contents against the current SDK specification: zero errors, warnings or design findings. [Upload requirements and sources](../player/STORE_UPLOAD.md). No store submission was performed.

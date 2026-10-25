@@ -3,7 +3,7 @@
 const $=id=>document.getElementById(id), C=ShiurCore;
 const engine=new VisiblePlayback(document.getElementById('audio'));
 let state=C.fresh(),view='all',query='',ready=false,loadedId=null,loadRevision=0,queue=[],saveChain=Promise.resolve(),importing=false,loading=false,initializing=false;
-const status=(message,error=false)=>{$('status').textContent=message;$('status').classList.toggle('error',error);$('recovery').hidden=!error;if(error){$('error-detail').textContent='נגן שיעורים 1.4.3\n'+message;$('player-state').textContent='נדרשת בדיקה';}};
+const status=(message,error=false)=>{$('status').textContent=message;$('status').classList.toggle('error',error);$('recovery').hidden=!error;if(error){$('error-detail').textContent='נגן שיעורים 1.4.4\n'+message;$('player-state').textContent='נדרשת בדיקה';}};
 async function rpc(method,args={}){const r=await window.Otzaria.call(method,args);if(!r || !r.success)throw new Error(r?.error?.message||`הפעולה נכשלה: ${method}`);return r.data;}
 function safe(fn){return (...args)=>Promise.resolve().then(()=>fn(...args)).catch(e=>status(e.message||String(e),true));}
 function save(){

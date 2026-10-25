@@ -49,7 +49,7 @@ def main():
     context=browser.new_context(viewport={'width':1440,'height':1000});context.add_init_script(MOCK)
     page=context.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(url)
     expect(page.locator('#add-folder')).to_be_enabled()
-    expect(page.locator('header h1')).to_contain_text('נגן שיעורים');expect(page.locator('header h1')).to_contain_text('1.4.3')
+    expect(page.locator('header h1')).to_contain_text('נגן שיעורים');expect(page.locator('header h1')).to_contain_text('1.4.4')
     expect(page.locator('#welcome')).to_be_visible();assert page.locator('#audio').get_attribute('controls') is not None
     assert 'nodownload' in page.locator('#audio').get_attribute('controlslist')
     page.locator('#add-folder').click();expect(page.locator('.track')).to_have_count(2)
