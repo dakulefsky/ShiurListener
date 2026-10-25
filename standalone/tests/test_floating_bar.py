@@ -16,6 +16,11 @@ class TestBar(unittest.TestCase):
    for left,right in zip(controls,controls[1:]):self.assertLess(left[0]+left[2],right[0])
    self.assertLessEqual(controls[0][1]+controls[0][3],bounds[104][1])
    self.assertLessEqual(bounds[104][1]+bounds[104][3],bounds[107][1])
+ def test_frameless_edges_resize_and_empty_surface_drags(self):
+  self.assertFalse(module.FRAMELESS_STYLE & 0x00C00000)
+  for point,target in [((1,1),13),((359,1),14),((1,149),16),((359,149),17),((1,50),10),((359,50),11),((80,1),12),((80,149),15),((80,20),2)]:
+   self.assertEqual(module.hit_test(*point,360,150),target)
+  self.assertEqual(module.hit_test(1,1,144,44,collapsed=True),2)
  def test_labels_and_colors(self):
   state={'currentId':'a','skipSeconds':60,'status':'playing'}
   self.assertEqual(module.display(state,[{'id':'a','name':'Shiur'}]),('Shiur','Pause','−60','+60'))
@@ -41,6 +46,7 @@ class TestBar(unittest.TestCase):
      if cmd['op']=='seek':self.state['position']=cmd['value']
     def persist(self):self.writes+=1
    player=Player();callbacks={};handles={};shows=[];texts=[];next_handle=10;messages=[(0x111,106),(0x111,105),(0x0005,0),(0x0232,0)]+[(0x113,0)]*10+[(0x111,107),(0x111,102),(0x111,101),(0x111,103),(0x10,0),(0x8001,0),(0x8003,1),(0x8003,1),(0x8003,0)];registered_style=[];window_sizes=[];invalidations=[];moves=[];caption_updates=[];bounds={};idle_checks=[]
+   messages.extend((0x002B,ident) for ident in (102,105,108,106,107))
    mode_sizes=[]
    if collapse:messages[14:14]=[(0x111,108),(0x0232,0),(0x111,108)]
    cursor_reads=[]
@@ -58,20 +64,26 @@ class TestBar(unittest.TestCase):
     msg,wp=messages.pop(0)
     if msg==0x113:idle_checks.append((len(invalidations),len(caption_updates)))
     value=ctypes.cast(pointer,ctypes.POINTER(w.MSG)).contents;value.hWnd=11;value.message=msg;value.wParam=wp;value.lParam=0;return 1
+   class DrawItem(ctypes.Structure):
+    _fields_=[('type',w.UINT),('id',w.UINT),('item',w.UINT),('action',w.UINT),('state',w.UINT),('hwnd',w.HWND),('dc',w.HDC),('rect',w.RECT),('data',ctypes.c_size_t)]
    def dispatch(pointer):
-    value=ctypes.cast(pointer,ctypes.POINTER(w.MSG)).contents;return callbacks['proc'](value.hWnd,value.message,value.wParam,value.lParam)
+    value=ctypes.cast(pointer,ctypes.POINTER(w.MSG)).contents
+    if value.message==0x002B:
+     item=DrawItem();item.id=value.wParam;item.dc=1;item.rect=w.RECT(0,0,76,32);value.lParam=ctypes.addressof(item)
+     return callbacks['proc'](value.hWnd,value.message,value.wParam,value.lParam)
+    return callbacks['proc'](value.hWnd,value.message,value.wParam,value.lParam)
    def getrect(hwnd,pointer):
     rect=pointer._obj;rect.left=72;rect.top=96;rect.right=492;rect.bottom=276;return 1
    def clientrect(hwnd,pointer):
     rect=pointer._obj;rect.left=0;rect.top=0;rect.right=bounds.get(hwnd,(0,0,404,140))[2];rect.bottom=bounds.get(hwnd,(0,0,404,140))[3];return 1
    def move(hwnd,x,y,width,height,repaint):bounds[hwnd]=(x,y,width,height);moves.append((hwnd,(x,y,width,height,repaint)));return 1
-   def screenclient(hwnd,pointer):pointer._obj.x=192;pointer._obj.y=4;return 1
+   def screenclient(hwnd,pointer):pointer._obj.x=bounds.get(hwnd,(0,0,404,140))[2]//2;pointer._obj.y=4;return 1
    def settext(hwnd,text):texts.append(text);caption_updates.append((handles[hwnd],text));return 1
    user_funcs={'GetCursorPos':getcursor,'SetWindowPos':lambda hwnd,after,x,y,width,height,flags:mode_sizes.append((width,height)) or 1,'GetSystemMetrics':lambda index:{76:0,77:0,78:1920,79:1080}.get(index,0),'GetWindowRect':getrect,'GetClientRect':clientrect,'ScreenToClient':screenclient,'InvalidateRect':lambda hwnd,rect,erase:invalidations.append((hwnd,erase)) or 1,'MoveWindow':move,'RegisterClassW':register,'CreateWindowExW':create,'GetMessageW':message,'DispatchMessageW':dispatch,'ShowWindow':lambda hwnd,mode:shows.append(mode) or 1,'SetWindowTextW':settext,'LoadCursorW':lambda *args:1,'DefWindowProcW':lambda *args:0}
    class Library:
     def __init__(self,functions):self.functions=functions
     def __getattr__(self,name):value=Function(self.functions.get(name,lambda *args:1));setattr(self,name,value);return value
-   libraries={'user32':Library(user_funcs),'gdi32':Library({}),'kernel32':Library({})}
+   libraries={'user32':Library(user_funcs),'gdi32':Library({}),'kernel32':Library({}),'dwmapi':Library({})}
    with unittest.mock.patch.object(module.ctypes,'WinDLL',side_effect=lambda name,**kwargs:libraries[name],create=True),unittest.mock.patch.object(module.ctypes,'WINFUNCTYPE',ctypes.CFUNCTYPE,create=True):
     bar=module.FloatingBar(player);bar.run()
    self.assertEqual(player.commands,[{'op':'speed_cycle'},{'op':'seek','value':180.0},{'op':'toggle'},{'op':'skip','direction':-1},{'op':'skip','direction':1}]);self.assertIn(0,shows);self.assertEqual(shows[-3:],[4,4,0]);self.assertFalse(player.saved['floatingVisible']);self.assertEqual(player.writes,10 if hover else 9 if collapse else 6);self.assertIn('Current shiur',texts);self.assertEqual(registered_style[0]&0x08000088,0x08000088);self.assertEqual(bar.status,'ready')
@@ -81,6 +93,7 @@ class TestBar(unittest.TestCase):
    self.assertEqual(len([c for c in caption_updates if c[0]==100]),1);self.assertEqual(len([c for c in caption_updates if c[0]==104]),2)
    if not hover:self.assertEqual(len(set(idle_checks[1:])),1,'Idle timer ticks must not repaint the strip or rewrite captions.')
    self.assertIn((106,'1.5x'),caption_updates)
+   self.assertEqual(player.error,'','Native drawing and message handlers must not raise')
    if collapse:
     self.assertEqual(mode_sizes,[module.COLLAPSED_SIZE,module.HOVER_SIZE,module.COLLAPSED_SIZE,(420,180)] if hover else [module.COLLAPSED_SIZE,(420,180)])
     self.assertFalse(player.saved['floatingCollapsed'])

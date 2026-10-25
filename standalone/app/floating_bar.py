@@ -2,6 +2,7 @@
 import ctypes,sys,threading,pathlib
 
 MIN_SIZE=(300,140)
+FRAMELESS_STYLE=0x82040000 # popup, clip children, resize frame; no caption
 DEFAULT_SIZE=(360,150)
 COLLAPSED_SIZE=(144,44)
 HOVER_SIZE=(252,44)
@@ -31,13 +32,27 @@ def layout(width,height,collapsed=False,hovered=False):
   bounds={102:(16,6,76,32),108:(98,6,36,32)}
   if hovered:bounds.update({101:(140,6,48,32),103:(194,6,48,32)})
   return bounds
- width=max(270,width);height=max(96,height);pad=10;gap=6
+ width=max(270,width);height=max(96,height);pad=14;gap=8
  available=width-2*pad-3*gap;back=int(available*.19);play=int(available*.32);speed=available-2*back-play
  row_height=max(26,min(44,height-74));bottom=height-34
- return {100:(pad,6,width-144,22),108:(width-112,4,30,24),105:(width-76,4,66,24),
+ return {100:(pad,6,width-148,22),108:(width-112,4,30,24),105:(width-76,4,66,24),
          101:(pad,34,back,row_height),102:(pad+back+gap,34,play,row_height),
          103:(pad+back+play+2*gap,34,back,row_height),106:(width-pad-speed,34,speed,row_height),
          104:(pad,bottom,width-2*pad,20),107:(pad,height-10,width-2*pad,8)}
+
+def hit_test(x,y,width,height,collapsed=False):
+ """Win32 hit targets: resize edges in expanded mode; empty surface drags."""
+ if not collapsed:
+  left=x<6;right=x>=width-6;top=y<6;bottom=y>=height-6
+  if top and left:return 13
+  if top and right:return 14
+  if bottom and left:return 16
+  if bottom and right:return 17
+  if left:return 10
+  if right:return 11
+  if top:return 12
+  if bottom:return 15
+ return 2
 
 class FloatingBar:
  def __init__(self,player):self.player=player;self.thread=None;self.hwnd=None;self.ready=threading.Event();self.status='';self.post=None
@@ -81,15 +96,22 @@ class FloatingBar:
   brush=bind(gdi,'CreateSolidBrush',w.HBRUSH,[w.DWORD]);delete=bind(gdi,'DeleteObject',w.BOOL,[w.HGDIOBJ]);fill=bind(user,'FillRect',ctypes.c_int,[w.HDC,ctypes.POINTER(w.RECT),w.HBRUSH]);drawtext=bind(user,'DrawTextW',ctypes.c_int,[w.HDC,w.LPCWSTR,ctypes.c_int,ctypes.POINTER(w.RECT),w.UINT]);setcolor=bind(gdi,'SetTextColor',w.DWORD,[w.HDC,w.DWORD]);setbg=bind(gdi,'SetBkMode',ctypes.c_int,[w.HDC,ctypes.c_int]);select=bind(gdi,'SelectObject',w.HGDIOBJ,[w.HDC,w.HGDIOBJ])
   fontfn=bind(gdi,'CreateFontW',w.HFONT,[ctypes.c_int]*5+[w.DWORD]*8+[w.LPCWSTR]);getmodule=bind(kernel,'GetModuleHandleW',w.HMODULE,[w.LPCWSTR]);cursor=bind(user,'LoadCursorW',w.HANDLE,[w.HINSTANCE,ctypes.c_void_p])
   roundrect=bind(gdi,'RoundRect',w.BOOL,[w.HDC]+[ctypes.c_int]*6);penfn=bind(gdi,'CreatePen',w.HPEN,[ctypes.c_int,ctypes.c_int,w.DWORD])
+  polygon=bind(gdi,'Polygon',w.BOOL,[w.HDC,ctypes.POINTER(w.POINT),ctypes.c_int])
+  linefrom=bind(gdi,'MoveToEx',w.BOOL,[w.HDC,ctypes.c_int,ctypes.c_int,ctypes.c_void_p]);lineto=bind(gdi,'LineTo',w.BOOL,[w.HDC,ctypes.c_int,ctypes.c_int])
+  region=bind(gdi,'CreateRoundRectRgn',w.HANDLE,[ctypes.c_int]*6);setregion=bind(user,'SetWindowRgn',ctypes.c_int,[w.HWND,w.HANDLE,w.BOOL])
+  try:
+   dwm=ctypes.WinDLL('dwmapi',use_last_error=True)
+   corner=bind(dwm,'DwmSetWindowAttribute',ctypes.c_long,[w.HWND,w.DWORD,ctypes.c_void_p,w.DWORD])
+  except OSError:corner=None
   addfont=bind(gdi,'AddFontResourceExW',ctypes.c_int,[w.LPCWSTR,w.DWORD,w.LPVOID]);removefont=bind(gdi,'RemoveFontResourceExW',w.BOOL,[w.LPCWSTR,w.DWORD,w.LPVOID])
   fontpath=pathlib.Path(__file__).resolve().parent/'assets/Rubik.ttf';fontloaded=bool(fontpath.exists() and addfont(str(fontpath),0x10,None))
   current_family='Rubik' if fontloaded else 'Segoe UI'
   controls={};labels={101:'−15',102:'Play',103:'+15',105:'Open',106:'1x',108:'−'};palette={};resources=[];font=None
-  progress_ratio=0.;last_progress=None
+  progress_ratio=0.;last_progress=None;hot_control=None
   texts={};enabled={};visible=self.player.saved.get('floatingVisible',False)
   collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE);hovered=False
   def apply_mode():
-   setstyle(self.hwnd,-16,ctypes.c_long(0x82000000 if collapsed else 0x02CC0000).value)
+   setstyle(self.hwnd,-16,ctypes.c_int32(0x82000000 if collapsed else FRAMELESS_STYLE).value)
    size=(HOVER_SIZE if hovered else COLLAPSED_SIZE) if collapsed else expanded_size
    rect=w.RECT();getrect(self.hwnd,ctypes.byref(rect))
    # Keep the restored window on screen, even after dragging the pill to an edge.
@@ -105,19 +127,38 @@ class FloatingBar:
    for ident,handle in controls.items():show(handle,5 if ident in bounds else 0)
    for ident,(x,y,width,height) in bounds.items():
     if ident in controls:move(controls[ident],x,y,width,height,True)
+   # Windows 11 supplies antialiased corners; older Windows gets a rounded region.
+   preference=ctypes.c_int(2)
+   rounded=corner and corner(self.hwnd,33,ctypes.byref(preference),4)==0
+   if not rounded:
+    clip=region(0,0,rect.right+1,rect.bottom+1,28 if collapsed else 24,28 if collapsed else 24)
+    if clip and not setregion(self.hwnd,clip,True):delete(clip)
    last_progress=None
   def update():
-   nonlocal palette,font,current_family,progress_ratio,last_progress
+   nonlocal palette,font,current_family,progress_ratio,last_progress,hot_control
    with self.player.lock:state=self.player.snapshot();tracks=self.player.tracks;desired_palette=dict(self.player.saved.get('floatingTheme',{}))
+   next_hot=None
+   if visible:
+    point=w.POINT()
+    if getcursor(ctypes.byref(point)):
+     local=w.POINT(point.x,point.y)
+     if screenclient(self.hwnd,ctypes.byref(local)):
+      rect=w.RECT();clientrect(self.hwnd,ctypes.byref(rect))
+      for ident,(x,y,width,height) in layout(rect.right,rect.bottom,collapsed,hovered).items():
+       if ident in labels and x<=local.x<x+width and y<=local.y<y+height:next_hot=ident;break
+   if next_hot!=hot_control:
+    for ident in (hot_control,next_hot):
+     if ident in controls:invalidate(controls[ident],None,False)
+    hot_control=next_hot
    desired=desired_palette.get('fontFamily') or ('Rubik' if fontloaded else 'Segoe UI')
    if desired!=current_family:
-    replacement=fontfn(-16,0,0,0,600,0,0,0,1,0,0,5,0,desired)
+    replacement=fontfn(-16,0,0,0,500,0,0,0,1,0,0,5,0,desired)
     if replacement:
      old=font;font=replacement;current_family=desired
      for handle in controls.values():send(handle,0x0030,font,1)
      if old:delete(old)
    if not resources or desired_palette!=palette:
-    palette=desired_palette;background=brush(color(palette.get('surface'),'#111E36'))
+    palette=desired_palette;background=brush(color(palette.get('surface'),'#F7F7FA'))
     if resources:delete(resources.pop())
     resources.append(background)
     if self.hwnd:invalidate(self.hwnd,None,False)
@@ -143,7 +184,11 @@ class FloatingBar:
     if msg==0x0024:
      info=ctypes.cast(lp,ctypes.POINTER(MINMAXINFO)).contents
      info.minTrackSize.x,info.minTrackSize.y=COLLAPSED_SIZE if collapsed else MIN_SIZE;return 0
-    if msg==0x0084 and collapsed:return 2 # Unoccupied pill surface drags like a title bar.
+    if msg==0x0083:return 0 # Remove the native non-client frame, retaining resize semantics.
+    if msg==0x0084:
+     rect=w.RECT();getrect(hwnd,ctypes.byref(rect))
+     x=ctypes.c_short(lp&0xffff).value-rect.left;y=ctypes.c_short((lp>>16)&0xffff).value-rect.top
+     return hit_test(x,y,rect.right-rect.left,rect.bottom-rect.top,collapsed)
     if msg==0x0005:resize();return 0
     if msg==0x0232:
      rect=w.RECT()
@@ -194,24 +239,42 @@ class FloatingBar:
      if resources:fill(wp,ctypes.byref(rect),resources[0])
      return 1
     if msg==0x0138:
-     setbg(wp,1);setcolor(wp,color(palette.get('onSurface'),'#FFFFFF'));return resources[0] if resources else 0
+     setbg(wp,1);setcolor(wp,color(palette.get('onSurface'),'#242332'));return resources[0] if resources else 0
     if msg==0x002B:
      item=ctypes.cast(lp,ctypes.POINTER(DRAWITEM)).contents;primary=item.id==102
      if item.id==107:
       if resources:fill(item.dc,ctypes.byref(item.rect),resources[0])
       middle=(item.rect.top+item.rect.bottom)//2
       track=w.RECT(item.rect.left,middle-2,item.rect.right,middle+2)
-      background=brush(color(palette.get('surfaceContainer'),'#263A5B'));fill(item.dc,ctypes.byref(track),background);delete(background)
+      background=brush(color(palette.get('surfaceContainer'),'#E9EAF0'));fill(item.dc,ctypes.byref(track),background);delete(background)
       if progress_ratio>0:
        track.right=track.left+round((track.right-track.left)*progress_ratio)
-       foreground=brush(color(palette.get('primary'),'#214CDB'));fill(item.dc,ctypes.byref(track),foreground);delete(foreground)
+       foreground=brush(color(palette.get('primary'),'#6558D3'));fill(item.dc,ctypes.byref(track),foreground);delete(foreground)
       return 1
-     shade=color(palette.get('primary') if primary else palette.get('surfaceContainer'),'#214CDB' if primary else '#263A5B')
+     active=item.id==hot_control or bool(item.state&1)
+     shade=color(palette.get('primary') if primary else palette.get('surfaceContainer' if active else 'surface'),'#6558D3' if primary else '#E9EAF0' if active else '#F7F7FA')
      if resources:fill(item.dc,ctypes.byref(item.rect),resources[0])
      b=brush(shade);pen=penfn(0,1,shade);oldbrush=select(item.dc,b);oldpen=select(item.dc,pen)
-     roundrect(item.dc,item.rect.left+1,item.rect.top+1,item.rect.right-1,item.rect.bottom-1,12,12)
+     roundrect(item.dc,item.rect.left+1,item.rect.top+1,item.rect.right-1,item.rect.bottom-1,24,24)
      select(item.dc,oldpen);select(item.dc,oldbrush);delete(pen);delete(b)
-     setcolor(item.dc,color(palette.get('onPrimary') if primary else palette.get('onSurface'),'#FFFFFF'));setbg(item.dc,1)
+     ink=color(palette.get('onPrimary') if primary else palette.get('onSurface'),'#FFFFFF' if primary else '#242332')
+     if item.state&4:ink=color('#A7A5B5','#A7A5B5')
+     setcolor(item.dc,ink);setbg(item.dc,1)
+     if item.id in (102,105,108):
+      cx=(item.rect.left+item.rect.right)//2;cy=(item.rect.top+item.rect.bottom)//2
+      iconbrush=brush(ink);iconpen=penfn(0,2,ink);oldb=select(item.dc,iconbrush);oldp=select(item.dc,iconpen)
+      if item.id==102:
+       if labels[102]=='Pause':
+        for offset in (-5,3):
+         r=w.RECT(cx+offset,cy-6,cx+offset+3,cy+6);fill(item.dc,ctypes.byref(r),iconbrush)
+       else:
+        points=(w.POINT*3)(w.POINT(cx-4,cy-7),w.POINT(cx+6,cy),w.POINT(cx-4,cy+7));polygon(item.dc,points,3)
+      elif item.id==108 and not collapsed:linefrom(item.dc,cx-5,cy,None);lineto(item.dc,cx+5,cy)
+      else:
+       linefrom(item.dc,cx-5,cy+5,None);lineto(item.dc,cx+5,cy-5)
+       linefrom(item.dc,cx-3,cy-5,None);lineto(item.dc,cx+5,cy-5);lineto(item.dc,cx+5,cy+3)
+      select(item.dc,oldp);select(item.dc,oldb);delete(iconpen);delete(iconbrush)
+      return 1
      old=select(item.dc,font);drawtext(item.dc,labels.get(item.id,''),-1,ctypes.byref(item.rect),0x25);select(item.dc,old);return 1
    except Exception as e:
     with self.player.lock:self.player.error=str(e)
@@ -222,7 +285,7 @@ class FloatingBar:
    instance=getmodule(None);name='ShiurPlayerFloatingTransport'
    cls=WNDCLASS(0,self.callback,0,0,instance,None,cursor(None,ctypes.c_void_p(32512)),None,None,name)
    if not register(ctypes.byref(cls)):raise OSError(ctypes.get_last_error(),'Could not register floating bar window.')
-   font=fontfn(-16,0,0,0,600,0,0,0,1,0,0,5,0,current_family)
+   font=fontfn(-16,0,0,0,500,0,0,0,1,0,0,5,0,current_family)
    position=self.player.saved.get('floatingPosition',[80,80]);x,y=position if isinstance(position,list) and len(position)==2 and all(isinstance(v,int) for v in position) else [80,80]
    size=self.player.saved.get('floatingSize',list(DEFAULT_SIZE))
    if not isinstance(size,list) or len(size)!=2 or not all(isinstance(v,int) for v in size):size=list(DEFAULT_SIZE)
@@ -233,8 +296,8 @@ class FloatingBar:
    if width>0 and height>0:
     bar_width=min(bar_width,max(1,width));bar_height=min(bar_height,max(1,height))
     x=max(left,min(x,left+max(0,width-bar_width)));y=max(top,min(y,top+max(0,height-bar_height)))
-   # WS_THICKFRAME enables resizing. WS_CLIPCHILDREN avoids painting over controls.
-   self.hwnd=create(0x08000088,name,'Shiur Player',(0x82000000 if collapsed else 0x02CC0000),x,y,bar_width,bar_height,None,None,instance,None)
+   # Frameless popup: custom hit targets retain resizing without a Windows title bar.
+   self.hwnd=create(0x08000088,name,'Shiur Player',(0x82000000 if collapsed else FRAMELESS_STYLE),x,y,bar_width,bar_height,None,None,instance,None)
    if not self.hwnd:raise OSError(ctypes.get_last_error(),'Could not create floating bar.')
    for ident in (100,104):controls[ident]=create(0,'STATIC','',0x50004000,0,0,1,1,self.hwnd,ident,instance,None)
    # SS_OWNERDRAW | SS_NOTIFY: clickable, without claiming a keyboard tab stop.

@@ -72,3 +72,7 @@ Click the minus button in the floating mini player to collapse it into a 144 × 
 ### Hover controls and individual speeds (development)
 
 Hover over the tiny pill to reveal backward/forward skip buttons using the configured 10/15/60-second interval. Moving away hides them again; hovering does not issue playback commands. Each recording saves its playback speed independently, including changes from the mini player, and restores it after switching recordings or restarting. Recordings without a saved speed start at 1×. The speed cycle remains 1× → 1.5× → 2× → 0.5× → 1×. These changes are not yet packaged in an installer or visually verified on Windows.
+
+### Frameless mini-player design (development)
+
+The floating panel now removes the native Windows caption and frame, uses a light neutral surface with a violet transport control, draws transport/expand icons directly, and highlights secondary controls on hover. Empty panel space drags; expanded edges/corners resize. Rounded corners use Windows 11 DWM when available, with a rounded-region fallback for older Windows. Native button labels remain available for accessibility despite icon drawing. Existing custom floating themes remain supported. No additional runtime dependency is needed. Native visual verification and installer packaging remain outstanding.
