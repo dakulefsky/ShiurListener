@@ -43,7 +43,7 @@ See the [0.9.4 whole-app review](docs/STANDALONE_REVIEW_0.9.4.md) for fixes, tes
 
 Controller tests cover separate positions, collections, bookmarks and playback actions. Actual Tk window tests verify three independent resume times, recent ordering, searching, switching and reopening. Real VLC WAV/MP3 decoding passes on Linux with dummy output.
 
-Packaging verifies runtime/license preservation, source correspondence, x64 PE structure, the GUI subsystem and bundled Tk dependencies. Actual Windows rendering, global shortcuts and physical speaker output remain untested here. This is an unsigned per-user installer. Installer extraction and version activation have been tested on Linux; actual Windows setup, shortcuts and restart remain unverified here.
+Packaging verifies runtime/license preservation, source correspondence, x64 PE structure, the GUI subsystem and bundled Tk dependencies. Windows tests exercise actual mini-player mouse input, desktop controls with bundled VLC, packaged-app startup, shortcut identity, duplicate launches and same-version repair. Audio tests use dummy output; physical speakers/headsets and unusual display setups still need manual checks. This is an unsigned per-user installer.
 
 The app exposes no browser control or URL-opening command. Its bundled Python interpreter is general purpose; it is not a device-level browser/Internet lockdown tool.
 

@@ -40,7 +40,7 @@ The previously published mini-player fixes are also included: controls return a 
 
 The native mouse automation waits for the complete visible control layout, rather than treating an updated mode flag as proof that resizing has finished. This prevents the test itself from clicking an intentionally not-yet-visible seek bar.
 
-One suspected problem was not confirmed: Python safely handles `print` when its no-console process has no standard output. Shortcut registration, conflict reporting, dispatch and cleanup were tested with no console; no output-related fix is claimed.
+One suspected problem was not confirmed: Python safely handles `print` when its no-console process has no standard output. Shortcut registration, conflict status recording, dispatch and cleanup were tested with no console; no output-related fix is claimed.
 
 The first Windows runs also exposed assumptions in the tests: temporary paths can use Windows short names, and a runner's screen can be smaller than a hard-coded window size. Fixtures now resolve temporary paths and use screen-fitting dimensions. These are test portability corrections, not claimed product fixes.
 
