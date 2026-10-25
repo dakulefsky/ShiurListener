@@ -3,6 +3,7 @@ import ctypes,sys,threading,pathlib
 
 MIN_SIZE=(300,140)
 DEFAULT_SIZE=(360,150)
+COLLAPSED_SIZE=(144,44)
 
 def display(state,tracks):
  track=next((t for t in tracks if t['id']==state['currentId']),None)
@@ -23,12 +24,13 @@ def color(value,fallback):
  except ValueError:return color(fallback,fallback)
  return r|(g<<8)|(b<<16)
 
-def layout(width,height):
+def layout(width,height,collapsed=False):
  """Client coordinates; title, transport, timing and a clickable progress strip."""
+ if collapsed:return {102:(16,6,76,32),108:(98,6,36,32)}
  width=max(270,width);height=max(96,height);pad=10;gap=6
  available=width-2*pad-3*gap;back=int(available*.19);play=int(available*.32);speed=available-2*back-play
  row_height=max(26,min(44,height-74));bottom=height-34
- return {100:(pad,6,width-100,22),105:(width-76,4,66,24),
+ return {100:(pad,6,width-144,22),108:(width-112,4,30,24),105:(width-76,4,66,24),
          101:(pad,34,back,row_height),102:(pad+back+gap,34,play,row_height),
          103:(pad+back+play+2*gap,34,back,row_height),106:(width-pad-speed,34,speed,row_height),
          104:(pad,bottom,width-2*pad,20),107:(pad,height-10,width-2*pad,8)}
@@ -66,6 +68,8 @@ class FloatingBar:
   default=bind(user,'DefWindowProcW',LRESULT,[w.HWND,w.UINT,w.WPARAM,w.LPARAM]);register=bind(user,'RegisterClassW',w.ATOM,[ctypes.POINTER(WNDCLASS)])
   self.post=bind(user,'PostMessageW',w.BOOL,[w.HWND,w.UINT,w.WPARAM,w.LPARAM]);show=bind(user,'ShowWindow',w.BOOL,[w.HWND,ctypes.c_int]);destroy=bind(user,'DestroyWindow',w.BOOL,[w.HWND]);settext=bind(user,'SetWindowTextW',w.BOOL,[w.HWND,w.LPCWSTR]);invalidate=bind(user,'InvalidateRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT),w.BOOL])
   enable=bind(user,'EnableWindow',w.BOOL,[w.HWND,w.BOOL]);move=bind(user,'MoveWindow',w.BOOL,[w.HWND,ctypes.c_int,ctypes.c_int,ctypes.c_int,ctypes.c_int,w.BOOL])
+  setstyle=bind(user,'SetWindowLongW',ctypes.c_long,[w.HWND,ctypes.c_int,ctypes.c_long])
+  setpos=bind(user,'SetWindowPos',w.BOOL,[w.HWND,w.HWND,ctypes.c_int,ctypes.c_int,ctypes.c_int,ctypes.c_int,w.UINT])
   getrect=bind(user,'GetWindowRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT)]);clientrect=bind(user,'GetClientRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT)]);metrics=bind(user,'GetSystemMetrics',ctypes.c_int,[ctypes.c_int])
   getcursor=bind(user,'GetCursorPos',w.BOOL,[ctypes.POINTER(w.POINT)]);screenclient=bind(user,'ScreenToClient',w.BOOL,[w.HWND,ctypes.POINTER(w.POINT)])
   getmessage=bind(user,'GetMessageW',ctypes.c_int,[ctypes.POINTER(w.MSG),w.HWND,w.UINT,w.UINT]);translate=bind(user,'TranslateMessage',w.BOOL,[ctypes.POINTER(w.MSG)]);dispatch=bind(user,'DispatchMessageW',LRESULT,[ctypes.POINTER(w.MSG)]);quitmessage=bind(user,'PostQuitMessage',None,[ctypes.c_int])
@@ -76,14 +80,26 @@ class FloatingBar:
   addfont=bind(gdi,'AddFontResourceExW',ctypes.c_int,[w.LPCWSTR,w.DWORD,w.LPVOID]);removefont=bind(gdi,'RemoveFontResourceExW',w.BOOL,[w.LPCWSTR,w.DWORD,w.LPVOID])
   fontpath=pathlib.Path(__file__).resolve().parent/'assets/Rubik.ttf';fontloaded=bool(fontpath.exists() and addfont(str(fontpath),0x10,None))
   current_family='Rubik' if fontloaded else 'Segoe UI'
-  controls={};labels={101:'−15',102:'Play',103:'+15',105:'Open',106:'1x'};palette={};resources=[];font=None
+  controls={};labels={101:'−15',102:'Play',103:'+15',105:'Open',106:'1x',108:'−'};palette={};resources=[];font=None
   progress_ratio=0.;last_progress=None
   texts={};enabled={};visible=self.player.saved.get('floatingVisible',False)
+  collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE)
+  def apply_mode():
+   setstyle(self.hwnd,-16,ctypes.c_long(0x82000000 if collapsed else 0x02CC0000).value)
+   size=COLLAPSED_SIZE if collapsed else expanded_size
+   rect=w.RECT();getrect(self.hwnd,ctypes.byref(rect))
+   # Keep the restored window on screen, even after dragging the pill to an edge.
+   left,top,width,height=(metrics(i) for i in [76,77,78,79])
+   x=max(left,min(rect.left,left+max(0,width-size[0])));y=max(top,min(rect.top,top+max(0,height-size[1])))
+   setpos(self.hwnd,None,x,y,*size,0x0034)
+   resize();invalidate(self.hwnd,None,False)
   def resize():
    nonlocal last_progress
    if not self.hwnd:return
    rect=w.RECT();clientrect(self.hwnd,ctypes.byref(rect))
-   for ident,(x,y,width,height) in layout(rect.right,rect.bottom).items():
+   bounds=layout(rect.right,rect.bottom,collapsed)
+   for ident,handle in controls.items():show(handle,5 if ident in bounds else 0)
+   for ident,(x,y,width,height) in bounds.items():
     if ident in controls:move(controls[ident],x,y,width,height,True)
    last_progress=None
   def update():
@@ -111,25 +127,28 @@ class FloatingBar:
    progress=(rect.right,rect.bottom,round(max(0,rect.right)*progress_ratio),enabled[107])
    if last_progress!=progress:invalidate(controls[107],None,False);last_progress=progress
    title,play,back,forward=display(state,tracks)
-   values={100:title,102:play,101:back,103:forward,104:timing(state,False),105:'Open',106:f"{state.get('speed',1):g}x"}
+   values={100:title,102:play,101:back,103:forward,104:timing(state,False),105:'Open',106:f"{state.get('speed',1):g}x",108:'↗' if collapsed else '−'}
    for ident,text in values.items():
     if texts.get(ident)!=text:
      texts[ident]=text
      if ident in labels:labels[ident]=text
      settext(controls[ident],text)
   def proc(hwnd,msg,wp,lp):
-   nonlocal visible
+   nonlocal visible,collapsed,expanded_size
    try:
     if msg==0x0024:
      info=ctypes.cast(lp,ctypes.POINTER(MINMAXINFO)).contents
-     info.minTrackSize.x,info.minTrackSize.y=MIN_SIZE;return 0
+     info.minTrackSize.x,info.minTrackSize.y=COLLAPSED_SIZE if collapsed else MIN_SIZE;return 0
+    if msg==0x0084 and collapsed:return 2 # Unoccupied pill surface drags like a title bar.
     if msg==0x0005:resize();return 0
     if msg==0x0232:
      rect=w.RECT()
      if getrect(hwnd,ctypes.byref(rect)):
       with self.player.lock:
        self.player.saved['floatingPosition']=[rect.left,rect.top]
-       self.player.saved['floatingSize']=[max(MIN_SIZE[0],rect.right-rect.left),max(MIN_SIZE[1],rect.bottom-rect.top)];self.player.persist()
+       if not collapsed:
+        expanded_size=[max(MIN_SIZE[0],rect.right-rect.left),max(MIN_SIZE[1],rect.bottom-rect.top)];self.player.saved['floatingSize']=expanded_size
+       self.player.persist()
      return 0
     if msg in (0x0010,0x8001,0x8003):
      visible=bool(wp) if msg==0x8003 else False if msg==0x0010 else not visible;show(hwnd,4 if visible else 0)
@@ -141,6 +160,10 @@ class FloatingBar:
     if msg==0x0113:update();return 0
     if msg==0x0111:
      ident=wp&0xffff
+     if (wp>>16)==0 and ident==108:
+      collapsed=not collapsed
+      with self.player.lock:self.player.saved['floatingCollapsed']=collapsed;self.player.persist()
+      apply_mode();update();return 0
      if (wp>>16)==0 and ident==107:
       point=w.POINT();rect=w.RECT()
       if getcursor(ctypes.byref(point)) and screenclient(controls[107],ctypes.byref(point)) and clientrect(controls[107],ctypes.byref(rect)) and rect.right>0:
@@ -194,12 +217,14 @@ class FloatingBar:
    size=self.player.saved.get('floatingSize',list(DEFAULT_SIZE))
    if not isinstance(size,list) or len(size)!=2 or not all(isinstance(v,int) for v in size):size=list(DEFAULT_SIZE)
    bar_width=max(MIN_SIZE[0],size[0]);bar_height=max(MIN_SIZE[1],size[1])
+   expanded_size=[bar_width,bar_height]
+   if collapsed:bar_width,bar_height=COLLAPSED_SIZE
    left,top,width,height=(metrics(i) for i in [76,77,78,79])
    if width>0 and height>0:
-    bar_width=min(bar_width,max(MIN_SIZE[0],width));bar_height=min(bar_height,max(MIN_SIZE[1],height))
+    bar_width=min(bar_width,max(1,width));bar_height=min(bar_height,max(1,height))
     x=max(left,min(x,left+max(0,width-bar_width)));y=max(top,min(y,top+max(0,height-bar_height)))
    # WS_THICKFRAME enables resizing. WS_CLIPCHILDREN avoids painting over controls.
-   self.hwnd=create(0x08000088,name,'Shiur Player',0x02CC0000,x,y,bar_width,bar_height,None,None,instance,None)
+   self.hwnd=create(0x08000088,name,'Shiur Player',(0x82000000 if collapsed else 0x02CC0000),x,y,bar_width,bar_height,None,None,instance,None)
    if not self.hwnd:raise OSError(ctypes.get_last_error(),'Could not create floating bar.')
    for ident in (100,104):controls[ident]=create(0,'STATIC','',0x50004000,0,0,1,1,self.hwnd,ident,instance,None)
    # SS_OWNERDRAW | SS_NOTIFY: clickable, without claiming a keyboard tab stop.

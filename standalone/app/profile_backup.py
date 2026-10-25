@@ -13,7 +13,7 @@ FORMAT = 'shiur-player-backup'
 MAX_BYTES = 32 * 1024 * 1024
 RATES = (.5, .75, 1, 1.25, 1.5, 1.75, 2)
 # These settings refer to this computer and already-running native windows.
-DEVICE_SETTINGS = ('libraryRoot', 'globalShortcuts', 'floatingVisible',
+DEVICE_SETTINGS = ('libraryRoot', 'globalShortcuts', 'floatingVisible', 'floatingCollapsed',
                    'floatingPosition', 'floatingSize', 'windowSize')
 
 
@@ -49,7 +49,7 @@ def _validate(payload):
     _require(isinstance(state, dict), 'saved profile is missing.')
     allowed = {'tracks', 'folders', 'bookmarks', 'currentId', 'queue', 'autoNext',
                'speed', 'volume', 'skipSeconds', 'language', 'libraryRoot',
-               'librarySort', 'librarySortDescending', 'floatingVisible',
+               'librarySort', 'librarySortDescending', 'floatingVisible', 'floatingCollapsed',
                'floatingPosition', 'floatingSize', 'windowSize', 'floatingTheme',
                'halfSpeedCycleMigration', 'miniOnMinimize', 'globalShortcuts', 'miniSpeedMiddle', 'miniSpeedCycleIndex'}
     _require(not (set(state) - allowed), 'this profile contains settings from a newer player.')
@@ -98,7 +98,7 @@ def _validate(payload):
         _require(_number(state['volume']) and state['volume'] <= 1, 'invalid volume.')
     if 'skipSeconds' in state:
         _require(type(state['skipSeconds']) is int and state['skipSeconds'] in (10, 15, 60), 'invalid skip interval.')
-    for key in ('autoNext', 'librarySortDescending', 'floatingVisible', 'miniOnMinimize', 'globalShortcuts'):
+    for key in ('autoNext', 'librarySortDescending', 'floatingVisible', 'floatingCollapsed', 'miniOnMinimize', 'globalShortcuts'):
         if key in state:
             _require(type(state[key]) is bool, 'invalid ' + key + '.')
     for key in ('floatingPosition', 'floatingSize', 'windowSize'):

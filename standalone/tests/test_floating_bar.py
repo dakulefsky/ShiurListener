@@ -23,7 +23,9 @@ class TestBar(unittest.TestCase):
   self.assertEqual(module.timing({'position':5,'duration':0},False),'0:05')
   self.assertEqual(module.color('#123456','#000000'),0x563412)
   self.assertEqual(module.color('bad','#ffffff'),0xffffff)
- def test_native_transport_and_hiding(self):
+ def test_collapse_and_expand_preserve_transport_and_expanded_size(self):
+  self.test_native_transport_and_hiding(collapse=True)
+ def test_native_transport_and_hiding(self,collapse=False):
   from ctypes import wintypes as w
   with tempfile.TemporaryDirectory() as tmp:
    class Player:
@@ -37,6 +39,8 @@ class TestBar(unittest.TestCase):
      if cmd['op']=='seek':self.state['position']=cmd['value']
     def persist(self):self.writes+=1
    player=Player();callbacks={};handles={};shows=[];texts=[];next_handle=10;messages=[(0x111,106),(0x111,105),(0x0005,0),(0x0232,0)]+[(0x113,0)]*10+[(0x111,107),(0x111,102),(0x111,101),(0x111,103),(0x10,0),(0x8001,0),(0x8003,1),(0x8003,1),(0x8003,0)];registered_style=[];window_sizes=[];invalidations=[];moves=[];caption_updates=[];bounds={};idle_checks=[]
+   mode_sizes=[]
+   if collapse:messages[14:14]=[(0x111,108),(0x0232,0),(0x111,108)]
    def register(pointer):callbacks['proc']=pointer._obj.proc;return 1
    def create(ex,name,title,style,x,y,width,height,parent,ident,instance,param):
     nonlocal next_handle
@@ -57,18 +61,23 @@ class TestBar(unittest.TestCase):
    def move(hwnd,x,y,width,height,repaint):bounds[hwnd]=(x,y,width,height);moves.append((hwnd,(x,y,width,height,repaint)));return 1
    def screenclient(hwnd,pointer):pointer._obj.x=192;pointer._obj.y=4;return 1
    def settext(hwnd,text):texts.append(text);caption_updates.append((handles[hwnd],text));return 1
-   user_funcs={'GetSystemMetrics':lambda index:{76:0,77:0,78:1920,79:1080}.get(index,0),'GetWindowRect':getrect,'GetClientRect':clientrect,'ScreenToClient':screenclient,'InvalidateRect':lambda hwnd,rect,erase:invalidations.append((hwnd,erase)) or 1,'MoveWindow':move,'RegisterClassW':register,'CreateWindowExW':create,'GetMessageW':message,'DispatchMessageW':dispatch,'ShowWindow':lambda hwnd,mode:shows.append(mode) or 1,'SetWindowTextW':settext,'LoadCursorW':lambda *args:1,'DefWindowProcW':lambda *args:0}
+   user_funcs={'SetWindowPos':lambda hwnd,after,x,y,width,height,flags:mode_sizes.append((width,height)) or 1,'GetSystemMetrics':lambda index:{76:0,77:0,78:1920,79:1080}.get(index,0),'GetWindowRect':getrect,'GetClientRect':clientrect,'ScreenToClient':screenclient,'InvalidateRect':lambda hwnd,rect,erase:invalidations.append((hwnd,erase)) or 1,'MoveWindow':move,'RegisterClassW':register,'CreateWindowExW':create,'GetMessageW':message,'DispatchMessageW':dispatch,'ShowWindow':lambda hwnd,mode:shows.append(mode) or 1,'SetWindowTextW':settext,'LoadCursorW':lambda *args:1,'DefWindowProcW':lambda *args:0}
    class Library:
     def __init__(self,functions):self.functions=functions
     def __getattr__(self,name):value=Function(self.functions.get(name,lambda *args:1));setattr(self,name,value);return value
    libraries={'user32':Library(user_funcs),'gdi32':Library({}),'kernel32':Library({})}
    with unittest.mock.patch.object(module.ctypes,'WinDLL',side_effect=lambda name,**kwargs:libraries[name],create=True),unittest.mock.patch.object(module.ctypes,'WINFUNCTYPE',ctypes.CFUNCTYPE,create=True):
     bar=module.FloatingBar(player);bar.run()
-   self.assertEqual(player.commands,[{'op':'speed_cycle'},{'op':'seek','value':180.0},{'op':'toggle'},{'op':'skip','direction':-1},{'op':'skip','direction':1}]);self.assertIn(0,shows);self.assertEqual(shows[-3:],[4,4,0]);self.assertFalse(player.saved['floatingVisible']);self.assertEqual(player.writes,6);self.assertIn('Current shiur',texts);self.assertEqual(registered_style[0]&0x08000088,0x08000088);self.assertEqual(bar.status,'ready')
+   self.assertEqual(player.commands,[{'op':'speed_cycle'},{'op':'seek','value':180.0},{'op':'toggle'},{'op':'skip','direction':-1},{'op':'skip','direction':1}]);self.assertIn(0,shows);self.assertEqual(shows[-3:],[4,4,0]);self.assertFalse(player.saved['floatingVisible']);self.assertEqual(player.writes,9 if collapse else 6);self.assertIn('Current shiur',texts);self.assertEqual(registered_style[0]&0x08000088,0x08000088);self.assertEqual(bar.status,'ready')
    self.assertEqual(player.saved['floatingSize'],[420,180]);self.assertEqual(player.saved['floatingPosition'],[72,96]);self.assertEqual(player.opens,1)
    self.assertEqual(window_sizes[0][:2],module.DEFAULT_SIZE);self.assertTrue(window_sizes[0][2]&0x00040000)
-   self.assertTrue(moves);self.assertEqual(len([i for i in invalidations if i[0]==11]),1);self.assertFalse(any(erase for _,erase in invalidations))
+   self.assertTrue(moves);self.assertEqual(len([i for i in invalidations if i[0]==11]),3 if collapse else 1);self.assertFalse(any(erase for _,erase in invalidations))
    self.assertEqual(len([c for c in caption_updates if c[0]==100]),1);self.assertEqual(len([c for c in caption_updates if c[0]==104]),2)
    self.assertEqual(len(set(idle_checks[1:])),1,'Idle timer ticks must not repaint the strip or rewrite captions.')
    self.assertIn((106,'1.5x'),caption_updates)
+   if collapse:
+    self.assertEqual(mode_sizes,[module.COLLAPSED_SIZE,(420,180)])
+    self.assertFalse(player.saved['floatingCollapsed'])
+    self.assertIn((108,'↗'),caption_updates)
+    self.assertEqual(set(module.layout(*module.COLLAPSED_SIZE,collapsed=True)),{102,108})
 if __name__=='__main__':unittest.main(verbosity=2)

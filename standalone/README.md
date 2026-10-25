@@ -64,3 +64,7 @@ Both main and mini speed buttons use 1 → 1.5 → 2 → 0.5 → 1×, regardless
 ## 0.8.2 library and branding
 
 Favorites controls are removed from the interface; existing profile metadata is retained. Rename recording in More or the right-click menu renames the actual audio file and migrates its saved position, bookmarks, collections and queue entries. The audio extension stays unchanged; conflicting or invalid names are rejected. Renaming an active recording briefly reloads it at its saved place and preserves paused/playing state.
+
+## Tiny floating player (development)
+
+Click the minus button in the floating mini player to collapse it into a 144 × 44 draggable pill. Play/pause remains available; click the expand arrow to restore the previous mini-player size. Drag the empty left edge to reposition the pill. Collapsing does not pause playback. The collapsed preference and position are saved, and the expanded size is kept separately. This source change has not yet been included in a Windows installer; native Windows visual testing remains required.
