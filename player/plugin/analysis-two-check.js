@@ -11,6 +11,18 @@ function decide(rows){
  if(!music&&rows.every(r=>r.speech>=.5))return {decision:'provisional_speech',reason:'Both checks indicate speech'};
  return {decision:'uncertain',reason:'Insufficient clear speech evidence'};
 }
+function prepareInput(samples){
+ if(!samples||samples.length!==15600)throw Error('Invalid analyzer sample length');
+ let dc=0;
+ for(const value of samples){if(!Number.isFinite(value))throw Error('Invalid analyzer sample');dc+=value;}
+ dc/=samples.length;let power=0,peak=0;
+ for(const value of samples){const centered=value-dc;power+=centered*centered;peak=Math.max(peak,Math.abs(centered));}
+ const rms=Math.sqrt(power/samples.length);
+ // Do not amplify digital silence or force quiet material to pass. Scores still decide.
+ const gain=rms>1e-5?Math.max(1,Math.min(16,.08/rms,.95/Math.max(peak,1e-12))):1;
+ const waveform=Float32Array.from(samples,value=>(value-dc)*gain);
+ return {waveform,stats:{dcOffset:dc,inputRms:rms,appliedGain:gain}};
+}
 function abortable(action,signal){
  return new Promise((resolve,reject)=>{
   const aborted=()=>{signal.removeEventListener('abort',aborted);reject(signal.reason||new DOMException('Scan cancelled','AbortError'));};
@@ -48,13 +60,13 @@ async function scan(url,{assetBase=new URL('../../plugin/',document.baseURI).hre
   onProgress('Reading two bounded excerpts');const [samples,net]=await abortable(Promise.all([prepared.samples(),netPromise]),controller.signal);prepared.file.check();
   const checks=[];
   for(let i=0;i<samples.length;i++){
-   prepared.file.check();onProgress(`Checking excerpt ${i+1}/2`);const input=tf.tensor1d(samples[i]);let output;
-   try{output=net.predict(input);const scores=output.dataSync();checks.push({startSeconds:prepared.times[i],speech:scores[0],music:scores[132],singing:scores[24]});}
+   prepared.file.check();onProgress(`Checking excerpt ${i+1}/2`);const preparedInput=prepareInput(samples[i]),input=tf.tensor1d(preparedInput.waveform);let output;
+   try{output=net.predict(input);const scores=output.dataSync();checks.push({startSeconds:prepared.times[i],speech:scores[0],music:scores[132],singing:scores[24],inputPreparation:preparedInput.stats});}
    finally{input.dispose();output?.dispose();}
   }
   prepared.file.check();const result=decide(checks);
-  return {...result,policy:'two-interior-checks-v2-speech-priority',scope:'sampled_only',fullFileApproved:false,checks,encodedBytes:prepared.file.size,sourceBytesRead:prepared.file.bytesRead,sourceRangeRequests:prepared.file.requests,duration:prepared.info.duration,format:prepared.info.kind,positionAccuracy:prepared.info.kind==='mp3'?'approximate MPEG byte seek':'PCM sample position',wallMs:performance.now()-started};
+  return {...result,policy:'two-interior-checks-v2-speech-priority',preprocessing:'dc-quiet-gain-v1',scope:'sampled_only',fullFileApproved:false,checks,encodedBytes:prepared.file.size,sourceBytesRead:prepared.file.bytesRead,sourceRangeRequests:prepared.file.requests,duration:prepared.info.duration,format:prepared.info.kind,positionAccuracy:prepared.info.kind==='mp3'?'approximate MPEG byte seek':'PCM sample position',wallMs:performance.now()-started};
  }finally{clearTimeout(timer);signal?.removeEventListener('abort',cancel);controller.abort();}
 }
-root.BrowserTwoCheck={scan,decide};
+root.BrowserTwoCheck={scan,decide,prepareInput};
 })(globalThis);

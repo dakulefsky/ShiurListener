@@ -11,6 +11,8 @@ See the [complete Hebrew handoff](../docs/INSIDE_DEVELOPER_HANDOFF.he.md) or [do
 
 See also the [supplemental Inside review in Hebrew](../docs/INSIDE_REVIEW_2026-10-25.he.md) for the latest reproduced bugs, source fixes and verification. No new plugin archive was published.
 
+See [the offline analyzer improvement results](../docs/INSIDE_ANALYZER_IMPROVEMENTS.he.md) for the new bounded quiet-input preparation and paired/regression measurements.
+
 ## Store upload requirements
 
 See [the publishing review](STORE_UPLOAD.md) for the official sources, field requirements, validation results and first-upload requirements. Published packages were built and checked with the official Otzaria validator; the current development source has been validated without publishing a new archive; the repository now checks manifest metadata and runs the official validator in CI with store publishing explicitly disabled.

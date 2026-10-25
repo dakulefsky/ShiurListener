@@ -71,3 +71,13 @@ Actual outputs are in `results/`. Source helper modules live in `player/plugin` 
 ## Deep review follow-up
 
 [Code review and fixes](CODE_REVIEW.md) records reproduced lifecycle, seek, timeout, permission, parser and stereo issues, plus the final regression results. The current picker now advertises MP3/WAV only; existing other-format library entries are preserved. Old validation counts and benchmark files above describe the earlier integration checkpoint; review results are in `results/review/`.
+
+## Quiet-recording improvement: bounded input preparation
+
+Before each of the same two model calls, the input now has its constant offset removed and receives bounded gain if quiet (target RMS 0.08, maximum 16×, peak-limited when boosting). Digital silence/near-silence is not boosted. This adds no range reads, model calls, model weights, external dependencies or threshold relaxation. Results identify `preprocessing: dc-quiet-gain-v1` and record input RMS, offset and applied gain per check. This is level preparation, not general denoising or restoration of damaged speech.
+
+Paired Chromium tests used the same encoded bytes and sample locations for baseline and candidate: 64 speech + 64 music sources, each at original level, 0.01× level (−40 dB), and 0.01× with an added 0.05 DC offset. Short sources were repeated to five minutes. Of 128 quiet speech variants, passes improved from 2 to 126; two remain uncertain/blocked. Across all 192 music variants, neither version passed any as speech. Detected music increased from 56 to 160, while the remaining music versions were uncertain and blocked. Candidate median scan time was 33.2 ms, maximum 169.6 ms on the development machine; these are not user-hardware guarantees.
+
+The separate 136-file regression rerun retained all original counts: speech 64/64 pass; pure music 0/64 pass (55 detected, 9 uncertain); full Freifeld shiur passes; mixtures 4/5 pass; silence/noise do not pass. External requests were blocked in that rerun. These reused/synthetic examples are not an independent accuracy estimate and do not validate Hebrew/Yiddish performance.
+
+[Paired measurements](results/preprocessing/paired-variants.json) · [Original corpus rerun](results/preprocessing/corpus-regression.json) · [Hebrew explanation](../../../docs/INSIDE_ANALYZER_IMPROVEMENTS.he.md). Reproduce the paired test with `evaluate_preprocessing.py --assets /path/to/research-fixtures --output paired.json`; it loads the baseline analyzer from Git commit `3ac22b7`, which must be present locally.

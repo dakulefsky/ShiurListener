@@ -1,0 +1,55 @@
+<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><title>שיפור בדיקת השמע המקומית</title><style>
+body{font-family:'Noto Sans Hebrew',Arial,sans-serif;color:#1d2939;font-size:10.5pt;line-height:1.65;max-width:900px;margin:36px auto;padding:0 20px}h1{font-size:23pt;color:#203b69;line-height:1.4}h2{font-size:15pt;margin-top:26px;border-bottom:1px solid #dbe3ef;padding-bottom:6px}h3{font-size:12pt}h1,h2,h3{break-after:avoid}table{width:100%;border-collapse:collapse;font-size:9pt;margin:15px 0}th,td{border:1px solid #d4dce8;padding:7px;text-align:right;vertical-align:top}th{background:#edf2fa}tr{break-inside:avoid}code{font-family:monospace;direction:ltr;unicode-bidi:isolate;font-size:9pt;background:#f1f4f8}a{color:#2455a4}li{margin:6px 0}p{orphans:3;widows:3}@media print{body{max-width:none;margin:0;padding:0}a{text-decoration:none}}
+</style><body><h1>שיפור בדיקת השמע המקומית — Inside 1.6.0 בפיתוח</h1>
+<p>בוצע שיפור בהכנת האות לפני הפעלת המודל: הסרת הזזה קבועה של גל השמע (DC) והגברה מוגבלת של קטעים חלשים. לא שונו המודל, ספי ההחלטה או מדיניות העדפת הדיבור. אין צורך באינטרנט, Python או יישום נלווה במחשב המשתמש. לא פורסמה חבילת תוסף חדשה.</p>
+<h2>מה נשאר קבוע</h2>
+<p>בדיוק שתי בדיקות מודל, כל אחת על 0.975 שניות, באותם אזורים בהקלטה. נשארו דדליין חמש שניות, קריאות חלקיות של MP3/WAV, מגבלת 2 GiB/שמונה שעות, בדיקת מינימום חמש דקות, אימות המודל המקומי ואיסור ניגון לפני אישור הבדיקה. אין קריאה מלאה של ההקלטה ואין דגימה שלישית.</p>
+<h2>הכנת האות</h2>
+<ul>
+<li>מחושב הממוצע של הדגימה והוא מופחת ממנה, להסרת היסט DC.</li>
+<li>מחושבת עוצמת RMS. בקטעים חלשים ניתן להגביר עד פי 16, לעוצמת יעד 0.08; ההגברה מוגבלת גם לפי שיא האות כדי למנוע חיתוך שנגרם מההגברה.</li>
+<li>שתיקה דיגיטלית ואות שכמעט אפסי אינם מוגברים. אין כלל שמאשר קובץ רק מפני שהוא חלש.</li>
+<li>החלטת המודל עדיין נדרשת. תוצאה לא ודאית נשארת חסומה.</li>
+<li>התוצאה מסומנת <code>preprocessing: dc-quiet-gain-v1</code>, עם נתוני RMS, היסט והגברה לכל דגימה, לצורך אבחון.</li>
+</ul>
+<p>זה אינו סינון רעשים כללי, הפרדת דיבור ממוזיקה או שחזור מידע שאבד בהקלטה.</p>
+<h2>תוצאות מדודות</h2>
+<p>בדיקה מזווגת על 64 קטעי דיבור ו־64 קטעי מוזיקה ממאגר הניסוי הקיים. מכל מקור נוצרו שלוש גרסאות: רמה מקורית, עוצמה פי 0.01, ועוצמה פי 0.01 עם היסט DC של 0.05. קטעים קצרים חזרו על עצמם עד חמש דקות. בכל זוג נבדקו אותם בתים ואותם זמני דגימה; בכל ניתוח היו בדיוק שתי בדיקות.</p>
+<table>
+<thead>
+<tr>
+<th>קבוצה</th>
+<th style="text-align: right;">לפני</th>
+<th style="text-align: right;">אחרי</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>גרסאות דיבור חלשות שאושרו, מתוך 128</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">126</td>
+</tr>
+<tr>
+<td>כלל גרסאות הדיבור שאושרו, מתוך 192</td>
+<td style="text-align: right;">66</td>
+<td style="text-align: right;">190</td>
+</tr>
+<tr>
+<td>גרסאות מוזיקה שאושרו בטעות, מתוך 192</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>גרסאות מוזיקה שזוהו כמוזיקה, מתוך 192</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">160</td>
+</tr>
+</tbody>
+</table>
+<p>שתי גרסאות דיבור נשארו לא ודאיות וחסומות; לא נוספה עקיפה כדי לאשר אותן. גרסאות המוזיקה שלא זוהו במפורש כמוזיקה נשארו לא ודאיות וחסומות.</p>
+<p>בהרצה נפרדת על 136 קובצי הבדיקה המקוריים נשמרו התוצאות: 64/64 קטעי דיבור אושרו; 0/64 קטעי מוזיקה אושרו; השיעור המלא של הרב פרייפלד אושר; 4/5 תערובות שנבנו לניסוי אושרו; שתיקה ורעש לא אושרו. בקשות לרשת חיצונית נחסמו בהרצה זו.</p>
+<p>חציון זמן הבדיקה של השיטה החדשה בניסוי המזווג היה 33.2 מילישניות; המרבי 169.6 מילישניות. זהו מחשב הפיתוח, ולא התחייבות לזמן במחשב המשתמש או בתוך אוצריא.</p>
+<h2>גבולות המסקנה</h2>
+<p>אלו מקורות שכבר נבדקו וגרסאות סינתטיות שלהם, ולא מאגר עצמאי או מדידת דיוק כללית. אין כאן נתוני אימות חדשים בעברית/יידיש. שתי דגימות קצרות עדיין עלולות לפספס מוזיקה בהמשך ההקלטה; חלק מתערובות הדיבור והמוזיקה עוברות בכוונה לפי הפשרה שנבחרה. אי אפשר להסיק מהתוצאה שההקלטה כולה היא שיעור תורה.</p>
+<p>ניגון ברקע, חלונית צפה ואכיפה שאינה ניתנת לעקיפה באמצעות שינוי התוסף עדיין דורשים שינוי במארח אוצריא. יש לבדוק את המימוש במופע אוצריא מותקן.</p>
+<p><a href="https://github.com/dakulefsky/ShiurListener/blob/main/player/experiments/browser-two-check/results/preprocessing/paired-variants.json">נתוני הבדיקה המזווגת</a> · <a href="https://github.com/dakulefsky/ShiurListener/blob/main/player/experiments/browser-two-check/results/preprocessing/corpus-regression.json">הרצת 136 הקבצים</a></p></body></html>
