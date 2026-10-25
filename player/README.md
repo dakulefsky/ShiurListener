@@ -75,3 +75,7 @@ SHIUR_PLUGIN_ROOT=/path/to/ShiurListener/player flutter test /path/to/ShiurListe
 No Otzaria native source is modified for 1.4.5. The developer handoff identifies the inspected upstream commit and separates current features from proposed host work.
 
 The actual-file-server integration test also needs ffmpeg to generate its real WAV fixture. From the Otzaria checkout, run `SHIUR_PLUGIN_ROOT=/path/to/ShiurListener/player OTZARIA_SOURCE_ROOT=/path/to/otzaria flutter test /path/to/ShiurListener/player/tests/real_host_media_test.dart`. These remain development prerequisites only.
+
+## 1.4.6: minimum recording duration
+
+Only recordings of at least five minutes can play. Unknown/non-finite duration is blocked, including through direct controls. Short shiurim also fail; long music can pass. The fixed diagnostic sound remains available. This does not enforce host-level media restrictions or identify speech/music. See [the developer policy note](../docs/INSIDE_MEDIA_POLICY.md). Author remains DanTheMan; plugin ID and saved data keys are unchanged.

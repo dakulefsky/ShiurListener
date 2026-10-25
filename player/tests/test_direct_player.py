@@ -17,7 +17,7 @@ window.Otzaria={on(topic,fn){(handlers[topic]||=[]).push(fn);if(topic==='plugin.
  else if(method==='fs.listUserFolder')data={entries:[{type:'file',name:'First.wav',path:'First.wav'},{type:'file',name:'Second.wav',path:'Second.wav'}]};
  else if(method==='fs.resolveFileUrl'||method==='fs.openFolderFile'){
   if(window.fileRevoked||window.fileMissing)return {success:false,error:{message:'File unavailable'}};
-  data={url:location.origin+'/sample.wav'};
+  data={url:location.origin+(window.shortFile?'/short.wav':'/sample.wav')};
  }else return {success:false,error:{message:'Unexpected method: '+method}};
  return {success:true,data};
 }};
@@ -25,8 +25,8 @@ window.Otzaria={on(topic,fn){(handlers[topic]||=[]).push(fn);if(topic==='plugin.
 class Quiet(http.server.SimpleHTTPRequestHandler):
  def log_message(self,*_):pass
  def do_GET(self):
-  if self.path.split('?')[0]!='/sample.wav':return super().do_GET()
-  data=(pathlib.Path(self.directory)/'sample.wav').read_bytes();start,end=0,len(data)-1;ranged=self.headers.get('Range')
+  if self.path.split('?')[0] not in ('/sample.wav','/short.wav'):return super().do_GET()
+  data=(pathlib.Path(self.directory)/self.path.split('?')[0].lstrip('/')).read_bytes();start,end=0,len(data)-1;ranged=self.headers.get('Range')
   if ranged:
    bounds=ranged.removeprefix('bytes=').split('-');start=int(bounds[0] or 0)
    if bounds[1]:end=min(end,int(bounds[1]))
@@ -39,7 +39,9 @@ def main():
   for file in (ROOT/'plugin').iterdir():shutil.copy(file,directory)
   with wave.open(str(pathlib.Path(directory)/'sample.wav'),'wb') as wav:
    wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(8000)
-   tone=b''.join(struct.pack('<h',int(2000*math.sin(2*math.pi*220*n/8000))) for n in range(8000));wav.writeframes(tone*120)
+   tone=b''.join(struct.pack('<h',int(2000*math.sin(2*math.pi*220*n/8000))) for n in range(8000));wav.writeframes(tone*600)
+  with wave.open(str(pathlib.Path(directory)/'short.wav'),'wb') as wav:
+   wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(8000);wav.writeframes(tone*10)
   server=http.server.ThreadingHTTPServer(('127.0.0.1',0),functools.partial(Quiet,directory=directory));threading.Thread(target=server.serve_forever,daemon=True).start()
   url=f'http://127.0.0.1:{server.server_port}/'
   try:
@@ -49,7 +51,7 @@ def main():
     context=browser.new_context(viewport={'width':1440,'height':1000});context.add_init_script(MOCK)
     page=context.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(url)
     expect(page.locator('#add-folder')).to_be_enabled()
-    expect(page.locator('header h1')).to_contain_text('נגן שיעורים');expect(page.locator('header h1')).to_contain_text('1.4.5')
+    expect(page.locator('header h1')).to_contain_text('נגן שיעורים');expect(page.locator('header h1')).to_contain_text('1.4.6')
     expect(page.locator('#welcome')).to_be_visible();assert page.locator('#audio').get_attribute('controls') is not None
     assert 'nodownload' in page.locator('#audio').get_attribute('controlslist')
     page.locator('#add-folder').click();expect(page.locator('.track')).to_have_count(2)
@@ -97,7 +99,7 @@ def main():
     positions=page.evaluate("JSON.parse(localStorage.getItem('shiur-audio-v1:progress')).positions")
     assert positions['folder:series:Second.wav']['positionMs']==23000
     page.locator('#more-options summary').click();page.locator('#autonext').check()
-    page.locator('#audio').evaluate('(a)=>{a.currentTime=119.9}')
+    page.locator('#audio').evaluate('(a)=>{a.currentTime=599.9}')
     page.locator('#play').click();expect(page.locator('#current-title')).to_have_text('Second.wav')
     page.wait_for_function('!document.querySelector("#audio").paused')
     page.locator('#play').click();page.wait_for_function('document.querySelector("#audio").paused')
@@ -113,6 +115,9 @@ def main():
     page.wait_for_function('!document.querySelector("#sound-check-audio").paused')
     assert page.locator('#audio').evaluate('(a)=>a.paused')
     page.evaluate("bridge.emit('plugin.suspended')");assert page.locator('#sound-check-audio').evaluate('(a)=>a.paused')
+    page.evaluate("bridge.emit('plugin.resumed')");page.evaluate('window.shortFile=true')
+    page.locator('#add-file').click();expect(page.locator('#status')).to_contain_text('חמש דקות')
+    assert page.locator('#audio').evaluate('(a)=>a.paused && a.muted && !a.getAttribute("src")')
     assert not errors,errors
     manifest=json.loads((ROOT/'plugin/manifest.json').read_text())
     assert 'background' not in manifest['contributes']

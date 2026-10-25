@@ -3,7 +3,7 @@
 const P=ShiurProtocol,K=P.keys;
 class LocalAudioEngine {
  constructor(audio){
-  this.audio=audio;this.session=ShiurCore.uuid();this.queue=[];this.current=null;this.loaded=false;this.positions=Object.create(null);this.savedPositions=Object.create(null);this.savedAt=0;this.restored=false;
+  this.audio=audio;this.audio.muted=true;this.session=ShiurCore.uuid();this.queue=[];this.current=null;this.loaded=false;this.positions=Object.create(null);this.savedPositions=Object.create(null);this.savedAt=0;this.restored=false;
   this.speed=1;this.volume=1;this.skipSeconds=15;this.autoNext=false;this.sleepUntil=0;this.error='';this.storageError='';
   this.tail=Promise.resolve();this.ready=false;this.running=false;this.closed=false;this.visible=true;this.lastAccess=0;
  }
@@ -83,7 +83,8 @@ class LocalAudioEngine {
   this.audio.addEventListener('ended',()=>this.serial(async()=>{this.capture();await this.expireSleep();if(this.autoNext&&!this.sleepExpired&&this.visible)await this.advance(1);await this.publish();}));
   this.audio.addEventListener('error',()=>{this.audio.pause();this.error='לא ניתן לנגן את קובץ השמע. בדקו את הפורמט ואת הרשאת הקובץ.';this.serial(()=>this.publish());});
   this.audio.addEventListener('pause',()=>{this.capture();if(!this.closed)this.serial(()=>this.publish());});
-  this.audio.addEventListener('play',()=>{if(!this.visible||!this.ready){this.audio.pause();return;}this.error='';this.serial(()=>this.publish());});
+  this.audio.addEventListener('durationchange',()=>{if(this.loaded&&!this.allowedDuration())this.blockShortAudio();});
+  this.audio.addEventListener('play',()=>{if(!this.visible||!this.ready||!this.loaded||!this.allowedDuration()){this.audio.pause();return;}this.error='';this.serial(()=>this.publish());});
   this.audio.addEventListener('seeked',()=>{this.capture();if(this.ready&&!this.closed)this.serial(()=>this.publish());});
   }
   this.ready=true;this.setupMediaSession();try{await this.publish();}catch(error){this.ready=false;throw error;}
@@ -102,14 +103,21 @@ class LocalAudioEngine {
   if(typeof file?.url!=='string')throw Error('לא התקבלה גישה לקובץ השמע');
   return file.url;
  }
+ allowedDuration(){return Number.isFinite(this.audio.duration)&&this.audio.duration>=300;}
+ blockShortAudio(){
+  this.loaded=false;this.audio.muted=true;this.audio.pause();
+  this.error='ניתן לנגן רק הקלטות באורך חמש דקות ומעלה. הקלטה קצרה או שאורכה אינו ידוע חסומה.';
+  this.audio.removeAttribute('src');this.audio.load();
+  return Error(this.error);
+ }
  async load(track,initial=0){
   const url=await this.resolve(track);
-  this.audio.pause();this.capture();await this.publish();
+  this.audio.pause();this.capture();await this.publish();this.audio.muted=true;
   this.current=track;this.loaded=false;this.error='';this.sleepExpired=false;
   const start=this.positions[track.id]?.positionMs??P.position(initial);
   await new Promise((resolve,reject)=>{
    const clean=()=>{clearTimeout(timer);this.audio.removeEventListener('loadedmetadata',ready);this.audio.removeEventListener('error',failed);};
-   const ready=()=>{clean();resolve();};
+   const ready=()=>{clean();if(!this.allowedDuration()){reject(this.blockShortAudio());return;}resolve();};
    const failed=()=>{clean();reject(Error(this.audio.error?.code===4?'פורמט השמע אינו נתמך בנגן של אוצריא. נסו קובץ MP3 או WAV.':'לא ניתן לקרוא את השיעור. בדקו שהקובץ קיים ושהגישה אליו מאושרת.'));};
    const timer=setTimeout(()=>{clean();reject(Error('טעינת השיעור ארכה זמן רב מדי'));},15000);
    this.audio.addEventListener('loadedmetadata',ready,{once:true});this.audio.addEventListener('error',failed,{once:true});
@@ -117,12 +125,13 @@ class LocalAudioEngine {
   });
   this.audio.playbackRate=this.speed;this.audio.volume=this.volume;
   this.audio.currentTime=Math.min(start/1000,Number.isFinite(this.audio.duration)?this.audio.duration:start/1000);
-  this.loaded=true;this.capture();this.lastAccess=Date.now();
+  this.loaded=true;this.audio.muted=false;this.capture();this.lastAccess=Date.now();
   if(navigator.mediaSession&&root.MediaMetadata)navigator.mediaSession.metadata=new MediaMetadata({title:track.title,artist:'נגן שיעורים — אוצריא'});
  }
  play(){
   if(!this.ready||!this.visible||this.closed)return Promise.reject(Error('פתחו את נגן השיעורים כדי להפעיל את השמע'));
   if(!this.current||!this.loaded)return Promise.reject(Error('בחרו שיעור והמתינו לטעינה, ואז לחצו על ניגון'));
+  if(!this.allowedDuration())return Promise.reject(this.blockShortAudio());
   this.error='';this.sleepExpired=false;
   return this.audio.play().catch(error=>{
    this.audio.pause();

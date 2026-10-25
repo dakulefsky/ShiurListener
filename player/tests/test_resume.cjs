@@ -8,7 +8,7 @@ const root=path.resolve(__dirname,'../plugin');
 const clone=value=>JSON.parse(JSON.stringify(value));
 function fixture({granted=true,entries={}}={}){
  const store=new Map(Object.entries(clone(entries)));
- const audio={currentTime:0,duration:120,readyState:0,paused:true,ended:false,playbackRate:1,volume:1,addEventListener(){},pause(){this.paused=true;}};
+ const audio={currentTime:0,duration:600,readyState:0,paused:true,ended:false,playbackRate:1,volume:1,addEventListener(){},pause(){this.paused=true;}};
  let failKey=null;
  const context=vm.createContext({console,crypto:{randomUUID},navigator:{},window:{addEventListener(){}},document:{addEventListener(){}},setInterval:()=>1,clearInterval(){},setTimeout,clearTimeout,Otzaria:{on(){},async call(method,args={}){
   if(method==='app.getGrantedPermissions')return {success:true,data:{permissions:granted?['fs.user_files.read']:[]}};
