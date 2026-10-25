@@ -57,3 +57,7 @@ Download **shiur-player-1.4.5.otzplugin**. The author is exactly **DanTheMan**. 
 ## Standalone Windows app 0.5.0 — stronger contrast and resizable mini player
 
 Download **shiur-player-windows-x64-0.5.0.zip**. Bold navy/blue styling, a clear Mini player button, locked column dividers, and a smaller resizable floating player with saved size/position and clickable speed. Settings offers 0.5× or 1.5× speed-cycle steps. Repeated idle redraws and the floating player’s full-window erase loop were removed. Existing saved positions carry over. [Preview](../previews/shiur-player-0.5.0.png). Windows GUI and physical audio remain unverified here.
+
+## Standalone Windows app 0.5.1 — preferred speed cycle
+
+Download **shiur-player-windows-x64-0.5.1.zip**. The mini-player speed button now defaults to **1× → 1.5× → 2× → 1.5× → 1×**. The half-speed cycle remains an option in Settings. All 0.5.0 visual, resizing and redraw improvements are retained.

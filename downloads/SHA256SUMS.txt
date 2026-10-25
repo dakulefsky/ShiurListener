@@ -24,3 +24,5 @@ d05412434a9c2c9cfd7514409147b0d651af4b47cbc1feff12b76e17e778bca0  shiur-player-s
 c147b8ba1cd24d27cbcc99d5184f01c09dbd6c1b5a0f28659cc05202a1d95c88  shiur-player-1.4.5.otzplugin
 298edda37cf8f241602042a405738394fe8fcb82549f02d5016d6f44bd3354c9  shiur-player-windows-x64-0.5.0.zip
 707e7be58aa1b098877cd7176d4a3b4f79573e9c1c8e49f55b5e103d9159e4ed  shiur-player-standalone-source-0.5.0.zip
+cf7867bc4b5c5b23aa906d6b84fb6ebb413c7b769970cd6b3acafd0d5c6961c5  shiur-player-windows-x64-0.5.1.zip
+63eabc9e472c64fa27e4989be51bac234cf50cbcfaeb3b889dc7a9c86535a9d7  shiur-player-standalone-source-0.5.1.zip

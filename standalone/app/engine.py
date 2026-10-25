@@ -137,8 +137,8 @@ class Player:
                 rates=[.5,.75,1,1.25,1.5,1.75,2];index=rates.index(self.saved['speed']);index=max(0,min(len(rates)-1,index+int(data.get('direction',1))))
                 return self.command({'op':'speed','value':rates[index]})
             if op=='speed_cycle':
-                middle=self.saved.get('miniSpeedMiddle',.5)
-                if middle not in (.5,1.5):middle=.5
+                middle=self.saved.get('miniSpeedMiddle',1.5)
+                if middle not in (.5,1.5):middle=1.5
                 cycle=[1,middle,2,middle];phase=self.saved.get('miniSpeedCycleIndex')
                 if not isinstance(phase,int) or not 0<=phase<len(cycle) or cycle[phase]!=self.saved['speed']:
                     phase=cycle.index(self.saved['speed']) if self.saved['speed'] in cycle else -1

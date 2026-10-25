@@ -31,7 +31,7 @@ class TestBar(unittest.TestCase):
     def snapshot(self):return self.state
     def command(self,cmd):
      self.commands.append(cmd);self.state['status']='paused'
-     if cmd['op']=='speed_cycle':self.state['speed']=.5
+     if cmd['op']=='speed_cycle':self.state['speed']=1.5
     def persist(self):self.writes+=1
    player=Player();callbacks={};handles={};shows=[];texts=[];next_handle=10;messages=[(0x111,106),(0x111,105),(0x0005,0),(0x0232,0)]+[(0x113,0)]*10+[(0x111,102),(0x111,101),(0x111,103),(0x10,0),(0x8001,0),(0x8003,1),(0x8003,1),(0x8003,0)];registered_style=[];window_sizes=[];invalidations=[];moves=[];caption_updates=[]
    def register(pointer):callbacks['proc']=pointer._obj.proc;return 1
@@ -62,5 +62,5 @@ class TestBar(unittest.TestCase):
    self.assertEqual(window_sizes[0][:2],module.DEFAULT_SIZE);self.assertTrue(window_sizes[0][2]&0x00040000)
    self.assertTrue(moves);self.assertEqual(len([i for i in invalidations if i[0]==11]),1);self.assertFalse(any(erase for _,erase in invalidations))
    self.assertEqual(len([c for c in caption_updates if c[0]==100]),1);self.assertEqual(len([c for c in caption_updates if c[0]==104]),1)
-   self.assertIn((106,'0.5x'),caption_updates)
+   self.assertIn((106,'1.5x'),caption_updates)
 if __name__=='__main__':unittest.main(verbosity=2)

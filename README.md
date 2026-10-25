@@ -4,7 +4,7 @@ An English-only local shiur player for Windows x64. The recording library and pl
 
 ## Download
 
-**[Download the standalone Windows app — 0.5.0](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-windows-x64-0.5.0.zip)**
+**[Download the standalone Windows app — 0.5.1](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-windows-x64-0.5.1.zip)**
 
 Extract the **entire ZIP**, run **Shiur Player.exe**, choose the folder containing your recordings, and press Play. Keep the runtime folders beside the executable. Python and the audio runtime are included; no separate runtime installation is needed.
 
@@ -28,7 +28,7 @@ After restarting the computer, open the same EXE and press Play. The chosen fold
 
 Minimizing keeps playback running. Closing the main window stops the app and saves progress. Run the EXE again to restore an already-running main window. Use **Rescan** after adding audio files. Recordings stay in their existing folders and are not modified, copied or deleted.
 
-[Installation and source guide](standalone/README.md) · [Source ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-standalone-source-0.5.0.zip) · [Checksums](downloads/SHA256SUMS.txt)
+[Installation and source guide](standalone/README.md) · [Source ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-standalone-source-0.5.1.zip) · [Checksums](downloads/SHA256SUMS.txt)
 
 ## Verification and limits
 

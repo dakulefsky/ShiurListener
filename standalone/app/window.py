@@ -291,10 +291,10 @@ class PlayerWindow:
   tk.Checkbutton(pop,text='Show mini player when minimized',variable=mini,command=save_mini,bg=BG).pack(anchor='w',padx=24,pady=8)
   speed_row=tk.Frame(pop,bg=BG);speed_row.pack(fill='x',padx=24,pady=6)
   self.label(speed_row,'Mini-player speed steps',10).pack(side='left')
-  middle=ttk.Combobox(speed_row,values=['1 / 0.5 / 2 / 0.5','1 / 1.5 / 2 / 1.5'],state='readonly',width=20)
-  middle.current(1 if self.player.saved.get('miniSpeedMiddle',.5)==1.5 else 0);middle.pack(side='right')
+  middle=ttk.Combobox(speed_row,values=['1 / 1.5 / 2 / 1.5','1 / 0.5 / 2 / 0.5'],state='readonly',width=20)
+  middle.current(1 if self.player.saved.get('miniSpeedMiddle',1.5)==.5 else 0);middle.pack(side='right')
   def save_cycle(_):
-   with self.player.lock:self.player.saved['miniSpeedMiddle']=1.5 if middle.current()==1 else .5;self.player.saved['miniSpeedCycleIndex']=None;self.player.persist()
+   with self.player.lock:self.player.saved['miniSpeedMiddle']=.5 if middle.current()==1 else 1.5;self.player.saved['miniSpeedCycleIndex']=None;self.player.persist()
   middle.bind('<<ComboboxSelected>>',save_cycle)
   global_keys=tk.BooleanVar(value=self.player.saved.get('globalShortcuts',False));tk.Checkbutton(pop,text='Enable shortcuts while using other apps',variable=global_keys,command=lambda:self.safe(lambda:self.shortcuts(global_keys.get())),bg=BG).pack(anchor='w',padx=24,pady=12)
   self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: choose folder  ·  Ctrl+B: bookmark\n\nGlobal keys: Ctrl+Alt+Shift+P: play/pause\nCtrl+Alt+Shift+Left / Right: skip',10,MUTED,justify='left').pack(anchor='w',padx=24,pady=12)

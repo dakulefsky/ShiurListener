@@ -1,4 +1,4 @@
-SHIUR PLAYER 0.5.0 — ENGLISH STANDALONE WINDOWS APP
+SHIUR PLAYER 0.5.1 — ENGLISH STANDALONE WINDOWS APP
 
 Close any older Shiur Player window first so its saved positions are written.
 Extract the ENTIRE ZIP. Open Shiur Player.exe. No separate installation needed.
@@ -43,8 +43,8 @@ that was opened automatically. A manually opened mini player stays visible.
 Click Mini player at the top right to show or hide the floating player manually.
 It starts smaller than before. Drag any edge or corner to resize it; your chosen
 size and position are remembered. Click Open to return to the full app.
-Click its speed button to cycle 1x -> 0.5x -> 2x -> 0.5x -> 1x.
-Settings also offers a 1x -> 1.5x -> 2x -> 1.5x -> 1x cycle.
+Click its speed button to cycle 1x -> 1.5x -> 2x -> 1.5x -> 1x.
+Settings also offers a 1x -> 0.5x -> 2x -> 0.5x -> 1x cycle.
 The main speed selector stays in sync. Settings can disable automatic showing.
 Closing the main window saves and stops playback; minimizing keeps playing.
 
