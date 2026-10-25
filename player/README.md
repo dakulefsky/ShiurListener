@@ -11,7 +11,7 @@ See the [complete Hebrew handoff](../docs/INSIDE_DEVELOPER_HANDOFF.he.md) or [do
 
 See also the [supplemental Inside review in Hebrew](../docs/INSIDE_REVIEW_2026-10-25.he.md) for the latest reproduced bugs, source fixes and verification. No new plugin archive was published.
 
-See [the offline analyzer improvement results](../docs/INSIDE_ANALYZER_IMPROVEMENTS.he.md) for the new bounded quiet-input preparation and paired/regression measurements.
+See [the current offline analyzer v2 results](../docs/INSIDE_ANALYZER_V2.he.md) for the new bounded quiet-input preparation and paired/regression measurements.
 
 ## Store upload requirements
 

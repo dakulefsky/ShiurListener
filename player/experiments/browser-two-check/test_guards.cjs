@@ -25,3 +25,13 @@ test('an Info string in MPEG payload outside the side-info header is not a durat
 test('stereo conversion does not cancel opposite-phase speech',()=>{const c=context(),left=Float32Array.from([.1,-.2,.3,-.4]),right=left.map(x=>-x);assert.deepEqual(Array.from(c.RangeAudio.toMono([left,right])),Array.from(left))});
 test('stereo conversion keeps a lone active channel and normal averaging',()=>{const c=context(),left=Float32Array.from([.2,-.4]);assert.deepEqual(Array.from(c.RangeAudio.toMono([new Float32Array(2),left])),Array.from(left));assert.deepEqual(Array.from(c.RangeAudio.toMono([left,left])),Array.from(left));assert.throws(()=>c.RangeAudio.toMono([Float32Array.from([NaN])]),/Invalid/)});
 test('consecutive valid ID3 tags before audio remain supported',async()=>{const data=new Uint8Array(1600);for(const p of [0,10])data.set([73,68,51,3,0,0,0,0,0,0],p);for(const p of [20,437,854])data.set([255,251,144,100],p);const c=context(async()=>response(0,1599,1600,data));const prepared=await c.RangeAudio.prepare('local',{duration:600});assert.equal(prepared.info.dataStart,20)});
+
+test('unsigned 8-bit WAV uses 128 as silence and preserves both amplitude endpoints',async()=>{
+ for(const [level,expected] of [[128,0],[0,-1],[255,127/128]]){
+  const wav=wavFixture(),view=new DataView(wav.head.buffer);view.setUint32(28,16000,true);view.setUint16(32,1,true);view.setUint16(34,8,true);
+  const c=context(async(url,{headers})=>{const [start,end]=headers.Range.slice(6).split('-').map(Number),last=Math.min(end,wav.total-1);return response(start,last,wav.total,Uint8Array.from({length:last-start+1},(_,i)=>start+i<wav.head.length?wav.head[start+i]:level));});
+  c.OfflineAudioContext=class{constructor(){this.destination={}}createBuffer(channels,length){this.data=new Float32Array(length);return {copyToChannel:a=>this.data.set(a)}}createBufferSource(){return {connect(){},start(){}}}async startRendering(){return {getChannelData:()=>this.data}}};
+  const prepared=await c.RangeAudio.prepare('local');assert.equal(prepared.info.bits,8);const samples=await prepared.samples();
+  assert.equal(samples.length,2);for(const sample of samples){assert.equal(sample.length,15600);assert.ok(sample.every(value=>value===expected));}
+ }
+});

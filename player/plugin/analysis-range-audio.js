@@ -58,7 +58,7 @@ async function probe(file,hostDuration){
      if(size<40||bytes.length<48||view.getUint16(24,true)<22||view.getUint16(26,true)<1||view.getUint16(26,true)>bits||suffix.some((v,i)=>bytes[36+i]!==v))throw Error('Unsupported extensible WAV format');
      codec=view.getUint32(32,true);
     }
-    if(![1,3].includes(codec)||channels<1||channels>2||rate<8000||rate>192000||![16,24,32].includes(bits)||codec===3&&bits!==32||align!==channels*bits/8||view.getUint32(16,true)!==rate*align)throw Error('Unsupported WAV encoding');
+    if(![1,3].includes(codec)||channels<1||channels>2||rate<8000||rate>192000||![8,16,24,32].includes(bits)||codec===3&&bits!==32||align!==channels*bits/8||view.getUint32(16,true)!==rate*align)throw Error('Unsupported WAV encoding');
     format={codec,channels,rate,align,bits};
    }
    if(id==='data'){
@@ -113,6 +113,7 @@ async function wavSamples(file,info,seconds){
  for(let n=0;n<channels[0].length;n++)for(let ch=0;ch<info.channels;ch++){
   const p=n*info.align+ch*info.bits/8;let value;
   if(info.codec===3)value=view.getFloat32(p,true);
+  else if(info.bits===8)value=(view.getUint8(p)-128)/128;
   else if(info.bits===16)value=view.getInt16(p,true)/32768;
   else if(info.bits===24){let v=view.getUint8(p)|view.getUint8(p+1)<<8|view.getUint8(p+2)<<16;if(v&8388608)v-=16777216;value=v/8388608;}
   else value=view.getInt32(p,true)/2147483648;

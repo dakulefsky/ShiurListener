@@ -1,0 +1,175 @@
+{
+  "cross_origin_audio": true,
+  "local_csp": true,
+  "outside_requests": [],
+  "results": [
+    {
+      "file": "dc-only.wav",
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "preprocessing": "dc-quiet-gain-v2",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 104.08511173794979,
+          "speech": 2.3031522522476422e-10,
+          "music": 1.2868486387162398e-13,
+          "singing": 0,
+          "inputPreparation": {
+            "dcOffset": 0.04998779296875,
+            "inputRms": 0,
+            "appliedGain": 1,
+            "gainLimit": 128
+          }
+        },
+        {
+          "startSeconds": 216.49797522230074,
+          "speech": 2.3031522522476422e-10,
+          "music": 1.2868486387162398e-13,
+          "singing": 0,
+          "inputPreparation": {
+            "dcOffset": 0.04998779296875,
+            "inputRms": 0,
+            "appliedGain": 1,
+            "gainLimit": 128
+          }
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 463.90000000596046
+    },
+    {
+      "file": "quiet-hum.wav",
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "preprocessing": "dc-quiet-gain-v2",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 66.9213405973278,
+          "speech": 0.011632321402430534,
+          "music": 0.0037933799903839827,
+          "singing": 9.990201215259731e-05,
+          "inputPreparation": {
+            "dcOffset": 2.1714430588942308e-07,
+            "inputRms": 8.907727815727876e-05,
+            "appliedGain": 128,
+            "gainLimit": 128
+          }
+        },
+        {
+          "startSeconds": 239.58674371708184,
+          "speech": 0.0046795387752354145,
+          "music": 0.0028393773827701807,
+          "singing": 7.822694897186011e-05,
+          "inputPreparation": {
+            "dcOffset": -5.614451872996795e-07,
+            "inputRms": 8.884290348881603e-05,
+            "appliedGain": 128,
+            "gainLimit": 128
+          }
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 69.39999997615814
+    },
+    {
+      "file": "quiet-pink-noise.wav",
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "preprocessing": "dc-quiet-gain-v2",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 103.21868869825266,
+          "speech": 0.008570533245801926,
+          "music": 0.0009697076748125255,
+          "singing": 0.0006196408648975194,
+          "inputPreparation": {
+            "dcOffset": 1.3576409755608974e-06,
+            "inputRms": 2.083762981794384e-05,
+            "appliedGain": 128,
+            "gainLimit": 128
+          }
+        },
+        {
+          "startSeconds": 232.01000265427865,
+          "speech": 0.008795900270342827,
+          "music": 0.001380117260850966,
+          "singing": 0.0005763817462138832,
+          "inputPreparation": {
+            "dcOffset": 2.2183931790865385e-06,
+            "inputRms": 2.0230632139081153e-05,
+            "appliedGain": 128,
+            "gainLimit": 128
+          }
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 81.69999998807907
+    },
+    {
+      "file": "quiet-white-noise.wav",
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "preprocessing": "dc-quiet-gain-v2",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 82.50440028961748,
+          "speech": 0.0078084454871714115,
+          "music": 0.003491436131298542,
+          "singing": 0.00015156404697336257,
+          "inputPreparation": {
+            "dcOffset": 3.521259014423077e-08,
+            "inputRms": 5.0846574194060884e-05,
+            "appliedGain": 128,
+            "gainLimit": 128
+          }
+        },
+        {
+          "startSeconds": 215.303372918861,
+          "speech": 0.005934387911111116,
+          "music": 0.004959098529070616,
+          "singing": 8.089733455562964e-05,
+          "inputPreparation": {
+            "dcOffset": -8.17714593349359e-07,
+            "inputRms": 5.109652984625889e-05,
+            "appliedGain": 128,
+            "gainLimit": 128
+          }
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 615.5
+    }
+  ]
+}

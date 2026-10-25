@@ -19,9 +19,11 @@ function prepareInput(samples){
  for(const value of samples){const centered=value-dc;power+=centered*centered;peak=Math.max(peak,Math.abs(centered));}
  const rms=Math.sqrt(power/samples.length);
  // Do not amplify digital silence or force quiet material to pass. Scores still decide.
- const gain=rms>1e-5?Math.max(1,Math.min(16,.08/rms,.95/Math.max(peak,1e-12))):1;
+ // Retain the previous cap when it already reaches RMS .008; avoid overcorrecting those inputs.
+ const gainLimit=rms<.0005?128:16;
+ const gain=rms>1e-5?Math.max(1,Math.min(gainLimit,.08/rms,.95/Math.max(peak,1e-12))):1;
  const waveform=Float32Array.from(samples,value=>(value-dc)*gain);
- return {waveform,stats:{dcOffset:dc,inputRms:rms,appliedGain:gain}};
+ return {waveform,stats:{dcOffset:dc,inputRms:rms,appliedGain:gain,gainLimit}};
 }
 function abortable(action,signal){
  return new Promise((resolve,reject)=>{
@@ -65,7 +67,7 @@ async function scan(url,{assetBase=new URL('../../plugin/',document.baseURI).hre
    finally{input.dispose();output?.dispose();}
   }
   prepared.file.check();const result=decide(checks);
-  return {...result,policy:'two-interior-checks-v2-speech-priority',preprocessing:'dc-quiet-gain-v1',scope:'sampled_only',fullFileApproved:false,checks,encodedBytes:prepared.file.size,sourceBytesRead:prepared.file.bytesRead,sourceRangeRequests:prepared.file.requests,duration:prepared.info.duration,format:prepared.info.kind,positionAccuracy:prepared.info.kind==='mp3'?'approximate MPEG byte seek':'PCM sample position',wallMs:performance.now()-started};
+  return {...result,policy:'two-interior-checks-v2-speech-priority',preprocessing:'dc-quiet-gain-v2',scope:'sampled_only',fullFileApproved:false,checks,encodedBytes:prepared.file.size,sourceBytesRead:prepared.file.bytesRead,sourceRangeRequests:prepared.file.requests,duration:prepared.info.duration,format:prepared.info.kind,positionAccuracy:prepared.info.kind==='mp3'?'approximate MPEG byte seek':'PCM sample position',wallMs:performance.now()-started};
  }finally{clearTimeout(timer);signal?.removeEventListener('abort',cancel);controller.abort();}
 }
 root.BrowserTwoCheck={scan,decide,prepareInput};

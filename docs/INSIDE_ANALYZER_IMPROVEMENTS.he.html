@@ -1,6 +1,7 @@
-<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><title>שיפור בדיקת השמע המקומית</title><style>
+<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><title>בדיקת השמע המקומית — INSIDE_ANALYZER_IMPROVEMENTS.he</title><style>
 body{font-family:'Noto Sans Hebrew',Arial,sans-serif;color:#1d2939;font-size:10.5pt;line-height:1.65;max-width:900px;margin:36px auto;padding:0 20px}h1{font-size:23pt;color:#203b69;line-height:1.4}h2{font-size:15pt;margin-top:26px;border-bottom:1px solid #dbe3ef;padding-bottom:6px}h3{font-size:12pt}h1,h2,h3{break-after:avoid}table{width:100%;border-collapse:collapse;font-size:9pt;margin:15px 0}th,td{border:1px solid #d4dce8;padding:7px;text-align:right;vertical-align:top}th{background:#edf2fa}tr{break-inside:avoid}code{font-family:monospace;direction:ltr;unicode-bidi:isolate;font-size:9pt;background:#f1f4f8}a{color:#2455a4}li{margin:6px 0}p{orphans:3;widows:3}@media print{body{max-width:none;margin:0;padding:0}a{text-decoration:none}}
-</style><body><h1>שיפור בדיקת השמע המקומית — Inside 1.6.0 בפיתוח</h1>
+</style><body><h1>שיפור בדיקת השמע המקומית — שלב v1</h1>
+<p><strong>עדכון:</strong> מסמך זה מתעד את השלב הראשון. <a href="https://github.com/dakulefsky/ShiurListener/blob/main/docs/INSIDE_ANALYZER_V2.he.md">המימוש והבדיקות העדכניים של v2</a> כוללים תיקון אדפטיבי לאות חלש במיוחד ותמיכה ב־WAV בן שמונה ביטים.</p>
 <p>בוצע שיפור בהכנת האות לפני הפעלת המודל: הסרת הזזה קבועה של גל השמע (DC) והגברה מוגבלת של קטעים חלשים. לא שונו המודל, ספי ההחלטה או מדיניות העדפת הדיבור. אין צורך באינטרנט, Python או יישום נלווה במחשב המשתמש. לא פורסמה חבילת תוסף חדשה.</p>
 <h2>מה נשאר קבוע</h2>
 <p>בדיוק שתי בדיקות מודל, כל אחת על 0.975 שניות, באותם אזורים בהקלטה. נשארו דדליין חמש שניות, קריאות חלקיות של MP3/WAV, מגבלת 2 GiB/שמונה שעות, בדיקת מינימום חמש דקות, אימות המודל המקומי ואיסור ניגון לפני אישור הבדיקה. אין קריאה מלאה של ההקלטה ואין דגימה שלישית.</p>

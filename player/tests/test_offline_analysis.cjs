@@ -19,10 +19,11 @@ test('adapter keeps sampled result and forwards duration',async()=>{
 
 
 test('quiet speech input gets bounded gain and constant offset is removed',()=>{
- const f=api(),samples=Float32Array.from({length:15600},(_,i)=>.05+.001*Math.sin(i*.1));
+ const f=api(),samples=Float32Array.from({length:15600},(_,i)=>.05+.0001*Math.sin(i*.1));
  const result=f.context.BrowserTwoCheck.prepareInput(samples);
- assert.ok(Math.abs(result.stats.dcOffset-.05)<.00001);assert.equal(result.stats.appliedGain,16);
+ assert.ok(Math.abs(result.stats.dcOffset-.05)<.00001);assert.ok(result.stats.appliedGain>16&&result.stats.appliedGain<=128);
  assert.ok(Math.abs(result.waveform.reduce((a,b)=>a+b,0)/15600)<1e-7);
+ const moderate=f.context.BrowserTwoCheck.prepareInput(Float32Array.from({length:15600},(_,i)=>.001*Math.sin(i*.1)));assert.equal(moderate.stats.appliedGain,16);
 });
 test('preparation preserves silence and limits boost at peaks',()=>{
  const prepare=api().context.BrowserTwoCheck.prepareInput;

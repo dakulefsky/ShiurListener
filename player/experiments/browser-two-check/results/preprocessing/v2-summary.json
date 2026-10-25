@@ -1,0 +1,31 @@
+{
+  "paired_versions": 640,
+  "source_speech_clips": 64,
+  "source_music_clips": 64,
+  "baseline_ref": "a227a2c",
+  "speech": {
+    "1": {
+      "count": 64,
+      "baseline": 64,
+      "normalized": 64
+    },
+    "0.01": {
+      "count": 128,
+      "baseline": 126,
+      "normalized": 127
+    },
+    "0.001": {
+      "count": 128,
+      "baseline": 16,
+      "normalized": 120
+    }
+  },
+  "music_versions": 320,
+  "music_false_accepts": 0,
+  "previously_passing_speech_regressions": 0,
+  "candidate_latency_ms": {
+    "median": 41.80000001192093,
+    "max": 300.19999998807907
+  },
+  "limits": "Reused corpus and synthetic volume/DC variants; not independent accuracy validation."
+}

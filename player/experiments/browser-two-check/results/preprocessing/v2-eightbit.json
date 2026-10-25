@@ -1,0 +1,91 @@
+{
+  "cross_origin_audio": true,
+  "local_csp": true,
+  "outside_requests": [],
+  "results": [
+    {
+      "file": "music-unsigned8.wav",
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "preprocessing": "dc-quiet-gain-v2",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 94.98981024487875,
+          "speech": 0.000440005591372028,
+          "music": 0.9669576287269592,
+          "singing": 0.005687233991920948,
+          "inputPreparation": {
+            "dcOffset": 0.008929286858974358,
+            "inputRms": 0.06073959404628932,
+            "appliedGain": 1.3170980355751543,
+            "gainLimit": 16
+          }
+        },
+        {
+          "startSeconds": 204.95265375240706,
+          "speech": 0.0005380399525165558,
+          "music": 0.9492165446281433,
+          "singing": 0.0055741071701049805,
+          "inputPreparation": {
+            "dcOffset": 0.008198116987179488,
+            "inputRms": 0.0649177417087319,
+            "appliedGain": 1.2323287578138202,
+            "gainLimit": 16
+          }
+        }
+      ],
+      "encodedBytes": 4800078,
+      "sourceBytesRead": 96736,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 462.59999999403954
+    },
+    {
+      "file": "speech-unsigned8.wav",
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "preprocessing": "dc-quiet-gain-v2",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 73.76188322086819,
+          "speech": 0.9787879586219788,
+          "music": 6.996950833126903e-05,
+          "singing": 1.936032458615955e-05,
+          "inputPreparation": {
+            "dcOffset": -1.5024038461538462e-05,
+            "inputRms": 0.030622483262045135,
+            "appliedGain": 2.612459587794291,
+            "gainLimit": 16
+          }
+        },
+        {
+          "startSeconds": 197.43215078604408,
+          "speech": 0.9856810569763184,
+          "music": 0.00015936774434521794,
+          "singing": 2.7115136617794633e-05,
+          "inputPreparation": {
+            "dcOffset": 0.00012069310897435897,
+            "inputRms": 0.10291457733708578,
+            "appliedGain": 1,
+            "gainLimit": 16
+          }
+        }
+      ],
+      "encodedBytes": 9600194,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 93.5
+    }
+  ]
+}
