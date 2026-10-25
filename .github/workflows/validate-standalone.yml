@@ -14,6 +14,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,7 +28,13 @@ jobs:
         run: xvfb-run -a python -m unittest discover -s standalone/tests -v
       - name: Unit and desktop tests (Windows, including native mini-player mouse input)
         if: runner.os == 'Windows'
-        run: python -m unittest discover -s standalone/tests -v
+        run: python standalone/tests/run_suite.py
+      - name: Fetch verified Windows VLC runtime for integration test
+        if: runner.os == 'Windows'
+        run: python standalone/tests/fetch_test_runtime.py
+      - name: Actual Windows desktop controls with real VLC (dummy audio output)
+        if: runner.os == 'Windows'
+        run: python standalone/tests/test_desktop_vlc.py
       - uses: actions/setup-go@v5
         if: runner.os == 'Linux'
         with:
