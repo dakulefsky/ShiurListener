@@ -4,7 +4,7 @@ An English-only local shiur player for Windows x64. The recording library and pl
 
 ## Download
 
-**[Download the standalone Windows app — 0.9.3](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-0.9.3.exe)**
+**[Download the standalone Windows app — 0.9.4](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-0.9.4.exe)**
 
 Close the older player and run the **setup EXE once**. It creates desktop and Start menu shortcuts. Use **Check for updates** inside the app for future releases—no repeated manual extraction. Python and VLC are bundled. Existing standalone listening data stays in the same profile.
 
@@ -33,9 +33,11 @@ After restarting the computer, open the Shiur Player shortcut and press Play. Th
 - Sleep timer, automatic next recording and opt-in Windows-wide shortcuts.
 - English-only native desktop controls; no browser or WebView interface.
 
-Minimizing keeps playback running. Closing the main window stops the app and saves progress. Run the EXE again to restore an already-running main window. Use **Rescan** after adding audio files. Recordings stay in their existing folders and are not modified, copied or deleted.
+Minimizing keeps playback running. Closing the main window stops the app and saves progress. Run the EXE again to restore an already-running main window. Use **Rescan** after adding audio files. Recordings stay in their existing folders. Rename changes the filename and preserves listening data; audio contents are not rewritten or deleted.
 
-[Installation and source guide](standalone/README.md) · [Source ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-standalone-source-0.9.3.zip) · [Checksums](downloads/SHA256SUMS.txt)
+[Installation and source guide](standalone/README.md) · [Source ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-standalone-source-0.9.4.zip) · [Checksums](downloads/SHA256SUMS.txt)
+
+See the [0.9.4 whole-app review](docs/STANDALONE_REVIEW_0.9.4.md) for fixes, test evidence and remaining limits.
 
 ## Verification and limits
 
