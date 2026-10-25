@@ -5,7 +5,7 @@ runtime=pathlib.Path(__file__).resolve().parent/'runtime'
 if (runtime/'tcl/tcl8.6').is_dir():
  os.environ['TCL_LIBRARY']=str(runtime/'tcl/tcl8.6')
  os.environ['TK_LIBRARY']=str(runtime/'tcl/tk8.6')
-from windows_identity import configure_taskbar
+from windows_identity import acquire_instance,configure_taskbar
 from engine import Player,VLC
 from controller import LibraryController
 from floating_bar import FloatingBar
@@ -16,9 +16,12 @@ def main():
  parser=argparse.ArgumentParser();parser.add_argument('--folder');parser.add_argument('--data-dir');args=parser.parse_args()
  if sys.platform!='win32':raise RuntimeError('This desktop build is for Windows.')
  configure_taskbar()
+ instance=acquire_instance()
+ if instance is None:return
  data=args.data_dir or str(pathlib.Path(os.environ.get('LOCALAPPDATA',pathlib.Path.home()))/'ShiurPlayerStandalone')
- backend=VLC();player=None;bar=None;keys=None;worker=None;stop=threading.Event()
+ backend=None;player=None;bar=None;keys=None;worker=None;stop=threading.Event()
  try:
+  backend=VLC()
   player=Player(args.folder,data,backend);controller=LibraryController(player);player.saved['language']='en'
   player.saved.setdefault('floatingVisible',False)
   player.saved.setdefault('floatingTheme',{'primary':'#6558D3','onPrimary':'#FFFFFF','surface':'#FFFFFF','onSurface':'#242332','surfaceContainer':'#E9E7F0','fontFamily':'Rubik'})
@@ -46,7 +49,10 @@ def main():
   try:
    if player:
     with player.lock:player.capture();player.persist()
-  finally:backend.close()
+  finally:
+   try:
+    if backend:backend.close()
+   finally:instance.close()
 
 if __name__=='__main__':
  try:main()

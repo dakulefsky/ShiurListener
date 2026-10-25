@@ -1,8 +1,9 @@
 """Real libVLC decoder tests. Uses a dummy audio sink: no physical speakers are tested.
 Set SHIUR_TEST_VLC_LIBRARY if testing a VLC library extracted outside the system search path.
 """
-import importlib.util,os,pathlib,subprocess,tempfile,time,wave,unittest.mock,json
+import importlib.util,os,pathlib,subprocess,tempfile,time,wave,unittest.mock,json,sys
 ROOT=pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'app'))
 spec=importlib.util.spec_from_file_location('companion',ROOT/'app/engine.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 def wait(player,predicate,description,seconds=8):
  deadline=time.monotonic()+seconds

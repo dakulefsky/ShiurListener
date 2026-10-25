@@ -7,6 +7,31 @@ from controller import LibraryController
 import test_player
 @unittest.skipUnless(os.environ.get('DISPLAY') or sys.platform=='win32','Needs a desktop display')
 class Tests(unittest.TestCase):
+ def test_hidden_or_cleared_selection_cannot_reset_recordings(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   ident=fixture.player.tracks[0]['id'];fixture.library.selected=ident
+   window.tree.selection_set(ident);window.query.set('no matching shiur');window.root.update()
+   self.assertEqual(window.selected_ids(),[])
+   with self.assertRaisesRegex(ValueError,'Select one'):window.reset_selected()
+   with self.assertRaisesRegex(ValueError,'Select one'):window.rename_recording()
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+
+ def test_refresh_error_remains_visible_in_collapsed_panel(self):
+  from unittest.mock import patch
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.toggle_dock();window.root.update()
+   with patch.object(fixture.player,'snapshot',side_effect=RuntimeError('Audio output missing')):window.refresh()
+   window.root.update()
+   self.assertEqual(window.status.cget('text'),'Audio output missing');self.assertTrue(window.status.winfo_ismapped())
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+
  def test_main_playback_panel_collapses_without_stopping_and_remembers_choice(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
@@ -101,7 +126,7 @@ class Tests(unittest.TestCase):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
    window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
-   fixture.library.selected=fixture.player.tracks[0]['id'];window.assign_collection('My recordings')
+   fixture.library.selected=fixture.player.tracks[0]['id'];window.tree.selection_set(fixture.library.selected);window.assign_collection('My recordings')
    folders=fixture.player.saved['folders'];self.assertEqual(len(folders),1);self.assertEqual(folders[0]['trackIds'],[fixture.library.selected])
    window.assign_collection('my recordings');self.assertEqual(len(folders),1);self.assertEqual(len(folders[0]['trackIds']),1)
   finally:

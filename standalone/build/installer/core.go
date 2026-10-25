@@ -91,7 +91,28 @@ func extract(payload []byte, root, version string) (string, error) {
 	}
 	target := filepath.Join(versions, version)
 	if _, err = os.Stat(target); err == nil {
+		// A same-version reinstall must repair damaged files, not silently reuse them.
+		backup, backupErr := os.MkdirTemp(versions, ".repair-"+version+"-")
+		if backupErr != nil {
+			return "", backupErr
+		}
+		if err = os.Remove(backup); err != nil {
+			return "", err
+		}
+		if err = os.Rename(target, backup); err != nil {
+			return "", err
+		}
+		if err = os.Rename(stage, target); err != nil {
+			if restoreErr := os.Rename(backup, target); restoreErr != nil {
+				return "", fmt.Errorf("repair failed (%v); original files retained at %s: %w", err, backup, restoreErr)
+			}
+			return "", err
+		}
+		// A cleanup failure may leave a spare program copy, never delete the active copy.
+		_ = os.RemoveAll(backup)
 		return target, nil
+	} else if !os.IsNotExist(err) {
+		return "", err
 	}
 	if err = os.Rename(stage, target); err != nil {
 		return "", err

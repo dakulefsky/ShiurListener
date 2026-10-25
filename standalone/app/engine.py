@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """Local shiur audio engine. No server, browser, plugin or pairing process."""
-import ctypes, ctypes.util, json, math, os, pathlib, secrets, sys, threading, time
+import ctypes, ctypes.util, functools, json, math, os, pathlib, secrets, sys, threading, time
 EXTENSIONS={'.mp3','.m4a','.m4b','.wav','.ogg','.oga','.opus','.flac','.aac','.aiff','.aif','.wma'}
+
+def synchronized(method):
+    @functools.wraps(method)
+    def call(self,*args,**kwargs):
+        with self.lock:return method(self,*args,**kwargs)
+    return call
 
 class VLC:
     def __init__(self,options=()):
@@ -22,7 +28,9 @@ class VLC:
         self.instance=self.lib.libvlc_new(len(arguments),args)
         if not self.instance:raise RuntimeError('VLC initialization failed.')
         self.player=self.lib.libvlc_media_player_new(self.instance)
-        if not self.player:raise RuntimeError('VLC player initialization failed.')
+        if not self.player:
+            self.lib.libvlc_release(self.instance)
+            raise RuntimeError('VLC player initialization failed.')
     def load(self,path):
         media=self.lib.libvlc_media_new_path(self.instance,os.fsencode(path))
         if not media:raise RuntimeError('VLC could not open the recording.')
@@ -44,7 +52,11 @@ class Player:
         self.file=self.data_dir/'state.json';self.lock=threading.RLock();self.backend=backend;self.error='';self.pending=None;self.was_playing=False
         self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'skipSeconds':15,'folders':[],'language':'en'}
         if self.file.exists():
-            try:self.saved.update(json.loads(self.file.read_text('utf-8')))
+            try:
+                from profile_backup import FORMAT,_read,_validate
+                stored=_read(self.file)
+                if not isinstance(stored,dict):raise ValueError('Saved state must be an object.')
+                self.saved=_validate({'format':FORMAT,'version':1,'state':{**self.saved,**stored}})
             except (ValueError,OSError):raise RuntimeError('Cannot read saved player state. Back up state.json before resetting it.')
         self.active=None;self.last_save=0;self.previous_status='stopped';self.hotkey_status=[];self.floating_bar=None;self.sleep_deadline=None;self.sleep_minutes=0;self.sleep_paused=False
         self.sleep_at_end=False;self.loop_a=None;self.loop_b=None;self.loop_track=None;self.loop_seek_at=0
@@ -52,7 +64,10 @@ class Player:
         self.paths={};self.tracks=[];self.library_revision=0;self.choose_folder=None;self.show_window=None;self.hide_window=None
         self.saved.setdefault('folders',[]);self.saved.setdefault('skipSeconds',15)
         selected=self.root or (pathlib.Path(self.saved['libraryRoot']) if self.saved.get('libraryRoot') else None)
-        if selected and selected.is_dir():self.scan(selected)
+        if selected:
+            self.root=selected.resolve()
+            if self.root.is_dir():self.scan(self.root)
+            else:self.error='The recordings folder is missing or disconnected. Reconnect it, then click Refresh.'
     def scan(self,root=None):
         with self.lock:
             selected=pathlib.Path(root).resolve() if root else self.root
@@ -66,7 +81,7 @@ class Player:
                 if not real.is_relative_to(selected):continue
                 relative=path.relative_to(selected).as_posix()
                 ident=hashlib.sha256((str(selected)+'/'+relative).encode()).hexdigest()[:24]
-                paths[ident]=real;tracks.append({'id':ident,'name':path.name,'source':relative})
+                paths[ident]=path;tracks.append({'id':ident,'name':path.name,'source':relative})
             self.capture()
             if self.active and self.active not in paths:self.backend.stop();self.active=None;self.pending=None;self.clear_loop()
             self.root=selected;self.paths=paths;self.tracks=tracks;self.library_revision+=1;self.error=''
@@ -75,11 +90,13 @@ class Player:
             if self.saved['currentId'] not in paths:self.saved['currentId']=None
             self.persist()
             return self.snapshot()
+    @synchronized
     def persist(self):
         temporary=self.file.with_suffix('.tmp')
         with temporary.open('w',encoding='utf-8') as stream:
             json.dump(self.saved,stream,ensure_ascii=False);stream.flush();os.fsync(stream.fileno())
         os.replace(temporary,self.file)
+    @synchronized
     def capture(self):
         raw=self.backend.state() if self.active else {'position':0,'duration':0,'status':'stopped'}
         if self.seek_target and raw['status'] in ('playing','paused'):
@@ -95,20 +112,25 @@ class Player:
             changed=position!=previous.get('position') or completed!=previous.get('completed',False)
             self.saved['tracks'][self.active]={**previous,'position':position,'duration':raw['duration'] or previous.get('duration',0),'completed':bool(completed),'lastListenedAt':time.time_ns() if changed else previous.get('lastListenedAt',0)}
         return raw
+    @synchronized
     def snapshot(self):
         raw=self.capture();ident=self.saved['currentId'];progress=self.saved['tracks'].get(ident,{})
         if self.pending:raw={**raw,'position':self.pending['position'],'duration':raw['duration'] or progress.get('duration',0),'status':'loading','playRequested':self.pending['autoplay']}
         if not self.active:raw={'position':progress.get('position',0),'duration':progress.get('duration',0),'status':'paused'}
         if self.sleep_paused and raw['status']=='ended':raw={**raw,'status':'paused'}
         return {**raw,'currentId':ident,'speed':self.saved['speed'],'volume':self.saved['volume'],'autoNext':self.saved['autoNext'],'queue':self.saved['queue'],'error':self.error,'skipSeconds':self.saved['skipSeconds'],'folders':self.saved['folders'],'hotkeys':self.hotkey_status,'sleepMinutes':self.sleep_minutes,'sleepAtEnd':self.sleep_at_end,'loopA':self.loop_a,'loopB':self.loop_b,'sleepRemaining':max(0,int(self.sleep_deadline-time.monotonic()+.999)) if self.sleep_deadline else 0,'floatingAvailable':bool(self.floating_bar and self.floating_bar.hwnd),'floatingStatus':self.floating_bar.status if self.floating_bar else '', 'loaded':self.active is not None,'libraryCount':len(self.tracks),'folderName':self.root.name if self.root else '', 'hasFolder':self.root is not None,'libraryRevision':self.library_revision,'language':self.saved.get('language','en')}
+    @synchronized
     def library(self):return [{**t,**self.saved['tracks'].get(t['id'],{})} for t in self.tracks]
+    @synchronized
     def clear_loop(self):self.loop_a=None;self.loop_b=None;self.loop_track=None;self.loop_seek_at=0
+    @synchronized
     def seek_backend(self,value):
         self.backend.seek(value)
         # VLC applies seeks asynchronously; keep a requested place through an
         # immediate pause/close until the decoder reports the new position.
         reported=self.backend.state()['position']
         self.seek_target=None if abs(reported-value)<=.3 else {'position':value,'expires':time.monotonic()+2}
+    @synchronized
     def load(self,ident,position=None,autoplay=False):
         if ident not in self.paths:raise ValueError('Unknown recording. Rescan your selected recordings folder.')
         if not self.paths[ident].resolve().is_relative_to(self.root):raise ValueError('The recording no longer resolves inside the selected folder.')
@@ -119,13 +141,25 @@ class Player:
         start=float(start)
         if not math.isfinite(start) or not 0<=start<1e8:raise ValueError('Invalid position.')
         if progress.get('duration'):start=min(start,progress['duration'])
-        self.backend.load(self.paths[ident]);self.active=ident;self.saved['currentId']=ident;self.error='';self.sleep_paused=False;self.seek_target=None
+        self.active=None;self.pending=None;self.saved['currentId']=ident;self.error='';self.sleep_paused=False;self.seek_target=None
         rate=progress.get('speed',1)
         self.saved['speed']=rate if rate in (.5,.75,1,1.25,1.5,1.75,2) else 1
         if self.loop_track!=ident:self.clear_loop()
-        self.pending={'position':start,'autoplay':autoplay,'started':time.monotonic()};self.backend.volume(0);self.backend.play()
+        try:
+            self.backend.load(self.paths[ident]);self.active=ident
+            self.pending={'position':start,'autoplay':autoplay,'started':time.monotonic()}
+            self.backend.volume(0);self.backend.play()
+        except Exception as error:
+            self.fail_load(str(error));self.persist();raise
         self.capture()
         self.persist()
+    def fail_load(self,message):
+        # Keep the captured resume position and make the next Play a fresh load.
+        self.pending=None;self.active=None;self.seek_target=None;self.was_playing=False
+        try:self.backend.stop()
+        except Exception:pass # Preserve the original decoder failure.
+        self.error=message
+    @synchronized
     def advance(self,delta):
         queue=self.saved['queue'];current=self.saved['currentId']
         if current in queue:
@@ -201,6 +235,7 @@ class Player:
                 if op in ('folder_create','folder_rename'):
                     name=str(data.get('name','')).strip()
                     if not name or len(name)>160:raise ValueError('Use a folder name of 1–160 characters.')
+                    if any(f['name'].casefold()==name.casefold() and (op=='folder_create' or f['id']!=data.get('id')) for f in folders):raise ValueError('A collection with that name already exists.')
                 if op=='folder_create':folders.append({'id':secrets.token_hex(12),'name':name,'trackIds':[]})
                 elif not folder:raise ValueError('Folder not found.')
                 elif op=='folder_rename':folder['name']=name
@@ -219,7 +254,7 @@ class Player:
             if op=='load':
                 queue=data.get('queue',[])
                 if not isinstance(queue,list) or any(i not in self.paths for i in queue):raise ValueError('Invalid queue.')
-                self.saved['queue']=list(dict.fromkeys(queue));self.load(data['id'],data.get('position'),False)
+                self.load(data['id'],data.get('position'),False);self.saved['queue']=list(dict.fromkeys(queue))
             elif op=='play':
                 self.sleep_paused=False
                 if not self.active:
@@ -228,19 +263,20 @@ class Player:
                         self.saved['currentId']=self.tracks[0]['id'];self.saved['queue']=[t['id'] for t in self.tracks]
                     self.load(self.saved['currentId'],autoplay=True)
                 elif self.pending:self.pending['autoplay']=True
-                elif self.backend.state()['status'] in ('ended','stopped'):
+                elif self.backend.state()['status'] in ('ended','stopped','error'):
                     self.load(self.saved['currentId'],autoplay=True)
                 else:self.backend.play()
             elif op=='pause':
                 if self.pending:self.pending['autoplay']=False
-                self.backend.pause();self.capture()
+                else:self.backend.pause()
+                self.capture()
             elif op=='seek':
                 value=float(data['value'])
                 if not math.isfinite(value) or not 0<=value<1e8:raise ValueError('Invalid position.')
                 if not self.saved['currentId']:raise ValueError('Select a recording first.')
                 raw=self.snapshot()
                 if raw['duration']:value=min(raw['duration'],value)
-                if not self.active or raw['status'] in ('ended','stopped'):
+                if not self.active or raw['status'] in ('ended','stopped','error'):
                     self.load(self.saved['currentId'],position=value,autoplay=False)
                     return self.snapshot()
                 if self.pending:self.pending['position']=value
@@ -248,13 +284,15 @@ class Player:
             elif op=='speed':
                 value=float(data['value'])
                 if value not in (.5,.75,1,1.25,1.5,1.75,2):raise ValueError('Invalid speed.')
-                self.backend.speed(value);self.saved['speed']=value;self.saved['miniSpeedCycleIndex']=None
+                if self.active and not self.pending and self.backend.state()['status'] in ('playing','paused'):self.backend.speed(value)
+                self.saved['speed']=value;self.saved['miniSpeedCycleIndex']=None
                 ident=self.saved['currentId']
                 if ident:self.saved['tracks'].setdefault(ident,{})['speed']=value
             elif op=='volume':
                 value=float(data['value'])
                 if not 0<=value<=1:raise ValueError('Invalid volume.')
-                self.backend.volume(value);self.saved['volume']=value
+                if not self.pending:self.backend.volume(value)
+                self.saved['volume']=value
             elif op=='autonext':self.saved['autoNext']=data.get('value') is True
             elif op=='next':self.advance(1)
             elif op=='previous':self.advance(-1)
@@ -268,13 +306,15 @@ class Player:
             raw=self.capture()
             if self.pending:
                 if raw['status']=='error' or time.monotonic()-self.pending['started']>20:
-                    self.pending=None;self.backend.stop();self.error='VLC could not load this recording.'
+                    self.fail_load('VLC could not load this recording. Press Play to try again.')
                 elif raw['status'] in ('playing','paused') and raw['duration']>0:
-                    pending=self.pending;self.pending=None
-                    self.seek_backend(min(pending['position'],raw['duration']))
-                    self.backend.speed(self.saved['speed'])
-                    if not pending['autoplay']:self.backend.pause()
-                    self.backend.volume(self.saved['volume'])
+                    pending=self.pending
+                    try:
+                        self.seek_backend(min(pending['position'],raw['duration']))
+                        self.backend.speed(self.saved['speed'])
+                        if not pending['autoplay']:self.backend.pause()
+                        self.backend.volume(self.saved['volume']);self.pending=None
+                    except Exception as error:self.fail_load('Could not restore playback: '+str(error))
             elif raw['status']=='ended' and self.sleep_at_end:
                 self.sleep_at_end=False;self.sleep_paused=True
             elif self.loop_b is not None and not self.sleep_paused and raw['status'] in ('playing','ended') and raw['position']>=self.loop_b:

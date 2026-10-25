@@ -203,6 +203,7 @@ def import_profile(player, path):
         player.backend.stop()
         player.active = None
         player.pending = None
+        player.seek_target = None
         player.was_playing = False
         player.sleep_deadline = None
         player.sleep_minutes = 0

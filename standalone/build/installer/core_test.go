@@ -102,3 +102,37 @@ func TestActualBundledPayload(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestReinstallRepairsExistingVersionWithoutChangingProfile(t *testing.T) {
+	root := t.TempDir()
+	original := archive(valid())
+	target, err := extract(original, root, "0.9.4")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := activate(root, "0.9.4"); err != nil {
+		t.Fatal(err)
+	}
+	before, _ := os.ReadFile(filepath.Join(root, "active.json"))
+	if err := os.WriteFile(filepath.Join(target, "main.py"), []byte("broken"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := extract(original, root, "0.9.4"); err != nil {
+		t.Fatal(err)
+	}
+	data, _ := os.ReadFile(filepath.Join(target, "main.py"))
+	if string(data) != "main" {
+		t.Fatal("reinstallation left corrupted program files in place")
+	}
+	after, _ := os.ReadFile(filepath.Join(root, "active.json"))
+	if !bytes.Equal(before, after) {
+		t.Fatal("repair changed the selected release")
+	}
+	if _, err := extract(archive(map[string]string{"Shiur Player/main.py": "invalid"}), root, "0.9.4"); err == nil {
+		t.Fatal("invalid repair payload accepted")
+	}
+	data, _ = os.ReadFile(filepath.Join(target, "main.py"))
+	if string(data) != "main" {
+		t.Fatal("failed repair damaged existing files")
+	}
+}

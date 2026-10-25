@@ -1,0 +1,40 @@
+name: Validate standalone player
+on:
+  push:
+    paths:
+      - 'standalone/**'
+      - '.github/workflows/validate-standalone.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            standalone
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Unit and desktop tests (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a python -m unittest discover -s standalone/tests -v
+      - name: Unit and desktop tests (Windows, including native mini-player mouse input)
+        if: runner.os == 'Windows'
+        run: python -m unittest discover -s standalone/tests -v
+      - uses: actions/setup-go@v5
+        if: runner.os == 'Linux'
+        with:
+          go-version: '1.24.x'
+          cache: false
+      - name: Installer extraction and repair tests
+        if: runner.os == 'Linux'
+        env:
+          GO111MODULE: 'off'
+        run: go test -v ./standalone/build/installer

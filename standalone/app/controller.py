@@ -115,9 +115,13 @@ class LibraryController:
    ident=self.selected
    if not ident or ident not in self.player.paths:raise ValueError('Select a recording first.')
    if self.player.active==ident:
-    self.player.backend.pause()
-    if self.player.pending:self.player.pending['position']=0;self.player.pending['autoplay']=False
-    else:self.player.backend.seek(0)
+    self.player.clear_loop()
+    if self.player.backend.state()['status'] in ('ended','stopped','error'):
+     self.player.load(ident,position=0,autoplay=False)
+    elif self.player.pending:
+     self.player.pending['position']=0;self.player.pending['autoplay']=False;self.player.seek_target=None
+    else:
+     self.player.backend.pause();self.player.seek_backend(0)
    previous=self.player.saved['tracks'].get(ident,{})
    self.player.saved['tracks'][ident]={**previous,'position':0,'completed':False};self.player.persist();self.revision+=1
  def bookmarks(self):return sorted(self.player.saved['bookmarks'].get(self.player.saved['currentId'],[]),key=lambda mark:mark['position'])
@@ -127,12 +131,12 @@ class LibraryController:
    if not ident:raise ValueError('Select a recording first.')
    self.player.saved['bookmarks'].setdefault(ident,[]).append({'id':secrets.token_hex(12),'position':state['position'],'name':name.strip()[:160] or clock(state['position'])})
    self.player.persist();self.revision+=1
- def bookmark_action(self,ident,delete=False):
+ def bookmark_action(self,ident,delete=False,track_id=None):
   with self.player.lock:
-   current=self.player.saved['currentId'];marks=self.bookmarks();mark=next((m for m in marks if m['id']==ident),None)
+   current=track_id or self.player.saved['currentId'];marks=self.player.saved['bookmarks'].get(current,[]);mark=next((m for m in marks if m['id']==ident),None)
    if not mark:raise ValueError('Select a bookmark first.')
    if delete:self.player.saved['bookmarks'][current]=[m for m in marks if m['id']!=ident];self.player.persist();self.revision+=1
-   elif not self.player.active:self.player.load(current,position=mark['position'],autoplay=False)
+   elif self.player.active!=current:self.player.load(current,position=mark['position'],autoplay=False)
    else:self.player.command({'op':'seek','value':mark['position']})
 
  def rename(self,ident,name):
@@ -144,14 +148,14 @@ class LibraryController:
    if not name or len(name)>180 or re.search(r'[<>:"/\\|?*\x00-\x1f]',name) or name.endswith(('.', ' ')) or name.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*(f'COM{i}' for i in range(1,10)),*(f'LPT{i}' for i in range(1,10))}:raise ValueError('Choose a valid filename without slashes or special characters.')
    target=source.with_name(name+source.suffix)
    if target==source:return ident
-   if target.exists():raise ValueError('A recording with that filename already exists.')
+   if target.exists() or target.is_symlink():raise ValueError('A recording with that filename already exists.')
    if not source.resolve().is_relative_to(self.player.root):raise ValueError('The recording is outside the audio folder.')
    state=self.player.snapshot();active=self.player.active==ident;position=self.player.saved['tracks'].get(ident,{}).get('position',0)
    if active:
     self.player.backend.stop();self.player.active=None;self.player.pending=None;self.player.seek_target=None
    try:source.rename(target)
    except OSError:
-    if active:self.player.load(ident,position=position,autoplay=False)
+    if active:self.player.load(ident,position=position,autoplay=state['status']=='playing' or state.get('playRequested',False))
     raise
    relative=target.relative_to(self.player.root).as_posix();new_id=hashlib.sha256((str(self.player.root)+'/'+relative).encode()).hexdigest()[:24]
    self.player.paths.pop(ident);self.player.paths[new_id]=target

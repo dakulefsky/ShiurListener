@@ -26,3 +26,15 @@ class Tests(unittest.TestCase):
   with self.assertRaises(ValueError):updater.validate_release(release)
   with patch.object(updater.urllib.request,'urlopen',return_value=Response(b'{}','https://example.com/')):
    with self.assertRaises(ValueError):updater.check()
+
+ def test_check_requests_fresh_channel_metadata(self):
+  release=self.release()
+  with patch.object(updater.urllib.request,'urlopen',return_value=Response(json.dumps(release).encode(),updater.CHANNEL)) as open_url:
+   updater.check()
+  request=open_url.call_args.args[0]
+  self.assertTrue(request.full_url.startswith(updater.CHANNEL+'?check='))
+  self.assertEqual(request.get_header('Cache-control'),'no-cache')
+
+ def test_bad_release_shape_and_boolean_size_are_rejected(self):
+  for value in [None,[],{}, {'version':'1.0.0'}, {**self.release(),'size':True}]:
+   with self.subTest(value=value),self.assertRaises(ValueError):updater.validate_release(value)

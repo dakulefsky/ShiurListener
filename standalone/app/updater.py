@@ -1,5 +1,5 @@
 """Manual HTTPS update checks. No browser, listener or background network polling."""
-import hashlib,json,os,pathlib,re,subprocess,tempfile,urllib.request
+import hashlib,json,os,pathlib,re,secrets,subprocess,tempfile,urllib.request
 from version import APP_VERSION
 CHANNEL='https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/standalone-latest.json'
 MAX_DOWNLOAD=100*1024*1024
@@ -9,17 +9,19 @@ def version_tuple(value):
  return tuple(map(int,value.split('.')))
 
 def validate_release(data):
- version_tuple(data['version'])
+ if not isinstance(data,dict):raise ValueError('The update information must be an object.')
+ version_tuple(data.get('version'))
  expected=f"https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-{data['version']}.exe"
  if data.get('url')!=expected:raise ValueError('The update download address is invalid.')
  if not isinstance(data.get('sha256'),str) or not re.fullmatch('[a-f0-9]{64}',data['sha256']):raise ValueError('The update checksum is invalid.')
- if not isinstance(data.get('size'),int) or not 0<data['size']<=MAX_DOWNLOAD:raise ValueError('The update size is invalid.')
+ if type(data.get('size')) is not int or not 0<data['size']<=MAX_DOWNLOAD:raise ValueError('The update size is invalid.')
  return data
 
 def check():
- request=urllib.request.Request(CHANNEL,headers={'User-Agent':'ShiurPlayer/'+APP_VERSION})
+ address=CHANNEL+'?check='+secrets.token_hex(8)
+ request=urllib.request.Request(address,headers={'User-Agent':'ShiurPlayer/'+APP_VERSION,'Cache-Control':'no-cache','Pragma':'no-cache'})
  with urllib.request.urlopen(request,timeout=20) as response:
-  if response.geturl()!=CHANNEL:raise ValueError('Unexpected update server redirect.')
+  if response.geturl() not in (CHANNEL,address):raise ValueError('Unexpected update server redirect.')
   raw=response.read(65537)
  if len(raw)>65536:raise ValueError('The update information is too large.')
  release=validate_release(json.loads(raw))

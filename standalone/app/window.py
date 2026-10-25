@@ -384,7 +384,7 @@ class PlayerWindow:
   if hasattr(self,'selection_info'):
    self.set_options(self.selection_info,text=f'{len(ids)} selected' if ids else '')
    self.set_options(self.organize_button,state='normal' if ids else 'disabled');self.set_options(self.resume_button,state='normal' if ids else 'disabled')
- def selected_ids(self):return list(self.tree.selection()) or ([self.library.selected] if self.library.selected in self.player.paths else [])
+ def selected_ids(self):return list(self.tree.selection())
  def select_all(self,_=None):self.tree.selection_set(self.tree.get_children());self.select();return 'break'
  def list_press(self,event):
   self.column_drag_blocked=self.tree.identify_region(event.x,event.y)=='separator'
@@ -484,6 +484,9 @@ class PlayerWindow:
    menu.add_command(label='Rename collection',command=lambda:self.safe(self.rename_collection));menu.add_command(label='Delete collection',command=lambda:self.safe(self.delete_collection))
   menu.tk_popup(self.root.winfo_pointerx(),self.root.winfo_pointery())
  def reset_selected(self):
+  ids=self.selected_ids()
+  if len(ids)!=1:raise ValueError('Select one recording to reset.')
+  self.library.selected=ids[0]
   if messagebox.askyesno('Reset position','Reset only the selected recording to 0:00?',parent=self.root):self.library.reset()
  def rename_recording(self):
   ids=self.selected_ids()
@@ -501,10 +504,11 @@ class PlayerWindow:
   name=self.ask_value('Bookmark','Name this moment:')
   if name is not None:self.library.mark(name)
  def bookmarks(self):
-  pop=tk.Toplevel(self.root);pop.title('Bookmarks for the current shiur');pop.geometry('430x330');pop.configure(bg=BG);items=tk.Listbox(pop,relief='flat',bg=PAPER,fg=INK,selectbackground=TINT,selectforeground=INK,highlightthickness=0,bd=0,activestyle='none');items.pack(fill='both',expand=True,padx=16,pady=16);marks=list(self.library.bookmarks())
+  pop=tk.Toplevel(self.root);pop.title('Bookmarks for the current shiur');pop.geometry('430x330');pop.configure(bg=BG);items=tk.Listbox(pop,relief='flat',bg=PAPER,fg=INK,selectbackground=TINT,selectforeground=INK,highlightthickness=0,bd=0,activestyle='none');items.pack(fill='both',expand=True,padx=16,pady=16)
+  with self.player.lock:track_id=self.player.saved['currentId'];marks=list(self.library.bookmarks())
   for mark in marks:items.insert('end',f"{clock(mark['position'])}   {mark['name']}")
   def action(delete=False):
-   if items.curselection():self.library.bookmark_action(marks[items.curselection()[0]]['id'],delete);pop.destroy()
+   if items.curselection():self.library.bookmark_action(marks[items.curselection()[0]]['id'],delete,track_id=track_id);pop.destroy()
   self.button(pop,'Jump to bookmark',lambda:action()).pack(side='left',padx=16,pady=12);self.button(pop,'Delete',lambda:action(True)).pack(side='right',padx=16)
  def settings(self):
   pop=tk.Toplevel(self.root);pop.title('Settings & backup');pop.geometry('600x660');pop.configure(bg=BG);pop.transient(self.root)
@@ -700,7 +704,9 @@ class PlayerWindow:
     if self.status.cget('text') and not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
     elif not self.status.cget('text') and self.status.winfo_manager():self.status.pack_forget()
    self.refresh_tools(state);self.refresh_queue()
-  except Exception as error:self.set_options(self.status,text=str(error))
+  except Exception as error:
+   self.set_options(self.status,text=str(error),fg=ERROR)
+   if self.dock_collapsed and not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
   self.root.after(500,self.refresh)
  def close(self):
   try:
