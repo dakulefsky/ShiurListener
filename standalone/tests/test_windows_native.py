@@ -15,6 +15,7 @@ class NativeWindowTests(unittest.TestCase):
   def bind(name,result,args):
    fn=getattr(user,name);fn.restype=result;fn.argtypes=args;return fn
   rect=bind('GetClientRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT)])
+  to_client=bind('ScreenToClient',w.BOOL,[w.HWND,ctypes.POINTER(w.POINT)])
   screen=bind('ClientToScreen',w.BOOL,[w.HWND,ctypes.POINTER(w.POINT)])
   cursor=bind('GetCursorPos',w.BOOL,[ctypes.POINTER(w.POINT)])
   move=bind('SetCursorPos',w.BOOL,[ctypes.c_int,ctypes.c_int])
@@ -34,7 +35,22 @@ class NativeWindowTests(unittest.TestCase):
    self.fail(label+'; mini status='+str(bar.status)+'; player error='+str(fixture.player.error))
   def size():
    value=w.RECT();self.assertTrue(rect(bar.hwnd,ctypes.byref(value)));return value.right,value.bottom
+  def settled():
+   width,height=size();collapsed=bool(fixture.player.saved.get('floatingCollapsed',False))
+   hovered=collapsed and width>=HOVER_SIZE[0]
+   for leftward in ([False,True] if hovered else [False]):
+    expected=layout(width,height,collapsed,hovered,leftward);matches=True
+    for ident in range(100,109):
+     handle=child(bar.hwnd,ident)
+     if not handle or bool(visible(handle))!=(ident in expected):matches=False;break
+     if ident in expected:
+      value=w.RECT();windowrect(handle,ctypes.byref(value));point=w.POINT(value.left,value.top);to_client(bar.hwnd,ctypes.byref(point))
+      actual=(point.x,point.y,value.right-value.left,value.bottom-value.top)
+      if actual!=expected[ident]:matches=False;break
+    if matches:return True
+   return False
   def click(ident):
+   wait(settled,'Control layout did not finish updating')
    expected=child(bar.hwnd,ident);self.assertTrue(expected);self.assertTrue(visible(expected))
    value=w.RECT();self.assertTrue(rect(expected,ctypes.byref(value)))
    point=w.POINT(value.right//2,value.bottom//2)
@@ -68,7 +84,7 @@ class NativeWindowTests(unittest.TestCase):
    position(bar.hwnd,None,metric(0)-COLLAPSED_SIZE[0],80,*COLLAPSED_SIZE,0x14)
    base=w.RECT();windowrect(bar.hwnd,ctypes.byref(base))
    play=w.POINT(38,16);screen(child(bar.hwnd,102),ctypes.byref(play));move(play.x,play.y)
-   wait(lambda:size()[0]==HOVER_SIZE[0],'Screen-edge hover failed')
+   wait(lambda:size()[0]==HOVER_SIZE[0],'Screen-edge hover failed');wait(settled,'Screen-edge layout did not settle')
    anchored=w.POINT(38,16);screen(child(bar.hwnd,102),ctypes.byref(anchored))
    self.assertEqual((play.x,play.y),(anchored.x,anchored.y),'Hover must not move play/pause away from the pointer')
    click(102);wait(lambda:fixture.backend.status=='playing','Screen-edge play failed')
