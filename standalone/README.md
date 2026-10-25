@@ -1,8 +1,8 @@
-# Shiur Player 0.6.0
+# Shiur Player 0.7.0
 
 An English-only local Windows x64 desktop player with a high-contrast navy sidebar, bold typography, blue controls and a dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
 
-Close the old player and run **shiur-player-setup-0.6.0.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
+Close the old player and run **shiur-player-setup-0.7.0.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
 
 Click **Check for updates** in the app for subsequent releases. Checks run only when requested. The app fetches a small release JSON from this repository, validates its version/URL/size/SHA-256, downloads the installer in a worker thread, saves playback state and starts setup. Setup waits for the old player process to exit before selecting and starting the new version. Program files use separate version directories and an atomic `active.json` pointer, leaving the previous version selected if extraction/activation fails. User data and audio recordings are outside the installation tree. Previous program versions are retained; old portable copies are not removed.
 
@@ -16,7 +16,15 @@ Create and name collections yourself. Select a recording, click **Add to collect
 
 See [the instructions](READ%20ME%20FIRST.txt) for keyboard shortcuts. State stays at `%LOCALAPPDATA%\ShiurPlayerStandalone\state.json`; earlier Inside/Sidekick profiles remain separate.
 
-![Actual desktop-toolkit preview on Linux](../previews/shiur-player-0.6.0.png)
+![Actual desktop-toolkit preview on Linux](../previews/shiur-player-0.7.0.png)
+
+## New in 0.7.0
+
+The library uses the full window width above a permanent playback dock. Favorites, Unplayed and Finished join Continue listening. Numbered recordings sort naturally, and search matches all entered words. Right-click or More offers Play next, Add to queue and Favorite; the Queue window supports reordering and removing upcoming recordings. Current audio keeps playing during queue changes.
+
+Listening tools adds A–B section repeat, jump to time, 15/30/45/60-minute sleep presets, and pause at the end of the recording. Repeat and end-of-recording timers exclude one another. The dock displays time remaining adjusted for playback speed. The native mini player has a clickable progress strip and elapsed/remaining time.
+
+Settings & backup exports the listening profile as JSON and restores validated backups with a pre-restore safety copy. Audio stays external and the current library folder is preserved. Seeking or skipping a remembered recording before decoder loading keeps its requested position and stays paused; completed recordings replay from the start.
 
 ## Validation
 

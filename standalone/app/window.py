@@ -1,7 +1,7 @@
 """Local desktop library. UI work stays on the Tk thread; audio runs independently."""
 import queue,sys,threading
 from version import APP_VERSION
-import updater
+import updater,profile_backup
 import tkinter as tk
 from tkinter import ttk, filedialog, simpledialog, messagebox
 from controller import clock
@@ -9,6 +9,7 @@ from controller import clock
 TITLE='Shiur Player — Your listening library'
 FONT='Segoe UI' if sys.platform=='win32' else 'Helvetica'
 BG='#E8EDF5'; PAPER='#FFFFFF'; INK='#0D172B'; MUTED='#475569'; GREEN='#214CDB'; LINE='#C6D1E1'; SIDEBAR='#111E36'
+VIEWS={'all':'All shiurim','continue':'Continue listening','favorites':'Favorites','unplayed':'Unplayed','finished':'Finished'}
 
 
 class SlimScrollbar(tk.Canvas):
@@ -31,14 +32,15 @@ class SlimScrollbar(tk.Canvas):
 
 class ModernScale(tk.Canvas):
  """Flat seek/volume track; updates from playback do not send seek commands."""
- def __init__(self,parent,from_=0,to=1,value=0,command=None):
-  super().__init__(parent,height=26,bg=PAPER,highlightthickness=0,bd=0,takefocus=1,cursor='hand2')
+ def __init__(self,parent,from_=0,to=1,value=0,command=None,dark=False):
+  super().__init__(parent,height=26,bg=SIDEBAR if dark else PAPER,highlightthickness=0,bd=0,takefocus=1,cursor='hand2')
   self.maximum=to;self.minimum=from_;self.value=value;self.command=command;self.last_paint=None
-  self.track=self.create_line(8,13,9,13,fill=LINE,width=4,capstyle='round')
-  self.fill=self.create_line(8,13,9,13,fill=GREEN,width=4,capstyle='round')
-  self.dot=self.create_oval(2,7,14,19,fill=GREEN,outline='')
+  self.track=self.create_line(8,13,9,13,fill='#364765' if dark else LINE,width=4,capstyle='round')
+  self.fill=self.create_line(8,13,9,13,fill='#72A8FF' if dark else GREEN,width=4,capstyle='round')
+  self.dot=self.create_oval(2,7,14,19,fill='#FFFFFF' if dark else GREEN,outline='')
   self.bind('<Configure>',lambda _:self.paint());self.bind('<Button-1>',self.pointer);self.bind('<B1-Motion>',self.pointer)
   self.bind('<Left>',lambda _:self.step(-1));self.bind('<Right>',lambda _:self.step(1))
+  self.bind('<FocusIn>',lambda _:self.itemconfigure(self.dot,outline='#72A8FF',width=3));self.bind('<FocusOut>',lambda _:self.itemconfigure(self.dot,outline='',width=0))
  def configure(self,**kw):
   if 'to' in kw:self.maximum=kw.pop('to')
   if kw:super().configure(**kw)
@@ -61,7 +63,7 @@ class ModernScale(tk.Canvas):
 
 class PlayerWindow:
  def __init__(self,player,library,shortcuts):
-  self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False;self.update_busy=False
+  self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False;self.update_busy=False;self.queue_window=None;self.tools_window=None;self.last_volume=1
   self.root=tk.Tk();self.root.title(TITLE);self.root.configure(bg=BG)
   screen_w,screen_h=self.root.winfo_screenwidth(),self.root.winfo_screenheight()
   self.minimum_size=(min(980,screen_w-40),min(640,screen_h-80))
@@ -75,13 +77,13 @@ class PlayerWindow:
   style.map('TCombobox',fieldbackground=[('readonly',PAPER)],background=[('readonly',PAPER)],foreground=[('readonly',INK)],selectbackground=[('readonly',PAPER)],selectforeground=[('readonly',INK)])
   style.configure('TScale',sliderlength=14,sliderthickness=14,borderwidth=0,background=PAPER,troughcolor=LINE)
   style.layout('Treeview',[('Treeview.treearea',{'sticky':'nswe'})])
-  style.configure('Treeview',background=PAPER,fieldbackground=PAPER,foreground=INK,rowheight=57,borderwidth=0,font=(FONT,11))
+  style.configure('Treeview',background=PAPER,fieldbackground=PAPER,foreground=INK,rowheight=48,borderwidth=0,font=(FONT,11))
   style.configure('Treeview.Heading',background='#D6DFED',foreground=INK,font=(FONT,9,'bold'),padding=(8,14),relief='flat',borderwidth=0,lightcolor=BG,darkcolor=BG)
   style.map('Treeview',background=[('selected','#C9DAFF')],foreground=[('selected',INK)])
   style.configure('TScale',background=PAPER,troughcolor=LINE)
   self.player.show_window=lambda:self.requests.put('show');self.player.hide_window=lambda:self.requests.put('hide');self.player.choose_folder=lambda:self.requests.put('folder')
   self.build();self.root.protocol('WM_DELETE_WINDOW',self.close)
-  for key,fn in [('<space>',self.toggle),('<Left>',lambda:self.skip(-1)),('<Right>',lambda:self.skip(1)),('<Control-b>',self.bookmark),('<Control-f>',lambda:self.search.focus_set())]:
+  for key,fn in [('<space>',self.toggle),('<Left>',lambda:self.skip(-1)),('<Right>',lambda:self.skip(1)),('<Control-b>',self.bookmark),('<Control-f>',lambda:self.search.focus_set()),('<Control-j>',self.jump_to),('<Control-m>',lambda:self.command('floating_toggle'))]:
    self.root.bind(key,lambda event,f=fn:self.key(event,f))
   self.root.bind('<Control-o>',lambda _:self.safe(self.choose_folder));self.root.bind('<Escape>',lambda _:self.root.focus_set())
   self.root.bind('<Unmap>',lambda event:self.root.after(80,self.check_window_state) if event.widget is self.root and not self.closed else None)
@@ -99,69 +101,81 @@ class PlayerWindow:
   if changed:widget.configure(**changed)
 
  def build(self):
-  self.sidebar=tk.Frame(self.root,bg=SIDEBAR,width=220);self.sidebar.pack(side='left',fill='y');self.sidebar.pack_propagate(False)
-  self.label(self.sidebar,'Shiur Player',20,bg=SIDEBAR,anchor='w').pack(fill='x',padx=24,pady=(32,5))
-  self.label(self.sidebar,'COLLECTIONS',9,MUTED).pack(anchor='w',padx=24,pady=(26,12))
-  self.nav=tk.Frame(self.sidebar,bg=SIDEBAR);self.nav.pack(fill='x',padx=12)
-  self.button(self.sidebar,'+  New collection',self.new_collection).pack(fill='x',padx=12,pady=14)
-  bottom=tk.Frame(self.sidebar,bg=SIDEBAR);bottom.pack(side='bottom',fill='x',padx=12,pady=20)
-  self.folder_label=self.label(bottom,'No folder selected',9,MUTED,wraplength=180,anchor='w');self.folder_label.pack(fill='x',padx=12,pady=10)
-  self.button(bottom,'Open audio folder...',self.choose_folder).pack(fill='x')
-  self.button(bottom,'Refresh recordings',lambda:self.command('rescan')).pack(fill='x')
-  self.button(bottom,'Settings & shortcuts',self.settings).pack(fill='x')
-  content=tk.Frame(self.root,bg=BG);content.pack(side='left',fill='both',expand=True,padx=28,pady=28)
+  self.dock=tk.Frame(self.root,bg=SIDEBAR,padx=26,pady=16);self.dock.pack(side='bottom',fill='x')
+  tk.Frame(self.root,bg=GREEN,height=3).pack(side='bottom',fill='x')
+  top=tk.Frame(self.root,bg=BG);top.pack(fill='both',expand=True)
+  self.sidebar=tk.Frame(top,bg=SIDEBAR,width=210);self.sidebar.pack(side='left',fill='y');self.sidebar.pack_propagate(False)
+  brand=tk.Frame(self.sidebar,bg=SIDEBAR);brand.pack(fill='x',padx=20,pady=(28,18))
+  self.label(brand,'SHIUR',24,anchor='w').pack(fill='x')
+  self.label(brand,'P L A Y E R',10,'#72A8FF',anchor='w').pack(fill='x',pady=(0,6))
+  bottom=tk.Frame(self.sidebar,bg=SIDEBAR);bottom.pack(side='bottom',fill='x',padx=10,pady=(6,12))
+  self.folder_label=self.label(bottom,'No folder selected',9,MUTED,wraplength=170,anchor='w');self.folder_label.pack(fill='x',padx=12,pady=(6,8))
+  self.button(bottom,'Open audio folder...',self.choose_folder,anchor='w').pack(fill='x')
+  self.button(bottom,'Settings & backup',self.settings,anchor='w').pack(fill='x')
+  nav_canvas=tk.Canvas(self.sidebar,bg=SIDEBAR,highlightthickness=0);nav_canvas.pack(fill='both',expand=True,padx=10)
+  self.nav=tk.Frame(nav_canvas,bg=SIDEBAR);nav_id=nav_canvas.create_window(0,0,anchor='nw',window=self.nav)
+  self.nav.bind('<Configure>',lambda _:nav_canvas.configure(scrollregion=nav_canvas.bbox('all')))
+  nav_canvas.bind('<Configure>',lambda e:nav_canvas.itemconfigure(nav_id,width=e.width))
+  nav_canvas.bind('<MouseWheel>',lambda e:nav_canvas.yview_scroll(-int(e.delta/120),'units'))
+  self.nav_canvas=nav_canvas
+  content=tk.Frame(top,bg=BG);content.pack(side='left',fill='both',expand=True,padx=26,pady=(24,16))
   header=tk.Frame(content,bg=BG);header.pack(fill='x')
-  self.heading=self.label(header,'All recordings',28,anchor='w');self.heading.pack(side='left',fill='x',expand=True,pady=(6,4))
-  self.update_button=self.button(header,'Check for updates',self.check_updates);self.update_button.pack(side='right',padx=(12,0))
-  self.mini_button=self.button(header,'Mini player',lambda:self.command('floating_toggle'),True);self.mini_button.pack(side='right',padx=(12,0))
-  self.subtitle=self.label(content,'0 recordings',10,MUTED,anchor='w');self.subtitle.pack(fill='x',pady=(0,22))
-  body=tk.Frame(content,bg=BG);body.pack(fill='both',expand=True)
-  left=tk.Frame(body,bg=BG);left.pack(side='left',fill='both',expand=True,padx=(0,20))
-  self.label(left,'Search',10,MUTED,anchor='w').pack(fill='x',pady=(0,8))
-  self.query=tk.StringVar();self.search=tk.Entry(left,textvariable=self.query,relief='flat',bg=PAPER,fg=INK,insertbackground=INK,font=(FONT,11));self.search.pack(fill='x',ipady=12)
+  self.label(header,'LIBRARY',9,MUTED,anchor='w').pack(side='left')
+  self.update_button=self.button(header,'Check for updates',self.check_updates);self.update_button.pack(side='right')
+  title_row=tk.Frame(content,bg=BG);title_row.pack(fill='x',pady=(2,0))
+  self.heading=self.label(title_row,'All shiurim',28,anchor='w');self.heading.pack(side='left',fill='x',expand=True)
+  self.mini_button=self.button(title_row,'Mini player',lambda:self.command('floating_toggle'),True);self.mini_button.pack(side='right')
+  self.subtitle=self.label(content,'0 recordings',10,MUTED,anchor='w');self.subtitle.pack(fill='x',pady=(4,18))
+  search_row=tk.Frame(content,bg=PAPER,padx=12,pady=8);search_row.pack(fill='x',pady=(0,14))
+  self.label(search_row,'Search',10,MUTED).pack(side='left',padx=(0,12))
+  self.query=tk.StringVar();self.search=tk.Entry(search_row,textvariable=self.query,relief='flat',bg=PAPER,fg=INK,insertbackground=INK,font=(FONT,11));self.search.pack(side='left',fill='x',expand=True,ipady=6)
   self.query.trace_add('write',lambda *_:self.search_changed())
-  tk.Frame(left,bg=BG,height=16).pack()
-  table=tk.Frame(left,bg=PAPER);table.pack(fill='both',expand=True)
-  self.tree=ttk.Treeview(table,columns=('name','resume','duration'),show='headings',selectmode='extended',height=5)
-  for name,title,width in [('name','RECORDING',260),('resume','RESUME AT',110),('duration','LENGTH',80)]:
+  self.button(search_row,'Clear',lambda:self.query.set('')).pack(side='right')
+  self.button(search_row,'Refresh',lambda:self.command('rescan')).pack(side='right')
+  actions=tk.Frame(content,bg=BG);actions.pack(side='bottom',fill='x',pady=(12,0))
+  self.resume_button=self.button(actions,'Play selected',self.resume,True);self.resume_button.pack(side='left')
+  self.organize_button=self.button(actions,'Add to collection',self.add_collection);self.organize_button.pack(side='left',padx=5)
+  self.button(actions,'More ···',self.more).pack(side='right')
+  self.selection_info=self.label(actions,'',9,MUTED,anchor='w');self.selection_info.pack(side='left',padx=6)
+  table=tk.Frame(content,bg=PAPER);table.pack(fill='both',expand=True)
+  self.tree=ttk.Treeview(table,columns=('name','resume','duration'),show='headings',selectmode='extended',height=4)
+  for name,title,width in [('name','RECORDING',400),('resume','RESUME AT',112),('duration','LENGTH',90)]:
    self.tree.heading(name,text=title,command=lambda column=name:self.safe(lambda:self.sort_by(column)));self.tree.column(name,width=width,minwidth=75,stretch=name=='name',anchor='w' if name=='name' else 'center')
-  self.tree.tag_configure('current',foreground=GREEN)
+  self.tree.tag_configure('current',foreground=GREEN,font=(FONT,11,'bold'))
+  self.tree.tag_configure('alternate',background='#F4F7FC')
   scroll=SlimScrollbar(table,self.tree.yview);self.tree.configure(yscrollcommand=scroll.set);scroll.pack(side='right',fill='y');self.tree.pack(fill='both',expand=True)
+  self.empty=self.label(table,'',14,MUTED,justify='center')
   self.tree.bind('<<TreeviewSelect>>',self.select);self.tree.bind('<Double-1>',self.double_click);self.tree.bind('<Return>',lambda _:self.safe(self.resume))
   self.tree.bind('<ButtonPress-1>',self.list_press);self.tree.bind('<B1-Motion>',self.list_drag);self.tree.bind('<ButtonRelease-1>',self.list_release);self.tree.bind('<Motion>',self.list_motion)
   self.tree.bind('<Control-a>',self.select_all);self.tree.bind('<Button-3>',self.context_menu)
-  actions=tk.Frame(left,bg=BG);actions.pack(fill='x',pady=(12,0))
-  self.resume_button=self.button(actions,'Play selected',self.resume,True);self.resume_button.pack(side='left')
-  self.organize_button=self.button(actions,'Add to collection',self.add_collection);self.organize_button.pack(side='left',padx=8)
-  self.button(actions,'More',self.more).pack(side='right')
-  self.selection_info=self.label(left,'',9,MUTED,anchor='w');self.selection_info.pack(fill='x',pady=(8,0))
-  right=tk.Frame(body,bg=PAPER,width=310);right.pack(side='right',fill='y');right.pack_propagate(False)
-  card_scroll=SlimScrollbar(right,lambda *args:card_canvas.yview(*args));card_scroll.pack(side='right',fill='y')
-  card_canvas=tk.Canvas(right,bg=PAPER,highlightthickness=0,yscrollcommand=card_scroll.set);card_canvas.pack(fill='both',expand=True);card_canvas.bind('<MouseWheel>',lambda event:card_canvas.yview_scroll(-int(event.delta/120),'units'))
-  self.card=tk.Frame(card_canvas,bg=PAPER,padx=18,pady=20)
-  card_window=card_canvas.create_window(0,0,anchor='nw',window=self.card)
-  self.card.bind('<Configure>',lambda _:card_canvas.configure(scrollregion=card_canvas.bbox('all')))
-  card_canvas.bind('<Configure>',lambda event:card_canvas.itemconfigure(card_window,width=event.width))
-  self.label(self.card,'NOW PLAYING',9,MUTED,anchor='w').pack(fill='x')
-  tk.Frame(self.card,bg=PAPER,height=20).pack()
-  self.track_title=self.label(self.card,'No recording selected',17,anchor='nw',justify='left',wraplength=260);self.track_title.pack(fill='x')
-  self.source=self.label(self.card,'Choose a recording to begin.',9,MUTED,anchor='w',wraplength=260,justify='left');self.source.pack(fill='x',pady=(8,14))
-  self.state_label=self.label(self.card,'Paused',9,GREEN,anchor='w',wraplength=260);self.state_label.pack(fill='x',pady=(0,12))
-  self.seek=ModernScale(self.card,from_=0,to=1);self.seek.pack(fill='x');self.seek.bind('<ButtonPress-1>',lambda _:setattr(self,'dragging',True),add='+');self.seek.bind('<ButtonRelease-1>',self.seek_release);self.seek.bind('<<ScaleChanged>>',self.seek_release)
-  self.time=self.label(self.card,'0:00 / 0:00',10,MUTED,anchor='w');self.time.pack(fill='x',pady=(4,12))
-  controls=tk.Frame(self.card,bg=PAPER);controls.pack(fill='x')
+  self.tree.bind('<Control-q>',lambda _:self.safe(lambda:self.add_queue(False)))
+  self.tree.bind('<Control-d>',lambda _:self.safe(self.favorite_selected))
+  info=tk.Frame(self.dock,bg=SIDEBAR);info.pack(fill='x')
+  track_info=tk.Frame(info,bg=SIDEBAR);track_info.pack(side='left',fill='x',expand=True)
+  eyebrow=tk.Frame(track_info,bg=SIDEBAR);eyebrow.pack(fill='x')
+  self.label(eyebrow,'NOW PLAYING',9,'#72A8FF').pack(side='left')
+  self.state_label=self.label(eyebrow,'',9,MUTED);self.state_label.pack(side='left',padx=14)
+  self.track_title=self.label(track_info,'No recording selected',18,anchor='w');self.track_title.pack(fill='x',pady=(4,0))
+  self.source=self.label(track_info,'Choose an audio folder to begin.',9,MUTED,anchor='w');self.source.pack(fill='x',pady=(2,0))
+  self.favorite_button=self.button(info,'Favorite',self.favorite_current);self.favorite_button.pack(side='right',padx=(6,0))
+  self.queue_button=self.button(info,'Queue',self.show_queue);self.queue_button.pack(side='right')
+  timeline=tk.Frame(self.dock,bg=SIDEBAR);timeline.pack(fill='x',pady=(8,4))
+  self.time=self.label(timeline,'0:00 / 0:00',10,MUTED,width=17,anchor='w');self.time.pack(side='left')
+  self.remaining=self.label(timeline,'',10,MUTED,width=16,anchor='e');self.remaining.pack(side='right')
+  self.seek=ModernScale(timeline,from_=0,to=1,dark=True);self.seek.pack(fill='x',expand=True);self.seek.bind('<ButtonPress-1>',lambda _:setattr(self,'dragging',True),add='+');self.seek.bind('<ButtonRelease-1>',self.seek_release);self.seek.bind('<<ScaleChanged>>',self.seek_release)
+  controls=tk.Frame(self.dock,bg=SIDEBAR);controls.pack(fill='x')
+  self.button(controls,'Previous',lambda:self.command('previous')).pack(side='left')
   self.back=self.button(controls,'−15s',lambda:self.skip(-1));self.back.pack(side='left')
-  self.play_button=self.button(controls,'Play',self.toggle,True);self.play_button.pack(side='left',expand=True,fill='x',padx=6)
-  self.forward=self.button(controls,'+15s',lambda:self.skip(1));self.forward.pack(side='right')
-  opts=tk.Frame(self.card,bg=PAPER);opts.pack(fill='x',pady=16)
-  self.label(opts,'Speed',9,MUTED).pack(side='left');self.speed=ttk.Combobox(opts,values=['0.5','0.75','1','1.25','1.5','1.75','2'],state='readonly',width=5);self.speed.set(str(self.player.saved['speed']));self.speed.pack(side='left',padx=8);self.speed.bind('<<ComboboxSelected>>',lambda _:self.safe(lambda:self.command('speed',value=float(self.speed.get()))))
-  self.label(opts,'Skip',9,MUTED).pack(side='left');self.interval=ttk.Combobox(opts,values=['10','15','60'],state='readonly',width=4);self.interval.set(str(self.player.saved['skipSeconds']));self.interval.pack(side='left',padx=8);self.interval.bind('<<ComboboxSelected>>',lambda _:self.safe(lambda:self.command('skip_interval',value=int(self.interval.get()))))
-  self.label(self.card,'VOLUME',9,MUTED,anchor='w').pack(fill='x')
-  volume=ModernScale(self.card,from_=0,to=1,value=self.player.saved['volume'],command=lambda value:self.safe(lambda:self.command('volume',value=float(value))));volume.pack(fill='x',pady=(6,12))
-  self.button(self.card,'Mini player',lambda:self.command('floating_toggle')).pack(fill='x')
-  self.button(self.card,'Add bookmark',self.bookmark).pack(fill='x')
-  self.button(self.card,'View bookmarks',self.bookmarks).pack(fill='x')
-  self.status=self.label(content,'',9,MUTED,anchor='w',wraplength=850);self.status.pack(fill='x',pady=(18,0))
+  self.play_button=self.button(controls,'Play',self.toggle,True,width=8);self.play_button.pack(side='left',padx=8)
+  self.forward=self.button(controls,'+15s',lambda:self.skip(1));self.forward.pack(side='left')
+  self.button(controls,'Next',lambda:self.command('next')).pack(side='left')
+  self.button(controls,'Listening tools',self.listening_tools).pack(side='right')
+  self.volume=ModernScale(controls,from_=0,to=1,value=self.player.saved['volume'],command=lambda value:self.safe(lambda:self.command('volume',value=float(value))),dark=True);self.volume.configure(width=90);self.volume.pack(side='right',padx=8)
+  self.mute_button=self.button(controls,'Volume',self.mute);self.mute_button.pack(side='right')
+  self.speed=ttk.Combobox(controls,values=['0.5','0.75','1','1.25','1.5','1.75','2'],state='readonly',width=4);self.speed.set(str(self.player.saved['speed']));self.speed.pack(side='right',padx=8);self.speed.bind('<<ComboboxSelected>>',lambda _:self.safe(lambda:self.command('speed',value=float(self.speed.get()))))
+  self.label(controls,'Speed',9,MUTED).pack(side='right')
+  self.interval=None
+  self.status=self.label(self.dock,'',9,MUTED,anchor='w');self.status.pack(fill='x',pady=(6,0))
  def check_updates(self):
   if self.update_busy:return
   self.update_busy=True;self.set_options(self.update_button,text='Checking...',state='disabled')
@@ -228,8 +242,12 @@ class PlayerWindow:
   if ident not in self.tree.selection():self.tree.selection_set(ident)
   self.tree.focus(ident);self.select();menu=tk.Menu(self.root,tearoff=False)
   menu.add_command(label='Play from saved position',command=lambda:self.safe(self.resume))
+  menu.add_command(label='Play next',command=lambda:self.safe(lambda:self.add_queue(True)))
+  menu.add_command(label='Add to queue',command=lambda:self.safe(lambda:self.add_queue(False)))
+  menu.add_command(label='Toggle favorite',command=lambda:self.safe(self.favorite_selected))
+  menu.add_separator()
   menu.add_command(label=f'Add {len(self.selected_ids())} to collection…',command=lambda:self.safe(self.add_collection))
-  if self.library.view not in ('all','continue'):menu.add_command(label='Remove selected from collection',command=lambda:self.safe(self.remove_selected))
+  if self.library.view not in VIEWS:menu.add_command(label='Remove selected from collection',command=lambda:self.safe(self.remove_selected))
   try:menu.tk_popup(event.x_root,event.y_root)
   finally:menu.grab_release()
  def sort_by(self,column):self.library.set_sort(column);self.update_rows()
@@ -292,8 +310,12 @@ class PlayerWindow:
    self.auto_bar=False;self.player.error='Mini player: '+str(error)
    if minimized:self.root.deiconify()
  def more(self):
-  menu=tk.Menu(self.root,tearoff=False);menu.add_command(label='Reset selected recording to the beginning',command=lambda:self.safe(self.reset_selected))
-  if self.library.view not in ('all','continue'):
+  menu=tk.Menu(self.root,tearoff=False)
+  menu.add_command(label='Play next',command=lambda:self.safe(lambda:self.add_queue(True)))
+  menu.add_command(label='Add to queue',command=lambda:self.safe(lambda:self.add_queue(False)))
+  menu.add_command(label='Toggle favorite',command=lambda:self.safe(self.favorite_selected))
+  menu.add_separator();menu.add_command(label='Reset selected recording to the beginning',command=lambda:self.safe(self.reset_selected))
+  if self.library.view not in VIEWS:
    menu.add_command(label='Remove selected from this collection',command=lambda:self.safe(self.remove_selected))
    menu.add_command(label='Rename collection',command=lambda:self.safe(self.rename_collection));menu.add_command(label='Delete collection',command=lambda:self.safe(self.delete_collection))
   menu.tk_popup(self.root.winfo_pointerx(),self.root.winfo_pointery())
@@ -314,7 +336,7 @@ class PlayerWindow:
    if items.curselection():self.library.bookmark_action(marks[items.curselection()[0]]['id'],delete);pop.destroy()
   self.button(pop,'Jump to bookmark',lambda:action()).pack(side='left',padx=16,pady=12);self.button(pop,'Delete',lambda:action(True)).pack(side='right',padx=16)
  def settings(self):
-  pop=tk.Toplevel(self.root);pop.title('Settings & shortcuts');pop.geometry('530x570');pop.configure(bg=BG)
+  pop=tk.Toplevel(self.root);pop.title('Settings & backup');pop.geometry('600x660');pop.configure(bg=BG);pop.transient(self.root)
   self.label(pop,f'Settings · {APP_VERSION}',20).pack(anchor='w',padx=24,pady=20)
   auto=tk.BooleanVar(value=self.player.saved['autoNext']);tk.Checkbutton(pop,text='Automatically play the next recording',variable=auto,command=lambda:self.safe(lambda:self.command('autonext',value=auto.get())),bg=BG).pack(anchor='w',padx=24)
   mini=tk.BooleanVar(value=self.player.saved.get('miniOnMinimize',True))
@@ -329,12 +351,117 @@ class PlayerWindow:
    with self.player.lock:self.player.saved['miniSpeedMiddle']=.5 if middle.current()==1 else 1.5;self.player.saved['miniSpeedCycleIndex']=None;self.player.persist()
   middle.bind('<<ComboboxSelected>>',save_cycle)
   global_keys=tk.BooleanVar(value=self.player.saved.get('globalShortcuts',False));tk.Checkbutton(pop,text='Enable shortcuts while using other apps',variable=global_keys,command=lambda:self.safe(lambda:self.shortcuts(global_keys.get())),bg=BG).pack(anchor='w',padx=24,pady=12)
-  self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: choose folder  ·  Ctrl+B: bookmark\n\nGlobal keys: Ctrl+Alt+Shift+P: play/pause\nCtrl+Alt+Shift+Left / Right: skip',10,MUTED,justify='left').pack(anchor='w',padx=24,pady=12)
-  self.button(pop,'Set sleep timer',self.timer).pack(anchor='w',padx=24)
-  self.label(pop,'Minimize for mini player. Close to save and stop.',9,MUTED,justify='left').pack(anchor='w',padx=24,pady=18)
+  self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+D: favorite  ·  Ctrl+Q: add to queue\n\nGlobal keys: Ctrl+Alt+Shift+P: play/pause\nCtrl+Alt+Shift+Left / Right: skip',10,MUTED,justify='left').pack(anchor='w',padx=24,pady=12)
+  self.label(pop,'LISTENING BACKUP',9,MUTED).pack(anchor='w',padx=24,pady=(18,8))
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24)
+  self.button(row,'Export backup…',self.export_backup).pack(side='left');self.button(row,'Restore backup…',self.restore_backup).pack(side='left',padx=8)
+  self.label(pop,'Includes positions, collections and bookmarks. Audio stays in its folder.',9,MUTED,justify='left').pack(anchor='w',padx=24,pady=12)
  def timer(self):
   minutes=simpledialog.askinteger('Sleep timer','Minutes until pause (0 turns it off):',minvalue=0,maxvalue=180,parent=self.root)
   if minutes is not None:self.command('sleep_timer',minutes=minutes)
+ def favorite_selected(self):
+  self.library.favorite(self.selected_ids());self.update_rows()
+ def favorite_current(self):
+  ident=self.player.saved['currentId']
+  if ident:self.library.favorite([ident]);self.update_rows()
+ def add_queue(self,next_up=False):
+  self.library.queue_add(self.selected_ids(),next_up=next_up);self.show_queue()
+ def mute(self):
+  volume=self.player.saved['volume']
+  if volume:self.last_volume=volume
+  self.command('volume',value=0 if volume else self.last_volume);self.volume.set(self.player.saved['volume'])
+ def jump_to(self):
+  if not self.player.saved['currentId']:raise ValueError('Choose a recording first.')
+  value=simpledialog.askstring('Jump to time','Enter minutes:seconds or hours:minutes:seconds:',initialvalue=clock(self.player.snapshot()['position']),parent=self.root)
+  if value is None:return
+  pieces=value.strip().split(':')
+  if not 1<=len(pieces)<=3 or any(not p.isdigit() for p in pieces) or any(int(p)>=60 for p in pieces[1:]):raise ValueError('Use a time such as 12:30 or 1:02:30.')
+  seconds=sum(int(part)*60**index for index,part in enumerate(reversed(pieces)))
+  self.command('seek',value=seconds)
+ def listening_tools(self):
+  if self.tools_window is not None and self.tools_window.winfo_exists():self.tools_window.lift();return
+  pop=tk.Toplevel(self.root);self.tools_window=pop;pop.title('Listening tools');pop.geometry('560x610');pop.minsize(520,590);pop.configure(bg=BG);pop.transient(self.root)
+  self.label(pop,'Listening tools',22).pack(anchor='w',padx=24,pady=(24,12))
+  self.label(pop,'REPEAT A SECTION',9,MUTED).pack(anchor='w',padx=24,pady=(12,4))
+  self.loop_label=self.label(pop,'Set A where the section starts, then B where it ends.',10,wraplength=490,justify='left');self.loop_label.pack(anchor='w',padx=24,pady=8)
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24)
+  for text,op in [('Set A','loop_a'),('Set B','loop_b'),('Clear repeat','loop_clear')]:self.button(row,text,lambda o=op:self.command(o),op=='loop_b').pack(side='left',padx=(0,8))
+  self.label(pop,'SLEEP TIMER',9,MUTED).pack(anchor='w',padx=24,pady=(24,4))
+  self.sleep_label=self.label(pop,'Off',10);self.sleep_label.pack(anchor='w',padx=24,pady=8)
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24)
+  for minutes in [15,30,45,60]:self.button(row,f'{minutes} min',lambda n=minutes:self.command('sleep_timer',minutes=n)).pack(side='left',padx=(0,4))
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24,pady=(4,0))
+  self.button(row,'End of recording',lambda:self.command('sleep_timer',mode='end')).pack(side='left')
+  self.button(row,'Custom',self.timer).pack(side='left');self.button(row,'Turn off',lambda:self.command('sleep_timer',minutes=0)).pack(side='left')
+  self.label(pop,'NAVIGATION',9,MUTED).pack(anchor='w',padx=24,pady=(24,8))
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24)
+  self.button(row,'Jump to time…',self.jump_to).pack(side='left')
+  self.label(row,'Skip seconds',10,MUTED).pack(side='left',padx=(20,8))
+  self.interval=ttk.Combobox(row,values=['10','15','60'],state='readonly',width=4);self.interval.set(str(self.player.saved['skipSeconds']));self.interval.pack(side='left');self.interval.bind('<<ComboboxSelected>>',lambda _:self.safe(lambda:self.command('skip_interval',value=int(self.interval.get()))))
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24,pady=(18,0))
+  self.button(row,'Add bookmark',self.bookmark).pack(side='left');self.button(row,'View bookmarks',self.bookmarks).pack(side='left',padx=8)
+  self.refresh_tools(self.player.snapshot())
+ def refresh_tools(self,state):
+  if self.tools_window is None or not self.tools_window.winfo_exists():return
+  a,b=state.get('loopA'),state.get('loopB')
+  text=f'Repeating {clock(a)} to {clock(b)}' if b is not None else f'Start: {clock(a)} · Set B at the end of the section.' if a is not None else 'Set A where the section starts, then B where it ends.'
+  self.set_options(self.loop_label,text=text)
+  text=f"Pauses in {clock(state['sleepRemaining'])}" if state['sleepRemaining'] else 'Pauses at the end of this recording' if state.get('sleepAtEnd') else 'Off'
+  self.set_options(self.sleep_label,text=text)
+ def show_queue(self):
+  if self.queue_window is not None and self.queue_window.winfo_exists():self.queue_window.lift();self.refresh_queue();return
+  pop=tk.Toplevel(self.root);self.queue_window=pop;pop.title('Play queue');pop.geometry('700x500');pop.minsize(600,430);pop.configure(bg=BG);pop.transient(self.root)
+  self.label(pop,'Play queue',24).pack(anchor='w',padx=22,pady=(22,8))
+  auto=tk.BooleanVar(value=self.player.saved['autoNext']);self.queue_auto=auto
+  tk.Checkbutton(pop,text='Automatically continue to the next recording',variable=auto,command=lambda:self.safe(lambda:self.command('autonext',value=auto.get())),bg=BG,activebackground=BG).pack(anchor='w',padx=22,pady=(0,12))
+  frame=tk.Frame(pop,bg=PAPER);frame.pack(fill='both',expand=True,padx=22)
+  self.queue_tree=ttk.Treeview(frame,columns=('title','position'),show='headings',selectmode='browse')
+  self.queue_tree.heading('title',text='RECORDING');self.queue_tree.heading('position',text='RESUME AT')
+  self.queue_tree.column('title',width=420);self.queue_tree.column('position',width=100,stretch=False,anchor='center')
+  self.queue_tree.tag_configure('current',foreground=GREEN,font=(FONT,11,'bold'))
+  scroll=SlimScrollbar(frame,self.queue_tree.yview);self.queue_tree.configure(yscrollcommand=scroll.set);scroll.pack(side='right',fill='y');self.queue_tree.pack(fill='both',expand=True)
+  self.queue_tree.bind('<Double-1>',lambda _:self.safe(lambda:self.queue_action('play')));self.queue_tree.bind('<Return>',lambda _:self.safe(lambda:self.queue_action('play')))
+  self.queue_tree.bind('<ButtonPress-1>',lambda e:'break' if self.queue_tree.identify_region(e.x,e.y)=='separator' else None)
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=22,pady=14)
+  for text,action in [('Play','play'),('Move up','up'),('Move down','down'),('Remove','remove')]:self.button(row,text,lambda a=action:self.queue_action(a),action=='play').pack(side='left',padx=(0,6))
+  self.queue_hint=self.label(pop,'',9,MUTED);self.queue_hint.pack(anchor='w',padx=22,pady=(0,12))
+  self.refresh_queue()
+ def refresh_queue(self):
+  if self.queue_window is None or not self.queue_window.winfo_exists():return
+  with self.player.lock:ids=list(self.player.saved['queue']);tracks={t['id']:t for t in self.player.library()};current=self.player.saved['currentId'];auto=self.player.saved['autoNext']
+  ids=[i for i in ids if i in tracks];old=list(self.queue_tree.get_children())
+  for ident in old:
+   if ident not in ids:self.queue_tree.delete(ident)
+  for index,ident in enumerate(ids):
+   track=tracks[ident];values=(('Playing · ' if ident==current else f'{index+1:02}  ')+track['name'],clock(track.get('position',0)))
+   if not self.queue_tree.exists(ident):self.queue_tree.insert('',index,iid=ident,values=values)
+   elif tuple(self.queue_tree.item(ident,'values'))!=values:self.queue_tree.item(ident,values=values)
+   if old!=ids:self.queue_tree.move(ident,'',index)
+   tags=('current',) if ident==current else ()
+   if tuple(self.root.tk.splitlist(self.queue_tree.item(ident,'tags')))!=tags:self.queue_tree.item(ident,tags=tags)
+  if self.queue_auto.get()!=auto:self.queue_auto.set(auto)
+  self.set_options(self.queue_hint,text=f"{len(ids)} recordings · Select one to play or reorder." if ids else 'Select recordings in the library, then choose More → Add to queue.')
+ def queue_action(self,action):
+  ids=self.queue_tree.selection()
+  if not ids:return
+  ident=ids[0]
+  if action=='play':
+   if ident!=self.player.saved['currentId']:self.command('load',id=ident,queue=list(self.player.saved['queue']))
+   self.command('play')
+  elif action=='remove':self.library.queue_remove([ident])
+  else:self.library.queue_move(ident,-1 if action=='up' else 1)
+  self.refresh_queue()
+ def export_backup(self):
+  path=filedialog.asksaveasfilename(title='Back up listening library',defaultextension='.json',initialfile='Shiur Player backup.json',filetypes=[('Listening backup','*.json')],parent=self.root)
+  if path:profile_backup.export_profile(self.player,path);messagebox.showinfo('Backup saved','Your listening positions, collections and bookmarks are backed up. Audio files stay in their original folder.',parent=self.root)
+ def restore_backup(self):
+  path=filedialog.askopenfilename(title='Restore listening backup',filetypes=[('Listening backup','*.json')],parent=self.root)
+  if not path:return
+  if not messagebox.askyesno('Restore backup','Replace saved positions, collections and bookmarks with this backup? A safety copy of your current library will be kept. Playback will pause.',parent=self.root):return
+  safety=profile_backup.import_profile(self.player,path)
+  self.library.selected=self.player.saved['currentId'];self.library.view='all';self.library.sort=self.player.saved.get('librarySort','name');self.library.descending=self.player.saved.get('librarySortDescending',False)
+  self.library.explicit_sort=False;self.nav_signature=None;self.update_rows();self.volume.set(self.player.saved['volume'])
+  messagebox.showinfo('Backup restored',f'Your listening library has been restored.\n\nSafety copy: {safety}',parent=self.root)
  def update_rows(self):
   with self.player.lock:tracks=self.library.tracks()
   ids=[t['id'] for t in tracks];previous=list(self.tree.get_children());reorder=previous!=ids
@@ -342,11 +469,11 @@ class PlayerWindow:
    if ident not in ids:self.tree.delete(ident);self.rows.pop(ident,None)
   for index,track in enumerate(tracks):
    position=track.get('position',0);resume='Finished' if track.get('completed') else clock(position) if position else 'New'
-   values=(track['name'],resume,clock(track['duration']) if track.get('duration') else '-')
+   values=(('★  ' if track.get('favorite') else '')+track['name'],resume,clock(track['duration']) if track.get('duration') else '-')
    if not self.tree.exists(track['id']):self.tree.insert('',index,iid=track['id'],values=values)
    elif self.rows.get(track['id'])!=values:self.tree.item(track['id'],values=values)
    if reorder:self.tree.move(track['id'],'',index)
-   tags=('current',) if track['id']==self.player.saved['currentId'] else ()
+   tags=(('current',) if track['id']==self.player.saved['currentId'] else ())+(('alternate',) if index%2 else ())
    if tuple(self.root.tk.splitlist(self.tree.item(track['id'],'tags')))!=tags:self.tree.item(track['id'],tags=tags)
    self.rows[track['id']]=values
   if self.library.selected in ids and not self.tree.selection():self.tree.selection_set(self.library.selected)
@@ -355,14 +482,23 @@ class PlayerWindow:
    active=column==self.library.sort and (self.library.view!='continue' or self.library.explicit_sort)
    text=title+(' v' if self.library.descending else ' ^') if active else title
    if self.tree.heading(column,'text')!=text:self.tree.heading(column,text=text)
-  folders=self.player.saved['folders'];name=next((f['name'] for f in folders if f['id']==self.library.view),'Continue listening' if self.library.view=='continue' else 'All recordings')
-  self.set_options(self.heading,text=name);self.set_options(self.subtitle,text=f'{len(tracks)} recordings' if tracks else 'No recordings here yet. Choose a folder or try another search.')
+  if not tracks:
+   message='No matching recordings' if self.query.get() else 'Choose an audio folder to get started' if not self.player.root else 'No recordings in this view'
+   self.set_options(self.empty,text=message);self.empty.place(relx=.5,rely=.55,anchor='center')
+  else:self.empty.place_forget()
+  folders=self.player.saved['folders'];name=next((f['name'] for f in folders if f['id']==self.library.view),VIEWS.get(self.library.view,'All shiurim'))
+  self.set_options(self.heading,text=name);self.set_options(self.subtitle,text=f"{len(tracks)} recording{'s' if len(tracks)!=1 else ''}")
   signature=(self.library.view,tuple((f['id'],f['name']) for f in folders))
   if signature!=self.nav_signature:
    self.nav_signature=signature
    for widget in self.nav.winfo_children():widget.destroy()
-   for ident,title in [('all','All shiurim'),('continue','Continue listening')]+[(f['id'],f['name']) for f in folders]:
-    b=self.button(self.nav,title,lambda i=ident:self.navigate(i),anchor='w');b.configure(bg=GREEN if ident==self.library.view else SIDEBAR);b.pack(fill='x',pady=3)
+   for ident,title in VIEWS.items():
+    b=self.button(self.nav,title,lambda i=ident:self.navigate(i),anchor='w');b.configure(bg=GREEN if ident==self.library.view else SIDEBAR);b.pack(fill='x',pady=2)
+   self.label(self.nav,'COLLECTIONS',9,MUTED,anchor='w').pack(fill='x',padx=12,pady=(24,10))
+   for folder in folders:
+    b=self.button(self.nav,folder['name'],lambda i=folder['id']:self.navigate(i),anchor='w');b.configure(bg=GREEN if folder['id']==self.library.view else SIDEBAR);b.pack(fill='x',pady=2)
+   self.button(self.nav,'+ New collection',self.new_collection,anchor='w').pack(fill='x',pady=(4,12))
+   for widget in self.nav.winfo_children():widget.bind('<MouseWheel>',lambda e:self.nav_canvas.yview_scroll(-int(e.delta/120),'units'))
  def refresh(self):
   if self.closed:return
   try:
@@ -379,14 +515,24 @@ class PlayerWindow:
    with self.player.lock:state=self.player.snapshot();current=next((t for t in self.player.tracks if t['id']==state['currentId']),None)
    self.update_rows()
    if self.speed.get()!=f"{state['speed']:g}":self.speed.set(f"{state['speed']:g}")
-   if self.interval.get()!=str(state['skipSeconds']):self.interval.set(str(state['skipSeconds']))
-   self.set_options(self.folder_label,text=str(self.player.root) if self.player.root else 'No folder selected')
+   if self.interval is not None and self.interval.winfo_exists() and self.interval.get()!=str(state['skipSeconds']):self.interval.set(str(state['skipSeconds']))
+   if not self.volume.winfo_containing(self.root.winfo_pointerx(),self.root.winfo_pointery()) is self.volume:self.volume.set(state['volume'])
+   self.set_options(self.mute_button,text='Muted' if not state['volume'] else 'Volume')
+   self.set_options(self.folder_label,text=self.player.root.name if self.player.root else 'No folder selected')
    self.set_options(self.track_title,text=current['name'].rsplit('.',1)[0] if current else 'No recording selected');self.set_options(self.source,text=current['source'] if current and current['source']!=current['name'] else '' if current else 'Choose a recording to begin.')
    playing=state['status']=='playing' or bool(self.player.pending and self.player.pending['autoplay']);self.set_options(self.play_button,text='Pause' if playing else 'Play')
+   self.set_options(self.track_title,wraplength=max(280,self.root.winfo_width()-420))
    self.set_options(self.state_label,text='Loading…' if state['status']=='loading' else 'Playing' if playing else 'Paused' if current else '')
    if not self.dragging:self.seek.configure(to=max(1,state['duration']));self.seek.set(state['position'])
    self.set_options(self.time,text=f"{clock(state['position'])} / {clock(state['duration'])}");self.set_options(self.back,text=f"-{state['skipSeconds']}s");self.set_options(self.forward,text=f"+{state['skipSeconds']}s")
-   self.set_options(self.status,text=state['error'] or (f"Sleep timer · pauses in {clock(state['sleepRemaining'])}" if state['sleepRemaining'] else ''))
+   self.set_options(self.remaining,text=f"{clock(max(0,state['duration']-state['position'])/state['speed'])} left at {state['speed']:g}×" if state['duration'] else '')
+   favorite=self.player.saved['tracks'].get(state['currentId'],{}).get('favorite',False)
+   self.set_options(self.favorite_button,text='★ Favorited' if favorite else 'Favorite',state='normal' if current else 'disabled')
+   self.set_options(self.queue_button,text=f"Queue · {len(state['queue'])}")
+   sleep=f"Pauses in {clock(state['sleepRemaining'])}" if state['sleepRemaining'] else 'Pauses after this recording' if state.get('sleepAtEnd') else ''
+   loop=f"Repeat {clock(state['loopA'])}–{clock(state['loopB'])}" if state.get('loopB') is not None else ''
+   self.set_options(self.status,text=state['error'] or '   ·   '.join(t for t in (sleep,loop) if t),fg='#FFB4AD' if state['error'] else '#B4C1D8')
+   self.refresh_tools(state);self.refresh_queue()
   except Exception as error:self.set_options(self.status,text=str(error))
   self.root.after(500,self.refresh)
  def close(self):

@@ -147,4 +147,22 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_favorites_queue_and_listening_tools_keep_current_place(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   fixture.library.play();fixture.player.tick();fixture.backend.position=42.875
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.update()
+   ident=fixture.player.active;window.favorite_current();window.navigate('favorites');window.root.update()
+   self.assertEqual(list(window.tree.get_children()),[ident])
+   window.show_queue();window.queue_tree.selection_set(ident);window.queue_action('play')
+   self.assertEqual(fixture.backend.position,42.875)
+   window.listening_tools();window.root.update();fixture.player.command({'op':'loop_a'})
+   fixture.backend.position=55;fixture.player.command({'op':'loop_b'});window.refresh()
+   self.assertIn('0:42',window.loop_label.cget('text'))
+   fixture.player.command({'op':'sleep_timer','mode':'end'});window.refresh()
+   self.assertIn('end of this recording',window.sleep_label.cget('text'))
+   self.assertIsNone(fixture.player.snapshot()['loopB']);self.assertEqual(fixture.backend.position,55)
+  finally:
+   if window:window.close()
+   fixture.tearDown()
 if __name__=='__main__':unittest.main(verbosity=2)

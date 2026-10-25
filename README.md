@@ -4,16 +4,21 @@ An English-only local shiur player for Windows x64. The recording library and pl
 
 ## Download
 
-**[Download the standalone Windows app — 0.6.0](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-0.6.0.exe)**
+**[Download the standalone Windows app — 0.7.0](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-0.7.0.exe)**
 
 Close the older player and run the **setup EXE once**. It creates desktop and Start menu shortcuts. Use **Check for updates** inside the app for future releases—no repeated manual extraction. Python and VLC are bundled. Existing standalone listening data stays in the same profile.
 
 After restarting the computer, open the Shiur Player shortcut and press Play. The chosen folder, last recording and individual listening positions are remembered. Nothing starts playing automatically. The first standalone profile is separate from the previous Inside/Sidekick profiles; those are left untouched.
 
-![Redesigned player, rendered on Linux](previews/shiur-player-0.6.0.png)
+![Redesigned player, rendered on Linux](previews/shiur-player-0.7.0.png)
 
 ## Features
 
+- Favorites, Unplayed and Finished views; natural numbered sorting and multiword search.
+- Editable queue with Play next, reordering and removal of upcoming recordings.
+- A–B section repeat, jump to time and sleep presets including end of recording.
+- Profile backup and restore with a safety copy.
+- Full-width recording library and permanent playback dock.
 - Recording list and search; user-created named collections, with no preset collections.
 - Each recording shows its own saved resume time; Continue listening sorts unfinished shiurim by recency.
 - Bold, high-contrast styling, locked recording-list dividers and a clear Mini player button.
@@ -28,7 +33,7 @@ After restarting the computer, open the Shiur Player shortcut and press Play. Th
 
 Minimizing keeps playback running. Closing the main window stops the app and saves progress. Run the EXE again to restore an already-running main window. Use **Rescan** after adding audio files. Recordings stay in their existing folders and are not modified, copied or deleted.
 
-[Installation and source guide](standalone/README.md) · [Source ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-standalone-source-0.6.0.zip) · [Checksums](downloads/SHA256SUMS.txt)
+[Installation and source guide](standalone/README.md) · [Source ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-standalone-source-0.7.0.zip) · [Checksums](downloads/SHA256SUMS.txt)
 
 ## Verification and limits
 

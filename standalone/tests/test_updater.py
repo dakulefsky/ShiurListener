@@ -10,6 +10,7 @@ class Tests(unittest.TestCase):
   return {'version':'0.6.1','url':'https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-0.6.1.exe','sha256':hashlib.sha256(data).hexdigest(),'size':len(data)}
  def test_new_version_and_no_downgrade(self):
   release=self.release()
+  self.addCleanup(patch.stopall);patch.object(updater,'APP_VERSION','0.6.0').start()
   with patch.object(updater.urllib.request,'urlopen',return_value=Response(json.dumps(release).encode(),updater.CHANNEL)):
    self.assertEqual(updater.check(),release)
   release['version']='0.5.1';release['url']=release['url'].replace('0.6.1','0.5.1')

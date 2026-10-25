@@ -13,7 +13,8 @@ def display(state,tracks):
 def timing(state,include_speed=True):
  def fmt(value):
   value=max(0,int(value));return f'{value//3600}:{value%3600//60:02}:{value%60:02}' if value>=3600 else f'{value//60}:{value%60:02}'
- text=f"{fmt(state.get('position',0))} / {fmt(state.get('duration',0))}"
+ position=state.get('position',0);duration=state.get('duration',0)
+ text=f"{fmt(position)}  ·  {fmt(max(0,duration-position))} left" if duration else fmt(position)
  return text+(f"  ·  {state.get('speed',1):g}×" if include_speed else '')
 
 def color(value,fallback):
@@ -23,14 +24,14 @@ def color(value,fallback):
  return r|(g<<8)|(b<<16)
 
 def layout(width,height):
- """Client coordinates; title/open, transport/speed, then timing."""
+ """Client coordinates; title, transport, timing and a clickable progress strip."""
  width=max(270,width);height=max(96,height);pad=10;gap=6
  available=width-2*pad-3*gap;back=int(available*.19);play=int(available*.32);speed=available-2*back-play
- row_height=max(28,min(48,height-64));bottom=height-24
+ row_height=max(26,min(44,height-74));bottom=height-34
  return {100:(pad,6,width-100,22),105:(width-76,4,66,24),
          101:(pad,34,back,row_height),102:(pad+back+gap,34,play,row_height),
          103:(pad+back+play+2*gap,34,back,row_height),106:(width-pad-speed,34,speed,row_height),
-         104:(pad,bottom,width-2*pad,20)}
+         104:(pad,bottom,width-2*pad,20),107:(pad,height-10,width-2*pad,8)}
 
 class FloatingBar:
  def __init__(self,player):self.player=player;self.thread=None;self.hwnd=None;self.ready=threading.Event();self.status='';self.post=None
@@ -66,6 +67,7 @@ class FloatingBar:
   self.post=bind(user,'PostMessageW',w.BOOL,[w.HWND,w.UINT,w.WPARAM,w.LPARAM]);show=bind(user,'ShowWindow',w.BOOL,[w.HWND,ctypes.c_int]);destroy=bind(user,'DestroyWindow',w.BOOL,[w.HWND]);settext=bind(user,'SetWindowTextW',w.BOOL,[w.HWND,w.LPCWSTR]);invalidate=bind(user,'InvalidateRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT),w.BOOL])
   enable=bind(user,'EnableWindow',w.BOOL,[w.HWND,w.BOOL]);move=bind(user,'MoveWindow',w.BOOL,[w.HWND,ctypes.c_int,ctypes.c_int,ctypes.c_int,ctypes.c_int,w.BOOL])
   getrect=bind(user,'GetWindowRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT)]);clientrect=bind(user,'GetClientRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT)]);metrics=bind(user,'GetSystemMetrics',ctypes.c_int,[ctypes.c_int])
+  getcursor=bind(user,'GetCursorPos',w.BOOL,[ctypes.POINTER(w.POINT)]);screenclient=bind(user,'ScreenToClient',w.BOOL,[w.HWND,ctypes.POINTER(w.POINT)])
   getmessage=bind(user,'GetMessageW',ctypes.c_int,[ctypes.POINTER(w.MSG),w.HWND,w.UINT,w.UINT]);translate=bind(user,'TranslateMessage',w.BOOL,[ctypes.POINTER(w.MSG)]);dispatch=bind(user,'DispatchMessageW',LRESULT,[ctypes.POINTER(w.MSG)]);quitmessage=bind(user,'PostQuitMessage',None,[ctypes.c_int])
   timer=bind(user,'SetTimer',ctypes.c_size_t,[w.HWND,ctypes.c_size_t,w.UINT,ctypes.c_void_p]);killtimer=bind(user,'KillTimer',w.BOOL,[w.HWND,ctypes.c_size_t]);send=bind(user,'SendMessageW',LRESULT,[w.HWND,w.UINT,w.WPARAM,w.LPARAM])
   brush=bind(gdi,'CreateSolidBrush',w.HBRUSH,[w.DWORD]);delete=bind(gdi,'DeleteObject',w.BOOL,[w.HGDIOBJ]);fill=bind(user,'FillRect',ctypes.c_int,[w.HDC,ctypes.POINTER(w.RECT),w.HBRUSH]);drawtext=bind(user,'DrawTextW',ctypes.c_int,[w.HDC,w.LPCWSTR,ctypes.c_int,ctypes.POINTER(w.RECT),w.UINT]);setcolor=bind(gdi,'SetTextColor',w.DWORD,[w.HDC,w.DWORD]);setbg=bind(gdi,'SetBkMode',ctypes.c_int,[w.HDC,ctypes.c_int]);select=bind(gdi,'SelectObject',w.HGDIOBJ,[w.HDC,w.HGDIOBJ])
@@ -75,14 +77,17 @@ class FloatingBar:
   fontpath=pathlib.Path(__file__).resolve().parent/'assets/Rubik.ttf';fontloaded=bool(fontpath.exists() and addfont(str(fontpath),0x10,None))
   current_family='Rubik' if fontloaded else 'Segoe UI'
   controls={};labels={101:'−15',102:'Play',103:'+15',105:'Open',106:'1x'};palette={};resources=[];font=None
+  progress_ratio=0.;last_progress=None
   texts={};enabled={};visible=self.player.saved.get('floatingVisible',False)
   def resize():
+   nonlocal last_progress
    if not self.hwnd:return
    rect=w.RECT();clientrect(self.hwnd,ctypes.byref(rect))
    for ident,(x,y,width,height) in layout(rect.right,rect.bottom).items():
     if ident in controls:move(controls[ident],x,y,width,height,True)
+   last_progress=None
   def update():
-   nonlocal palette,font,current_family
+   nonlocal palette,font,current_family,progress_ratio,last_progress
    with self.player.lock:state=self.player.snapshot();tracks=self.player.tracks;desired_palette=dict(self.player.saved.get('floatingTheme',{}))
    desired=desired_palette.get('fontFamily') or ('Rubik' if fontloaded else 'Segoe UI')
    if desired!=current_family:
@@ -97,9 +102,14 @@ class FloatingBar:
     resources.append(background)
     if self.hwnd:invalidate(self.hwnd,None,False)
     for handle in controls.values():invalidate(handle,None,False)
-   for ident in (101,102,103):
-    available=bool(tracks) if ident==102 else bool(state.get('loaded',False))
+   for ident in (101,102,103,107):
+    available=bool(tracks) if ident==102 else bool(state.get('currentId'))
+    if ident==107:available=available and state.get('duration',0)>0
     if enabled.get(ident)!=available:enable(controls[ident],available);enabled[ident]=available
+   duration=state.get('duration',0);progress_ratio=max(0,min(1,state.get('position',0)/duration)) if duration else 0.
+   rect=w.RECT();clientrect(controls[107],ctypes.byref(rect))
+   progress=(rect.right,rect.bottom,round(max(0,rect.right)*progress_ratio),enabled[107])
+   if last_progress!=progress:invalidate(controls[107],None,False);last_progress=progress
    title,play,back,forward=display(state,tracks)
    values={100:title,102:play,101:back,103:forward,104:timing(state,False),105:'Open',106:f"{state.get('speed',1):g}x"}
    for ident,text in values.items():
@@ -131,6 +141,14 @@ class FloatingBar:
     if msg==0x0113:update();return 0
     if msg==0x0111:
      ident=wp&0xffff
+     if (wp>>16)==0 and ident==107:
+      point=w.POINT();rect=w.RECT()
+      if getcursor(ctypes.byref(point)) and screenclient(controls[107],ctypes.byref(point)) and clientrect(controls[107],ctypes.byref(rect)) and rect.right>0:
+       with self.player.lock:
+        state=self.player.snapshot()
+        if state.get('currentId') and state.get('duration',0)>0:self.player.command({'op':'seek','value':max(0,min(1,point.x/rect.right))*state['duration']})
+       update()
+      return 0
      if (wp>>16)==0 and ident==105:
       callback=getattr(self.player,'show_window',None)
       if callback:callback()
@@ -146,6 +164,15 @@ class FloatingBar:
      setbg(wp,1);setcolor(wp,color(palette.get('onSurface'),'#FFFFFF'));return resources[0] if resources else 0
     if msg==0x002B:
      item=ctypes.cast(lp,ctypes.POINTER(DRAWITEM)).contents;primary=item.id==102
+     if item.id==107:
+      if resources:fill(item.dc,ctypes.byref(item.rect),resources[0])
+      middle=(item.rect.top+item.rect.bottom)//2
+      track=w.RECT(item.rect.left,middle-2,item.rect.right,middle+2)
+      background=brush(color(palette.get('surfaceContainer'),'#263A5B'));fill(item.dc,ctypes.byref(track),background);delete(background)
+      if progress_ratio>0:
+       track.right=track.left+round((track.right-track.left)*progress_ratio)
+       foreground=brush(color(palette.get('primary'),'#214CDB'));fill(item.dc,ctypes.byref(track),foreground);delete(foreground)
+      return 1
      shade=color(palette.get('primary') if primary else palette.get('surfaceContainer'),'#214CDB' if primary else '#263A5B')
      if resources:fill(item.dc,ctypes.byref(item.rect),resources[0])
      b=brush(shade);pen=penfn(0,1,shade);oldbrush=select(item.dc,b);oldpen=select(item.dc,pen)
@@ -175,6 +202,8 @@ class FloatingBar:
    self.hwnd=create(0x08000088,name,'Shiur Player',0x02CC0000,x,y,bar_width,bar_height,None,None,instance,None)
    if not self.hwnd:raise OSError(ctypes.get_last_error(),'Could not create floating bar.')
    for ident in (100,104):controls[ident]=create(0,'STATIC','',0x50004000,0,0,1,1,self.hwnd,ident,instance,None)
+   # SS_OWNERDRAW | SS_NOTIFY: clickable, without claiming a keyboard tab stop.
+   controls[107]=create(0,'STATIC','Seek position',0x5000010D,0,0,1,1,self.hwnd,107,instance,None)
    for ident,text in labels.items():controls[ident]=create(0,'BUTTON',text,0x5001000B,0,0,1,1,self.hwnd,ident,instance,None)
    if not all(controls.values()):raise RuntimeError('Could not create floating controls.')
    for handle in controls.values():send(handle,0x0030,font,1)

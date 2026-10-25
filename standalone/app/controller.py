@@ -1,5 +1,9 @@
 """Local library actions shared by the native desktop controls and tests."""
-import secrets
+import re,secrets
+
+def natural_key(value):
+ """Keep numbered shiurim in listening order, including nested source folders."""
+ return tuple(int(part) if part.isdecimal() else part for part in re.split(r'(\d+)',value.casefold()))
 
 def clock(seconds):
  seconds=max(0,int(seconds));h,m,s=seconds//3600,seconds%3600//60,seconds%60
@@ -15,9 +19,12 @@ class LibraryController:
    values=self.player.library();folder=next((f for f in self.player.saved['folders'] if f['id']==self.view),None)
    if folder:values=[t for t in values if t['id'] in folder['trackIds']]
    elif self.view=='continue':values=sorted([t for t in values if t.get('position',0)>0 and not t.get('completed',False)],key=lambda t:t.get('lastListenedAt',0),reverse=True)
-   q=self.query.casefold();values=[t for t in values if q in (t['name']+' '+t['source']).casefold()]
+   elif self.view=='favorites':values=[t for t in values if t.get('favorite',False)]
+   elif self.view=='unplayed':values=[t for t in values if not t.get('position',0) and not t.get('completed',False)]
+   elif self.view=='finished':values=[t for t in values if t.get('completed',False)]
+   terms=self.query.casefold().split();values=[t for t in values if all(term in (t['name']+' '+t['source']).casefold() for term in terms)]
    if self.view!='continue' or self.explicit_sort:
-    key={'name':lambda t:(t['name'].casefold(),t['source'].casefold()),'resume':lambda t:(t.get('position',0),t['name'].casefold()),'duration':lambda t:(t.get('duration',0),t['name'].casefold())}.get(self.sort)
+    key={'name':lambda t:(natural_key(t['name']),natural_key(t['source'])),'resume':lambda t:(t.get('position',0),natural_key(t['name'])),'duration':lambda t:(t.get('duration',0),natural_key(t['name']))}.get(self.sort)
     if key:values.sort(key=key,reverse=self.descending)
    return values
  def set_sort(self,column):
@@ -26,6 +33,50 @@ class LibraryController:
    self.descending=not self.descending if column==self.sort and self.explicit_sort else False
    self.sort=column;self.explicit_sort=True
    self.player.saved.update(librarySort=column,librarySortDescending=self.descending);self.player.persist()
+ def _available_ids(self,ids):
+  ids=list(dict.fromkeys(ids))
+  if not ids or any(ident not in self.player.paths for ident in ids):raise ValueError('Select available recordings first.')
+  return ids
+ def favorite(self,ids,value=None):
+  if value is not None and not isinstance(value,bool):raise ValueError('Choose whether to add or remove favorites.')
+  with self.player.lock:
+   ids=self._available_ids(ids)
+   for ident in ids:
+    progress=self.player.saved['tracks'].setdefault(ident,{})
+    progress['favorite']=not progress.get('favorite',False) if value is None else value
+   self.player.persist();self.revision+=1
+ def _queue(self):
+  values=list(dict.fromkeys(ident for ident in self.player.saved['queue'] if ident in self.player.paths))
+  current=self.player.saved['currentId']
+  if current in self.player.paths and current not in values:values.insert(0,current)
+  return values
+ def queue_add(self,ids,next_up=False):
+  with self.player.lock:
+   ids=self._available_ids(ids);values=self._queue();current=self.player.saved['currentId']
+   if next_up:
+    ids=[ident for ident in ids if ident!=current]
+    values=[ident for ident in values if ident not in ids]
+    index=values.index(current)+1 if current in values else 0
+    values[index:index]=ids
+   else:values.extend(ident for ident in ids if ident not in values)
+   self.player.saved['queue']=values;self.player.persist();self.revision+=1
+   return list(values)
+ def queue_remove(self,ids):
+  with self.player.lock:
+   ids=set(self._available_ids(ids));current=self.player.saved['currentId']
+   if ids=={current}:raise ValueError('The current recording stays in the queue. Select another recording to remove.')
+   self.player.saved['queue']=[ident for ident in self._queue() if ident==current or ident not in ids]
+   self.player.persist();self.revision+=1
+   return list(self.player.saved['queue'])
+ def queue_move(self,ident,delta):
+  if not isinstance(delta,int) or isinstance(delta,bool) or delta not in (-1,1):raise ValueError('Move a recording up or down one place.')
+  with self.player.lock:
+   values=self._queue()
+   if ident not in values:raise ValueError('Select a recording in the queue first.')
+   index=values.index(ident);target=max(0,min(len(values)-1,index+delta))
+   values.insert(target,values.pop(index));self.player.saved['queue']=values
+   self.player.persist();self.revision+=1
+   return list(values)
  def assign_many(self,ids,name):
   name=name.strip();ids=list(dict.fromkeys(ids))
   if not name or len(name)>160:raise ValueError('Enter a collection name of 1–160 characters.')
@@ -69,7 +120,7 @@ class LibraryController:
     else:self.player.backend.seek(0)
    previous=self.player.saved['tracks'].get(ident,{})
    self.player.saved['tracks'][ident]={**previous,'position':0,'completed':False};self.player.persist();self.revision+=1
- def bookmarks(self):return self.player.saved['bookmarks'].get(self.player.saved['currentId'],[])
+ def bookmarks(self):return sorted(self.player.saved['bookmarks'].get(self.player.saved['currentId'],[]),key=lambda mark:mark['position'])
  def mark(self,name):
   with self.player.lock:
    state=self.player.snapshot();ident=state['currentId']

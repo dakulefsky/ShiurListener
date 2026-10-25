@@ -1,5 +1,9 @@
 # Shiur Player downloads
 
+## Current standalone: 0.7.0
+
+Download **[shiur-player-setup-0.7.0.exe](shiur-player-setup-0.7.0.exe)** or click **Check for updates** in standalone 0.6.0. No extraction. New full-width library, permanent playback dock, Favorites, queue editing, section repeat, sleep presets, profile backups and clickable mini-player progress. Existing standalone positions carry over. [Full guide](../standalone/README.md). Earlier variants below are retained for reference. Actual Windows setup/rendering and speaker output remain unverified here.
+
 The current plugin-only build is **1.4.0**. Install `shiur-player-1.4.0.otzplugin` in Otzaria as an update, keep its existing data and restart Otzaria. Add a local recording or folder, wait for it to load, and press Play. No companion installation is required.
 
 Version 1.4.0 has a simpler interface, startup/file retry, preservation of saved positions, malformed-queue recovery, and a bundled sound check under **עזרה**. The [installation guide](../player/README.md) explains recovery steps and the [Hebrew developer handoff](../docs/OTZARIA_AUDIO_HANDOFF.he.md) explains the host work needed for other tabs and floating controls.
