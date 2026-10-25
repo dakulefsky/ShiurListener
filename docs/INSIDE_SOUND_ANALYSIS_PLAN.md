@@ -1,6 +1,6 @@
 # Inside: offline speech/music experiment
 
-Status: experiment proposal, not an implemented classifier. Inside 1.4.6 enforces duration only. The proposed host audio API is also not implemented. No model accuracy or processing-speed results are claimed.
+Status: the [first offline experiment has now been run](INSIDE_SOUND_ANALYSIS_RESULTS.md); this remains a proposed production design, not an implemented plugin classifier. Inside 1.4.6 enforces duration only. The proposed host audio API is also not implemented. Preliminary measurements and their limits are recorded in the linked results report.
 
 ## What we would build first
 

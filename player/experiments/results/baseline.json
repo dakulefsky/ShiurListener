@@ -1,0 +1,1401 @@
+{
+  "runtime": "2.3.0",
+  "python": "3.12.14",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "model_sha256": "e193da5676a2fdb7a3702c10fba62aa27d76f64e4534467443811c1a2ff1667d",
+  "model_bytes": 16061524,
+  "model_url": "https://storage.googleapis.com/audioset/yamnet.tflite",
+  "dataset_zip_sha256": "11a78fd0f820f3ce001d4e98919c211448d2f7689b466c01e20059b6ad99c707",
+  "frame_samples": 15600,
+  "sample_rate": 16000,
+  "threads": 2,
+  "rule": "music-or-singing >=.5 in >=10% frames: block; else speech >=.5 in >=50% frames: allow; else uncertain",
+  "seconds_of_audio": 4855.0946875,
+  "wall_seconds": 21.714708221988985,
+  "inference_seconds": 8.203311752557056,
+  "peak_rss_kib": 396492,
+  "summary": {
+    "music": {
+      "allow": 0,
+      "block": 63,
+      "uncertain": 1
+    },
+    "shiur": {
+      "allow": 1,
+      "block": 0,
+      "uncertain": 0
+    },
+    "speech": {
+      "allow": 64,
+      "block": 0,
+      "uncertain": 0
+    },
+    "stress": {
+      "allow": 1,
+      "block": 4,
+      "uncertain": 2
+    }
+  },
+  "files": [
+    {
+      "file": "bagpipe.wav",
+      "label": "music",
+      "sha256": "04d7f02dcfc5b824549e2410da7a329a3528c871fcb6c79d9d8782c6c2ef34ff",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.16730304501834325
+    },
+    {
+      "file": "ballad.wav",
+      "label": "music",
+      "sha256": "9cba0a00407f90989fcfdf59630d922b2c099f4c65ddbc28cca02e66e6b6104e",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.1450083889940288
+    },
+    {
+      "file": "bartok.wav",
+      "label": "music",
+      "sha256": "227fae8124626c026313683b028c38ce3d4fc000757ed2fdab365e3d4274f183",
+      "seconds": 30.0,
+      "music_fraction": 0.935,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.16020068901707418
+    },
+    {
+      "file": "beat.wav",
+      "label": "music",
+      "sha256": "8bab165750d5ce03871d4777b356c23d498f4beb68af92a96037d0fb493bdbbe",
+      "seconds": 30.0,
+      "music_fraction": 0.9675,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.18563049400108866
+    },
+    {
+      "file": "beatles.wav",
+      "label": "music",
+      "sha256": "da466fbbf88300cd38562c49c2cd90f3c8a7e2056064a8ff6636cdc4e4a35944",
+      "seconds": 30.0,
+      "music_fraction": 0.9675,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.15986256301403046
+    },
+    {
+      "file": "bigband.wav",
+      "label": "music",
+      "sha256": "1d30201f6925a90eacf0c6693e8933946b5548683fe946dc3fd882c7623111a7",
+      "seconds": 30.0,
+      "music_fraction": 0.8375,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.1683755700069014
+    },
+    {
+      "file": "birdland.wav",
+      "label": "music",
+      "sha256": "c8475a107034fcab6468d2a0ec94c868e2f2cbb5bdcf51680daa9c0698fef41c",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.15892451698891819
+    },
+    {
+      "file": "blues.wav",
+      "label": "music",
+      "sha256": "55fed77ab15cbad861373999a033305abaa05662336ab69755db25c45ebfcff8",
+      "seconds": 30.0,
+      "music_fraction": 0.8125,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.16625731301610358
+    },
+    {
+      "file": "bmarsalis.wav",
+      "label": "music",
+      "sha256": "d647ae031e0d0621bd1e07fe5b939ed0394419c0365a11d6afbec20fbc8f5d8a",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.17887918700580485
+    },
+    {
+      "file": "brahms.wav",
+      "label": "music",
+      "sha256": "608e3b178d5c181c569fb9e4521ed09af306cb4183e1baefa816a905df4a5043",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.46996077900985256
+    },
+    {
+      "file": "canonaki.wav",
+      "label": "music",
+      "sha256": "0c58262535a786acee427e771f262ed70c3196a99c91fe825162955d14eb9ae7",
+      "seconds": 30.0,
+      "music_fraction": 0.9675,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.2790231690159999
+    },
+    {
+      "file": "caravan.wav",
+      "label": "music",
+      "sha256": "ef175885631b7a1cef86860cc2a5dba2470f242c0ab7505b376d80e1b49fef82",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.1581813679949846
+    },
+    {
+      "file": "chaka.wav",
+      "label": "music",
+      "sha256": "c695d59c4a31f52a7ebd3c93d823d71af57e47b846b888fc02cc112b21f37408",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.2052867430029437
+    },
+    {
+      "file": "classical.wav",
+      "label": "music",
+      "sha256": "5486b382a0cde50495a9361b12ae8ad0bb77abd2775bf2543577d37fdf06018d",
+      "seconds": 30.0,
+      "music_fraction": 0.5525,
+      "speech_fraction": 0.0325,
+      "decision": "block",
+      "wall_seconds": 0.17553612898336723
+    },
+    {
+      "file": "classical1.wav",
+      "label": "music",
+      "sha256": "a3e388a8bf6a8abdfa17486cfed25f3d44a8b88a3ce52859a04f4cea471f4582",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.2736029109801166
+    },
+    {
+      "file": "classical2.wav",
+      "label": "music",
+      "sha256": "c2db31c0ae61c5f6f0cb5e4cd20de7d3ffceadf85f99c1bdcfc8bf7ecbd8b91e",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.2694962520035915
+    },
+    {
+      "file": "copland.wav",
+      "label": "music",
+      "sha256": "0c48eccd90cc723e73ff711d495e26d1a2b4e46dbd27c84d94f5225e12e15cf0",
+      "seconds": 30.0,
+      "music_fraction": 0.545,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.2569532400229946
+    },
+    {
+      "file": "copland2.wav",
+      "label": "music",
+      "sha256": "8d7e07ca5635e4cbe4348d15c619cf4c21c842dbe925438e89dc3018e39dde26",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.24733677299809642
+    },
+    {
+      "file": "corea.wav",
+      "label": "music",
+      "sha256": "c753fe2b139f0812dc62296eefee50502a72a5b7b509a63c33681bb2988fa750",
+      "seconds": 30.0,
+      "music_fraction": 0.61,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.15437929600011557
+    },
+    {
+      "file": "corea1.wav",
+      "label": "music",
+      "sha256": "c1b01905c22da5a160be06561d6c9e74749e39c83a9839b06fcad2170428e0c1",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.15651097398949787
+    },
+    {
+      "file": "cure.wav",
+      "label": "music",
+      "sha256": "244d1377cf88fd06762f364834afff21164fcc5a311586ab02bcb98d1a4a3a48",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12155198300024495
+    },
+    {
+      "file": "debussy.wav",
+      "label": "music",
+      "sha256": "42c005e1f7b5398524ca82bf080182dfa328bd06be23683249e19a684186bbc1",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12001906402292661
+    },
+    {
+      "file": "deedee.wav",
+      "label": "music",
+      "sha256": "ae4af04eee58957ff89ba56b3d8fa419084539b29d9dc761e20cb762d56c98c9",
+      "seconds": 30.0,
+      "music_fraction": 0.87,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.11890766897704452
+    },
+    {
+      "file": "deedee1.wav",
+      "label": "music",
+      "sha256": "a2db709684e2dc03c6e5ad878b64e696c55d4ad21e5d058072764f9f280812ed",
+      "seconds": 30.0,
+      "music_fraction": 0.7725,
+      "speech_fraction": 0.065,
+      "decision": "block",
+      "wall_seconds": 0.1266352189995814
+    },
+    {
+      "file": "duke.wav",
+      "label": "music",
+      "sha256": "f2fb48c0e5927a563658e3b1b0e0ef18e10acc36c6f555104c52715b4d069354",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12068248199648224
+    },
+    {
+      "file": "echoes.wav",
+      "label": "music",
+      "sha256": "10af0eade24d8be480e2855bcde6403ecd2d520c9b0d1895ac5427429ff40f09",
+      "seconds": 30.0,
+      "music_fraction": 0.065,
+      "speech_fraction": 0.0325,
+      "decision": "uncertain",
+      "wall_seconds": 0.12216404700302519
+    },
+    {
+      "file": "eguitar.wav",
+      "label": "music",
+      "sha256": "8490384d1b6877fd99998549c9a2f28784b8166f4e2051b96acdd7217e0e320e",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12250791100086644
+    },
+    {
+      "file": "georose.wav",
+      "label": "music",
+      "sha256": "3aba295b24d71b05252969062cddcb67a0c4c0f04444ebb31ef5d0a1b73723da",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12386049900669605
+    },
+    {
+      "file": "gismonti.wav",
+      "label": "music",
+      "sha256": "785ebb2ee4cf124ffb07b58693037b0c57d6b3e983a459541a5bd8707a660df6",
+      "seconds": 30.0,
+      "music_fraction": 0.845,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12613555099233054
+    },
+    {
+      "file": "glass.wav",
+      "label": "music",
+      "sha256": "f9429abecd0a032a92a743d6135760e7bb53d20c8cc955d7f4d15df7f5614566",
+      "seconds": 30.0,
+      "music_fraction": 0.65,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.1268536830029916
+    },
+    {
+      "file": "glass1.wav",
+      "label": "music",
+      "sha256": "d183ffbc4d0135800926a8cc2346c15efb49e758af03bb5314020d7859e5fc53",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12366930398275144
+    },
+    {
+      "file": "gravity.wav",
+      "label": "music",
+      "sha256": "d787f445afc4cc2524ea5e95379342608c0bdf58ff34354d5b97d05a9f13d270",
+      "seconds": 30.0,
+      "music_fraction": 0.935,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.1260923530207947
+    },
+    {
+      "file": "gravity2.wav",
+      "label": "music",
+      "sha256": "1ad4b53303ab706ffcc51683194602aaa660865d869d11af8eae09acbbcea1d1",
+      "seconds": 30.0,
+      "music_fraction": 0.675,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12908253201749176
+    },
+    {
+      "file": "guitar.wav",
+      "label": "music",
+      "sha256": "f9dd3e8c5b91057628bec88b218573e58b2833a2e39cd344f5eb989c0dab1496",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.11849771300330758
+    },
+    {
+      "file": "hendrix.wav",
+      "label": "music",
+      "sha256": "bd01bf8c5bfd7942b86db482df5964118640e9317110d6e9f22d84c46d12c0bc",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12074580299668014
+    },
+    {
+      "file": "ipanema.wav",
+      "label": "music",
+      "sha256": "7e0e9365fc1f4aa8a157de41e7e294b17a9f1563b59b8fe0739495e2bd28ab6f",
+      "seconds": 30.0,
+      "music_fraction": 0.9675,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12584286302444525
+    },
+    {
+      "file": "jazz.wav",
+      "label": "music",
+      "sha256": "9e0c37b0701161693b3b47413f1e311ed27cb5b65919c3945e0429b16906b61d",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.1258130770002026
+    },
+    {
+      "file": "jazz1.wav",
+      "label": "music",
+      "sha256": "4245291acf248892584406a31cd1c638a2063d985095e336697c192b03d126a9",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12602103501558304
+    },
+    {
+      "file": "led.wav",
+      "label": "music",
+      "sha256": "329e27ea64cdd10ccb14fa4271c473eacc21ffba1194eddda60deba3584e07d9",
+      "seconds": 30.0,
+      "music_fraction": 0.8375,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12419155100360513
+    },
+    {
+      "file": "loreena.wav",
+      "label": "music",
+      "sha256": "bad889c81c7cf23fe94d5917b57675fe4b4f337da0489c1337524e687df75876",
+      "seconds": 30.0,
+      "music_fraction": 0.675,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.13675517699448392
+    },
+    {
+      "file": "madradeus.wav",
+      "label": "music",
+      "sha256": "5e4431643e8165f3d9138ab6a0aae3f98f6968b342554890b8cb852cfbc95096",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.14103937000618316
+    },
+    {
+      "file": "magkas.wav",
+      "label": "music",
+      "sha256": "3c5e5bc7a54436da5a17fa31bf5fe9ab5f648aae94310b6b3d7c996f1989dc72",
+      "seconds": 30.0,
+      "music_fraction": 0.9025,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12645878799958155
+    },
+    {
+      "file": "march.wav",
+      "label": "music",
+      "sha256": "d7f5da52a3eebf37c3112025a80dd19caff9148982b631d78ccc029d8d33ef09",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12577653999323957
+    },
+    {
+      "file": "marlene.wav",
+      "label": "music",
+      "sha256": "2bd642430bba1457f5101abd70770291d8048d31d1cab468dc609bb1348c898a",
+      "seconds": 30.0,
+      "music_fraction": 0.9025,
+      "speech_fraction": 0.0325,
+      "decision": "block",
+      "wall_seconds": 0.12783564001438208
+    },
+    {
+      "file": "mingus.wav",
+      "label": "music",
+      "sha256": "a0e28fc08ea674df63f8c4c8faf845b5014b418c63319375923a4d9a3adb7857",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12679307101643644
+    },
+    {
+      "file": "mingus1.wav",
+      "label": "music",
+      "sha256": "1f2108f58ce15ec2ebd4fc1076961551a118a05a9945789911d844c5fc71d6bb",
+      "seconds": 30.0,
+      "music_fraction": 0.9675,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.1223240609979257
+    },
+    {
+      "file": "misirlou.wav",
+      "label": "music",
+      "sha256": "6f7e0f1c22bd949f8a824e957ee99ba93517a2cabc91fa4d419c43580f1050be",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.13252025801921263
+    },
+    {
+      "file": "moanin.wav",
+      "label": "music",
+      "sha256": "1c46e2a7034e615da12cf5bf3bef16db58b27d8991c1af85eb24e6f5a5f4bc8e",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12945560397929512
+    },
+    {
+      "file": "narch.wav",
+      "label": "music",
+      "sha256": "5ce583c8a9c1e267f485369e3d2643476452efba6059b3b3d564dcbd2be1c67d",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12593171899789013
+    },
+    {
+      "file": "ncherry.wav",
+      "label": "music",
+      "sha256": "66fd809adef91d00b8a2bc82179a6ee8c84746a859452332fb5917406d1e2da4",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12510752599337138
+    },
+    {
+      "file": "nearhou.wav",
+      "label": "music",
+      "sha256": "eb285862e4f79f72c21f7033c7ef15d411697c5a56afc80b25c35b8839bf9b97",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12435224099317566
+    },
+    {
+      "file": "opera.wav",
+      "label": "music",
+      "sha256": "f9edda548aa07e283d04e6719be176da4266738a0910086758300b79ea1cc8a4",
+      "seconds": 30.0,
+      "music_fraction": 0.2525,
+      "speech_fraction": 0.0325,
+      "decision": "block",
+      "wall_seconds": 0.12912622099975124
+    },
+    {
+      "file": "opera1.wav",
+      "label": "music",
+      "sha256": "877cb3293958526680352b6c73e06766e359e2cf5919c9bfc83301acaacdc5d9",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.1331141669943463
+    },
+    {
+      "file": "pop.wav",
+      "label": "music",
+      "sha256": "1f8454cafc7a2906ad87d435738071221c2d55ee7079e46d75a3f76f4bcb0e4f",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12134493500343524
+    },
+    {
+      "file": "prodigy.wav",
+      "label": "music",
+      "sha256": "9e9cc7e4c9abf02bae2e042af61f84182b9760ea9025574b31a7dac9c8dd7f8f",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.1221579420089256
+    },
+    {
+      "file": "redhot.wav",
+      "label": "music",
+      "sha256": "3111283d31abf6c875e210249655e26568e1dab4f441132f5f1f97935e565bf5",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12804295000387356
+    },
+    {
+      "file": "rock.wav",
+      "label": "music",
+      "sha256": "ac6a2603f875d754d191d5cca49a4c1ef064fefaef8372bbb78f68077affe520",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.1252081879938487
+    },
+    {
+      "file": "rock2.wav",
+      "label": "music",
+      "sha256": "2d14d2f5636b786a53b3bba31e502afbdc58c14aba5f5296d0c10c66bf1ef349",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12566766300005838
+    },
+    {
+      "file": "russo.wav",
+      "label": "music",
+      "sha256": "a6cd3a664286d2e0648c65c9d8eee2b7e971fa000486f3ef8c589f9d6e289eb2",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12077162400237285
+    },
+    {
+      "file": "tony.wav",
+      "label": "music",
+      "sha256": "9e16b823e28e0617105caa371e06078e9ed05133277a3828b61ede621419a03a",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12476786598563194
+    },
+    {
+      "file": "u2.wav",
+      "label": "music",
+      "sha256": "0ad304b567b9506c7a652ff390ee024e7c07851f4b8bad22a211651a393c3910",
+      "seconds": 30.0,
+      "music_fraction": 0.935,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.13369035301730037
+    },
+    {
+      "file": "unpoco.wav",
+      "label": "music",
+      "sha256": "4e0f2324e2686dca75c7d821b617f672f657091d3cae2f5a1f8c4b4dcb393712",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.13540540100075305
+    },
+    {
+      "file": "vlobos.wav",
+      "label": "music",
+      "sha256": "ee4150736d4d65068ba4217f70588c0e7cdf8b4290717d26b22feda98706c53a",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12401756100007333
+    },
+    {
+      "file": "winds.wav",
+      "label": "music",
+      "sha256": "10018ae7c03eff1fc390520ff7012e3cd08480fcddbd94d7047f219f90902752",
+      "seconds": 30.0,
+      "music_fraction": 1.0,
+      "speech_fraction": 0.0,
+      "decision": "block",
+      "wall_seconds": 0.12461814901325852
+    },
+    {
+      "file": "acomic.wav",
+      "label": "speech",
+      "sha256": "04cb01edea4fe05ae25b1d10b8bef8136909ecc012eb1f0d91ba1511b4fbcec8",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.935,
+      "decision": "allow",
+      "wall_seconds": 0.12044697802048177
+    },
+    {
+      "file": "acomic2.wav",
+      "label": "speech",
+      "sha256": "29e50abe84ff555603ecaa3cd197a2156c7d72f49b440fdc09ef4bedc2696e04",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.87,
+      "decision": "allow",
+      "wall_seconds": 0.11871192799299024
+    },
+    {
+      "file": "allison.wav",
+      "label": "speech",
+      "sha256": "08cbaf0509d59aaefda00116d871b138428aa8ae57c687158876e59d849d7ade",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.1187674609827809
+    },
+    {
+      "file": "amal.wav",
+      "label": "speech",
+      "sha256": "3ed194272a1792663b6192fa1b541e2850578d4b9e37f3b1b23e3a7b2d664097",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.12527448200853541
+    },
+    {
+      "file": "austria.wav",
+      "label": "speech",
+      "sha256": "85e1b52d32c3962a2a5653e93a540eadc2e10cc028e0f83e8098da57d77c8903",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9025,
+      "decision": "allow",
+      "wall_seconds": 0.12512094900012016
+    },
+    {
+      "file": "bathroom1.wav",
+      "label": "speech",
+      "sha256": "6ab33ae04aa8f0e000eddad5d3d0b0b1c0ecf7c95569bb9c49e520599f5c0bf3",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.935,
+      "decision": "allow",
+      "wall_seconds": 0.11784406699007377
+    },
+    {
+      "file": "chant.wav",
+      "label": "speech",
+      "sha256": "a29a56a8eb26ebf1ecbea65a02907820db6c1b8e1a36c670c588f1e8cb8fb40f",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9025,
+      "decision": "allow",
+      "wall_seconds": 0.12335037600132637
+    },
+    {
+      "file": "charles.wav",
+      "label": "speech",
+      "sha256": "084299eb37cf78e19acb6d3d4d909a761a896b29579efd66e7696ee788decce9",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.12565626300056465
+    },
+    {
+      "file": "china.wav",
+      "label": "speech",
+      "sha256": "da3a8ef8705b95b6209f2935c8808057d1c170942c63e4d21da4fac522f19aaa",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.12306627299403772
+    },
+    {
+      "file": "comedy.wav",
+      "label": "speech",
+      "sha256": "53791034e608ae9029d553697bc0fb37f9ab49a1c83597a1899cf55433494c6f",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.12003205201472156
+    },
+    {
+      "file": "comedy1.wav",
+      "label": "speech",
+      "sha256": "fdbbf62e9b74692a063aa87220466d9fd294a577fd7376ded7a0ba06831bca4e",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.12374041599105112
+    },
+    {
+      "file": "conversion.wav",
+      "label": "speech",
+      "sha256": "d29910aab9147c23ed825c8f41297a0f67acdf2392bbddf2c5c38c98937a2b54",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.1276828059926629
+    },
+    {
+      "file": "danie.wav",
+      "label": "speech",
+      "sha256": "227309764bc18dac33d6293992603502be71dc1f84186430601e5147a5dbf0e6",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.935,
+      "decision": "allow",
+      "wall_seconds": 0.12701419400400482
+    },
+    {
+      "file": "danie1.wav",
+      "label": "speech",
+      "sha256": "a0625d5cb80ac2948a654e12021f17f4ddf13c1ea49e719687aefc24fb232282",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.12842357400222681
+    },
+    {
+      "file": "dialogue.wav",
+      "label": "speech",
+      "sha256": "8584dfd1529e82d289c141040654b0ce1d941dba75c007789549248512163f26",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.12670238202554174
+    },
+    {
+      "file": "dialogue1.wav",
+      "label": "speech",
+      "sha256": "2bb6599d184d8c30744415115e331d0ced401c6ae7977c880fab371fd87e5f33",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.12312249399838038
+    },
+    {
+      "file": "dialogue2.wav",
+      "label": "speech",
+      "sha256": "a771b2007b46d7a0afb1a6912bd0cb39c08c528ef4d44e8881f7e925c19da744",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.13721924502169713
+    },
+    {
+      "file": "diamond.wav",
+      "label": "speech",
+      "sha256": "c47828f66123596a8a9b73361e4d3f165ded55598c858ad865be5a0734e71d2e",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.14084065399947576
+    },
+    {
+      "file": "ellhnika.wav",
+      "label": "speech",
+      "sha256": "45daecf64d7afbbf08fc85b03e1349a545c4a63c7c846a32c84ed638fbed0f4d",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9025,
+      "decision": "allow",
+      "wall_seconds": 0.1344104250019882
+    },
+    {
+      "file": "emil.wav",
+      "label": "speech",
+      "sha256": "3211807c4a616632fca81fa99da4139ed341e65365ef54ae17a50583e7ec3004",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.8125,
+      "decision": "allow",
+      "wall_seconds": 0.12589472500258125
+    },
+    {
+      "file": "fem_rock.wav",
+      "label": "speech",
+      "sha256": "b19a2b80680eefd4d91429ecd14ac5b5b17630115fcf8e5f3a18821424d03561",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.1193914840114303
+    },
+    {
+      "file": "female.wav",
+      "label": "speech",
+      "sha256": "97c28c66f088a56bd3e2c1bce287e20e58e0d305333fb4c6a4bc1034276d29d4",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.129240789974574
+    },
+    {
+      "file": "fire.wav",
+      "label": "speech",
+      "sha256": "531f1700217bfda71677d810a57b82233506959b091e8115f427b524fa1bcfdd",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.1233902320091147
+    },
+    {
+      "file": "geography.wav",
+      "label": "speech",
+      "sha256": "876d94cad9ffae7603993e0c7a5a06079f7fb9ba5887651cf261eeae74be57c7",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.12783137100632302
+    },
+    {
+      "file": "geography1.wav",
+      "label": "speech",
+      "sha256": "0cfe3d3fca0d6d17b33e18aae992761923f3525247de694f956f0291f741b5b4",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.1232883550110273
+    },
+    {
+      "file": "georg.wav",
+      "label": "speech",
+      "sha256": "28b6027e903a8a449f4ff4b33a624cb72c0ee53f5f46fdab04319c5d2caab32e",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.935,
+      "decision": "allow",
+      "wall_seconds": 0.12538518098881468
+    },
+    {
+      "file": "god.wav",
+      "label": "speech",
+      "sha256": "1e70b116185cffe53f0ad43d0d2795b8a798630cf82f52f7fb810549c93534c6",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.14371472198399715
+    },
+    {
+      "file": "greek.wav",
+      "label": "speech",
+      "sha256": "8ffc75683c23ed35801cbee1f4a098f3624b6740b997d5925ca96883d5e9b19a",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.935,
+      "decision": "allow",
+      "wall_seconds": 0.1306025220255833
+    },
+    {
+      "file": "greek1.wav",
+      "label": "speech",
+      "sha256": "af363843aca0fd358fd91288e54146239f4827a3ce0d7f3d042f3048a61c6578",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.1396251959959045
+    },
+    {
+      "file": "india.wav",
+      "label": "speech",
+      "sha256": "c47eac82c912649005444becc96e87783a2116122f7dd5c7c3dbc0480c1eb740",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.935,
+      "decision": "allow",
+      "wall_seconds": 0.1317594550200738
+    },
+    {
+      "file": "jony.wav",
+      "label": "speech",
+      "sha256": "2dc239a7ece85f5a3fea5707a2642619c9dfb5eaf981d00f4072ee114e55e7d3",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9025,
+      "decision": "allow",
+      "wall_seconds": 0.14916110399644822
+    },
+    {
+      "file": "jvoice.wav",
+      "label": "speech",
+      "sha256": "7627d7f0c38e6e1fb3e0fe55d42c1b863a8a640ec7b13d720def2d2a2d246dd7",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.1419731099740602
+    },
+    {
+      "file": "kedar.wav",
+      "label": "speech",
+      "sha256": "9f3bc2a68b45914e440118585b89dbeaa1b636f892a8faaed4d7f6438abd6029",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.935,
+      "decision": "allow",
+      "wall_seconds": 0.14691289799520746
+    },
+    {
+      "file": "kid.wav",
+      "label": "speech",
+      "sha256": "9c2f96d7469130d28db5d88221820753aadbab021dccdaec73ca9518951f20b7",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.14691332701477222
+    },
+    {
+      "file": "lena.wav",
+      "label": "speech",
+      "sha256": "b7f6574d83facff2cf012b151309e052b29fba7e2d83ae66d297339843269916",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.27839927101740614
+    },
+    {
+      "file": "male.wav",
+      "label": "speech",
+      "sha256": "c4985b03539a27d0a10915b38f1dc985a3aecf767b1bf98c3704b0e01fd11e11",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.1768002579919994
+    },
+    {
+      "file": "my_voice.wav",
+      "label": "speech",
+      "sha256": "52556183c4542db37b4b2c933f7e4f46ce6d5d2f7e646ba2bee6075482bd2593",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.14274881599703804
+    },
+    {
+      "file": "nether.wav",
+      "label": "speech",
+      "sha256": "5e467b8ddfbab4979f88b7f2c8674e6e49f1f4e06afef3a0f263ec108822309c",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.13631488900864497
+    },
+    {
+      "file": "news1.wav",
+      "label": "speech",
+      "sha256": "d2e0aef5683a52a52a759605b083de5115310acfdf04ebd699ce7e4104429119",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.1243358259962406
+    },
+    {
+      "file": "news2.wav",
+      "label": "speech",
+      "sha256": "59500d077a9a44f60813ecc83c4eedf3ecc4b1cf15f8deca3fa11542a5786d0c",
+      "seconds": 30.0,
+      "music_fraction": 0.065,
+      "speech_fraction": 0.935,
+      "decision": "allow",
+      "wall_seconds": 0.13222211500396952
+    },
+    {
+      "file": "nj105.wav",
+      "label": "speech",
+      "sha256": "b88cf5dcc48ae45b0b38b8bd3a95532c78b402876ca218fed74e9e8ffe36b183",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.91,
+      "decision": "allow",
+      "wall_seconds": 0.1389496690244414
+    },
+    {
+      "file": "nj105a.wav",
+      "label": "speech",
+      "sha256": "aca5ec89f19bf9c273aca8163e908fdf0b29cb803f45ca3381e8ff97d7ac1003",
+      "seconds": 30.0,
+      "music_fraction": 0.0325,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.1354495770065114
+    },
+    {
+      "file": "oneday.wav",
+      "label": "speech",
+      "sha256": "654696a1df08955d56b84e99d88eeb434e3b2f1d63be73474793447bea86d072",
+      "seconds": 30.0,
+      "music_fraction": 0.0325,
+      "speech_fraction": 0.6825,
+      "decision": "allow",
+      "wall_seconds": 0.1262644509843085
+    },
+    {
+      "file": "psychic.wav",
+      "label": "speech",
+      "sha256": "56147449cff3397a3cf577ab4d792c62f268488cfb0e4568dc7971017214c036",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.1248139220115263
+    },
+    {
+      "file": "pulp.wav",
+      "label": "speech",
+      "sha256": "5ddfc17d33276fbd9067ce50cb776ffa85f0b792d5dcfdeee07c46bf39c5ab8b",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.12311878299806267
+    },
+    {
+      "file": "pulp1.wav",
+      "label": "speech",
+      "sha256": "4eaa2c71f8b6c31aabd23819513923711cbf9eebb09d2583dbb3e97caaf2d6af",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.87,
+      "decision": "allow",
+      "wall_seconds": 0.12497891997918487
+    },
+    {
+      "file": "pulp2.wav",
+      "label": "speech",
+      "sha256": "d0cc93d0368b151719a7df364f4bc93ad6e8622b9025436b090bfdb67f270dca",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9025,
+      "decision": "allow",
+      "wall_seconds": 0.12846911398810335
+    },
+    {
+      "file": "relation.wav",
+      "label": "speech",
+      "sha256": "8826034e877719a3eeefcb3caaff436e61df76bd68388496e95ba37db82178a1",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9025,
+      "decision": "allow",
+      "wall_seconds": 0.12753800200880505
+    },
+    {
+      "file": "serbian.wav",
+      "label": "speech",
+      "sha256": "dbf78e7e42b301c88a9c6a1e4ad459d3880aeeb01fa2d194deb03f3b9c27d158",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.13009079598123208
+    },
+    {
+      "file": "shannon.wav",
+      "label": "speech",
+      "sha256": "1242b60e14aabc84861f9a1661937e006e3811a79f4a7139c3821c95cf7c1635",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.12474423198727891
+    },
+    {
+      "file": "sleep.wav",
+      "label": "speech",
+      "sha256": "0dfc86c161c982478c9a01e84a4f75bb56c72ac4ff10e877422b1956b7ac29ce",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.14715486200293526
+    },
+    {
+      "file": "smoke1.wav",
+      "label": "speech",
+      "sha256": "3fa1c93184e9dd5549268e4c7e36b0958b9d95358fb943eebb67090611eb57ce",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.13421346599352546
+    },
+    {
+      "file": "smoking.wav",
+      "label": "speech",
+      "sha256": "ed988a338e81be55ba92bcf4e086e2246629ca736519399305bb4bdd90219af4",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.13638634400558658
+    },
+    {
+      "file": "stupid.wav",
+      "label": "speech",
+      "sha256": "3db9f073b4e037f7ff864dc54bd081a1aa8eb2bcaf3e7c1236eeea6b8931fab7",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.935,
+      "decision": "allow",
+      "wall_seconds": 0.12723454998922534
+    },
+    {
+      "file": "teachers.wav",
+      "label": "speech",
+      "sha256": "08ba5318f7117af1c83829671e69866f6f43de7b537354f537b48c9d9ab39b46",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.9675,
+      "decision": "allow",
+      "wall_seconds": 0.12873109898646362
+    },
+    {
+      "file": "teachers1.wav",
+      "label": "speech",
+      "sha256": "366e4e8d07dfd848ae0c5f51462c7ef3252eaea8ebc6df687b7d8ca2bef1faee",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.1297418479807675
+    },
+    {
+      "file": "teachers2.wav",
+      "label": "speech",
+      "sha256": "ada34e3bb4863cd815d0cc506d1b37b88a463ce32548194f9a157c8fde737bb1",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.12386105500627309
+    },
+    {
+      "file": "thlui.wav",
+      "label": "speech",
+      "sha256": "5bd79cdc0d24f0eea3d11c559ea2dc21503ec15cd8cb0bd2a51060c8cbf1ed82",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.935,
+      "decision": "allow",
+      "wall_seconds": 0.15015305200358853
+    },
+    {
+      "file": "undergrad.wav",
+      "label": "speech",
+      "sha256": "d959f158ed7d7397a4d525f81125228ce2e712456d34fdf119563ff46924984a",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.12551069998880848
+    },
+    {
+      "file": "vegetables.wav",
+      "label": "speech",
+      "sha256": "0d53692550f2f5ce54f47e964e534f1a6eb21fbfa5f8394e4088477f5825a5d9",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.13031074701575562
+    },
+    {
+      "file": "vegetables1.wav",
+      "label": "speech",
+      "sha256": "53092235dd967f792c93d6c775bc304e02f40c682301367192054ac764ab534f",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.13820697701885365
+    },
+    {
+      "file": "vegetables2.wav",
+      "label": "speech",
+      "sha256": "d98998a1044e3031e66d0affb1f4090d9189cc7050749669f2c0f42d33761370",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.12904616902233101
+    },
+    {
+      "file": "voice.wav",
+      "label": "speech",
+      "sha256": "0f664f0759c348d02796649053e9b5049fd25b9cea83374ac35722bea835751a",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.12862892998964526
+    },
+    {
+      "file": "voices.wav",
+      "label": "speech",
+      "sha256": "823e40db2f6b7408ceddf350a4137e3ba491594c614eb7815d427a4fe66c1519",
+      "seconds": 30.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 1.0,
+      "decision": "allow",
+      "wall_seconds": 0.14950928100734018
+    },
+    {
+      "file": "shiur_freifeld.mp3",
+      "label": "shiur",
+      "sha256": "1b97eef25f4e9f967fe0527dc5f3ffbe587d09ce65b2ae166f85c204aa600458",
+      "seconds": 460.0946875,
+      "music_fraction": 0.016953032086465897,
+      "speech_fraction": 0.8434133463016784,
+      "decision": "allow",
+      "wall_seconds": 1.579434486979153
+    },
+    {
+      "file": "shiur_plus_music_-10dB.wav",
+      "label": "stress",
+      "sha256": "1483891430b070bb1fb488b9af3fe39f9002ff8e0e8382998cec2374dd7d8e91",
+      "seconds": 30.0,
+      "music_fraction": 0.455,
+      "speech_fraction": 0.585,
+      "decision": "block",
+      "wall_seconds": 0.14768275700043887
+    },
+    {
+      "file": "shiur_plus_music_-20dB.wav",
+      "label": "stress",
+      "sha256": "06a4508f5915c4703e9a77c8c7c868d0801c424fc29ea7df10f55dc470c714d3",
+      "seconds": 30.0,
+      "music_fraction": 0.2275,
+      "speech_fraction": 0.805,
+      "decision": "block",
+      "wall_seconds": 0.12915487599093467
+    },
+    {
+      "file": "shiur_plus_music_0dB.wav",
+      "label": "stress",
+      "sha256": "1c2ef7ea48e86427523f984a1ddd63dbd8037d0922abcb6f23b223564e91ff43",
+      "seconds": 30.0,
+      "music_fraction": 0.65,
+      "speech_fraction": 0.13,
+      "decision": "block",
+      "wall_seconds": 0.133871830010321
+    },
+    {
+      "file": "silence.wav",
+      "label": "stress",
+      "sha256": "c24d031b5eff73ec71b1b583253424c05bab14cfcc9fb9c6ca117d026304b6fd",
+      "seconds": 15.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.0,
+      "decision": "uncertain",
+      "wall_seconds": 0.10540777700953186
+    },
+    {
+      "file": "six_minutes_speech_then_15sec_music.wav",
+      "label": "stress",
+      "sha256": "25357637f27d4d0bfa076b6d01e229bc2d94f270fc63594692ae44643452742d",
+      "seconds": 375.0,
+      "music_fraction": 0.0536,
+      "speech_fraction": 0.8346,
+      "decision": "allow",
+      "wall_seconds": 0.7115035819879267
+    },
+    {
+      "file": "spoken_intro_then_music.wav",
+      "label": "stress",
+      "sha256": "6a0b86b51b22b7869ccff0e90e63abc3a3df8c355414d7fb204b76841cf98f3b",
+      "seconds": 60.0,
+      "music_fraction": 0.5125,
+      "speech_fraction": 0.455,
+      "decision": "block",
+      "wall_seconds": 0.20687300199642777
+    },
+    {
+      "file": "white_noise.wav",
+      "label": "stress",
+      "sha256": "128375ec7948f8da65696ab1cdbdf9234dbdf05948099ea6d939d369df2ffdf5",
+      "seconds": 15.0,
+      "music_fraction": 0.0,
+      "speech_fraction": 0.0,
+      "decision": "uncertain",
+      "wall_seconds": 0.10765379798249342
+    }
+  ]
+}

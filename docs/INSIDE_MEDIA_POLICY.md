@@ -20,3 +20,5 @@ If administrators require a stronger content restriction, restrict playback to a
 
 - [Hebrew host restriction specification](INSIDE_RESTRICTIONS_FOR_DEVELOPERS.he.md)
 - [Offline sound-analysis experiment plan](INSIDE_SOUND_ANALYSIS_PLAN.md)
+
+- [Actual preliminary sound-analysis results](INSIDE_SOUND_ANALYSIS_RESULTS.md)
