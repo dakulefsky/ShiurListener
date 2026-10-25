@@ -7,6 +7,27 @@ from controller import LibraryController
 import test_player
 @unittest.skipUnless(os.environ.get('DISPLAY') or sys.platform=='win32','Needs a desktop display')
 class Tests(unittest.TestCase):
+ def test_main_playback_panel_collapses_without_stopping_and_remembers_choice(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   fixture.library.play();fixture.player.tick();fixture.backend.position=38
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.update()
+   expanded_height=window.dock_card.winfo_height();library_height=window.tree.winfo_height()
+   window.toggle_dock();window.root.update()
+   self.assertLess(window.dock_card.winfo_height(),expanded_height)
+   self.assertGreater(window.tree.winfo_height(),library_height)
+   self.assertTrue(window.compact_play.winfo_ismapped());self.assertFalse(window.seek.winfo_ismapped())
+   self.assertEqual(fixture.backend.status,'playing');self.assertEqual(fixture.backend.position,38)
+   window.compact_play.invoke();self.assertEqual(fixture.backend.status,'paused')
+   window.compact_speed.invoke();self.assertEqual(fixture.player.saved['speed'],1.5)
+   window.close();window=None
+   restored=Player(None,fixture.root/'data',test_player.Audio());library=LibraryController(restored)
+   window=PlayerWindow(restored,library,lambda _:None);window.root.update()
+   self.assertTrue(window.dock_collapsed);self.assertTrue(window.compact_play.winfo_ismapped())
+   window.toggle_dock();window.root.update();self.assertTrue(window.seek.winfo_ismapped())
+  finally:
+   if window:window.close()
+   fixture.tearDown()
  def test_queue_actions_fit_at_minimum_window_size(self):
   from window import SoftButton
   fixture=test_player.Tests();fixture.setUp();window=None

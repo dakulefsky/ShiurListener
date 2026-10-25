@@ -167,7 +167,7 @@ class SoftButton(tk.Canvas):
 
 class PlayerWindow:
  def __init__(self,player,library,shortcuts):
-  self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False;self.update_busy=False;self.queue_window=None;self.tools_window=None;self.last_volume=1
+  self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False;self.update_busy=False;self.queue_window=None;self.tools_window=None;self.last_volume=1;self.dock_collapsed=bool(player.saved.get('mainDockCollapsed',False))
   global FONT
   self.root=tk.Tk();self.root.title(TITLE);self.root.configure(bg=BG)
   if sys.platform=='win32':
@@ -288,17 +288,20 @@ class PlayerWindow:
   self.tree.bind('<Control-q>',lambda _:self.safe(lambda:self.add_queue(False)))
   info=tk.Frame(self.dock,bg=PAPER);info.pack(fill='x')
   track_info=tk.Frame(info,bg=PAPER);track_info.pack(side='left',fill='x',expand=True)
-  eyebrow=tk.Frame(track_info,bg=PAPER);eyebrow.pack(fill='x')
+  eyebrow=tk.Frame(track_info,bg=PAPER);self.dock_eyebrow=eyebrow;eyebrow.pack(fill='x')
   self.label(eyebrow,'Now playing',9,MUTED).pack(side='left')
   self.state_label=self.label(eyebrow,'',9,MUTED);self.state_label.pack(side='left',padx=14)
   self.track_title=self.label(track_info,'No recording selected',15,anchor='w');self.track_title.pack(fill='x',pady=(4,0))
   self.source=self.label(track_info,'Choose an audio folder to begin.',9,MUTED,anchor='w');self.source.pack(fill='x',pady=(2,0))
+  self.dock_toggle=self.button(info,'Collapse player',self.toggle_dock);self.dock_toggle.pack(side='right',padx=(8,0))
+  self.compact_play=self.button(info,'Play',self.toggle,True)
+  self.compact_speed=self.button(info,'1×',lambda:self.command('speed_cycle'))
   self.queue_button=self.button(info,'Queue',self.show_queue);self.queue_button.pack(side='right')
-  timeline=tk.Frame(self.dock,bg=PAPER);timeline.pack(fill='x',pady=(8,4))
+  timeline=tk.Frame(self.dock,bg=PAPER);self.dock_timeline=timeline;timeline.pack(fill='x',pady=(8,4))
   self.time=self.label(timeline,'0:00 / 0:00',10,MUTED,width=17,anchor='w');self.time.pack(side='left')
   self.remaining=self.label(timeline,'',10,MUTED,width=16,anchor='e');self.remaining.pack(side='right')
   self.seek=ModernScale(timeline,from_=0,to=1,dark=False);self.seek.pack(fill='x',expand=True);self.seek.bind('<ButtonPress-1>',lambda _:setattr(self,'dragging',True),add='+');self.seek.bind('<ButtonRelease-1>',self.seek_release);self.seek.bind('<<ScaleChanged>>',self.seek_release)
-  controls=tk.Frame(self.dock,bg=PAPER);controls.pack(fill='x')
+  controls=tk.Frame(self.dock,bg=PAPER);self.dock_controls=controls;controls.pack(fill='x')
   self.button(controls,'Prev',lambda:self.command('previous')).pack(side='left')
   self.back=self.button(controls,'−15s',lambda:self.skip(-1));self.back.pack(side='left')
   self.play_button=self.button(controls,'Play',self.toggle,True,width=8);self.play_button.pack(side='left',padx=8)
@@ -313,6 +316,25 @@ class PlayerWindow:
   self.label(controls,'Speed',9,MUTED).pack(side='right')
   self.interval=None
   self.status=self.label(self.dock,'',9,MUTED,anchor='w');self.status.pack(fill='x',pady=(6,0))
+  self.apply_dock_layout()
+ def toggle_dock(self):
+  self.dock_collapsed=not self.dock_collapsed
+  with self.player.lock:self.player.saved['mainDockCollapsed']=self.dock_collapsed;self.player.persist()
+  self.apply_dock_layout()
+ def apply_dock_layout(self):
+  for widget in (self.dock_eyebrow,self.source,self.queue_button,self.dock_timeline,self.dock_controls,self.status,self.compact_play,self.compact_speed):widget.pack_forget()
+  self.set_options(self.dock_toggle,text='Expand player' if self.dock_collapsed else 'Collapse player')
+  self.track_title.configure(font=(FONT,11,'bold') if self.dock_collapsed else (FONT,15,'bold'))
+  self.dock_card.inset=12 if self.dock_collapsed else 20
+  self.dock_card.coords(self.dock_card.window,self.dock_card.inset,self.dock_card.inset)
+  if self.dock_collapsed:
+   self.compact_speed.pack(side='right',padx=6);self.compact_play.pack(side='right',padx=6)
+   if self.status.cget('text'):self.status.pack(fill='x',pady=(6,0))
+  else:
+   self.dock_eyebrow.pack(fill='x',before=self.track_title);self.source.pack(fill='x',pady=(2,0))
+   self.queue_button.pack(side='right')
+   self.dock_timeline.pack(fill='x',pady=(8,4));self.dock_controls.pack(fill='x');self.status.pack(fill='x',pady=(6,0))
+  self.dock_card.content_changed();self.dock_card.resize()
  def speed_menu(self):
   menu=tk.Menu(self.root,tearoff=False,bg=PAPER,fg=INK,activebackground=TINT,activeforeground=GREEN,font=(FONT,11),bd=0)
   for rate in [.5,.75,1,1.25,1.5,1.75,2]:menu.add_command(label=f'{rate:g}×',command=lambda r=rate:self.safe(lambda:self.command('speed',value=r)))
@@ -664,7 +686,7 @@ class PlayerWindow:
    self.set_options(self.mute_button,text='Muted' if not state['volume'] else 'Volume')
    self.set_options(self.folder_label,text=self.player.root.name if self.player.root else 'No folder selected')
    self.set_options(self.track_title,text=current['name'].rsplit('.',1)[0] if current else 'No recording selected');self.set_options(self.source,text=current['source'] if current and current['source']!=current['name'] else '' if current else 'Choose a recording to begin.')
-   playing=state['status']=='playing' or bool(self.player.pending and self.player.pending['autoplay']);self.set_options(self.play_button,text='Pause' if playing else 'Play')
+   playing=state['status']=='playing' or bool(self.player.pending and self.player.pending['autoplay']);self.set_options(self.play_button,text='Pause' if playing else 'Play');self.set_options(self.compact_play,text='Pause' if playing else 'Play');self.set_options(self.compact_speed,text=f"{state['speed']:g}×")
    self.set_options(self.track_title,wraplength=max(280,self.root.winfo_width()-420))
    self.set_options(self.state_label,text='Loading…' if state['status']=='loading' else 'Playing' if playing else 'Paused' if current else '')
    if not self.dragging:self.seek.configure(to=max(1,state['duration']));self.seek.set(state['position'])
@@ -674,6 +696,9 @@ class PlayerWindow:
    sleep=f"Pauses in {clock(state['sleepRemaining'])}" if state['sleepRemaining'] else 'Pauses after this recording' if state.get('sleepAtEnd') else ''
    loop=f"Repeat {clock(state['loopA'])}–{clock(state['loopB'])}" if state.get('loopB') is not None else ''
    self.set_options(self.status,text=state['error'] or '   ·   '.join(t for t in (sleep,loop) if t),fg=ERROR if state['error'] else MUTED)
+   if self.dock_collapsed:
+    if self.status.cget('text') and not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
+    elif not self.status.cget('text') and self.status.winfo_manager():self.status.pack_forget()
    self.refresh_tools(state);self.refresh_queue()
   except Exception as error:self.set_options(self.status,text=str(error))
   self.root.after(500,self.refresh)

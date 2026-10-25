@@ -1,5 +1,5 @@
 """Compact, resizable Win32 transport; only changed controls are repainted."""
-import ctypes,sys,threading,pathlib
+import ctypes,sys,threading,pathlib,time
 
 MIN_SIZE=(300,140)
 FRAMELESS_STYLE=0x82040000 # popup, clip children, resize frame; no caption
@@ -54,6 +54,17 @@ def hit_test(x,y,width,height,collapsed=False):
   if bottom:return 15
  return 2
 
+class HoverIntent:
+ """Delay layout changes and ignore pointer noise while clicking or dragging."""
+ def __init__(self):self.open=False;self.candidate=None;self.since=0.
+ def reset(self):self.open=False;self.candidate=None
+ def update(self,inside,now,blocked=False):
+  if blocked or inside==self.open:self.candidate=None;return self.open
+  if self.candidate!=inside:self.candidate=inside;self.since=now
+  delay=.2 if inside else .45
+  if now-self.since>=delay:self.open=inside;self.candidate=None
+  return self.open
+
 class FloatingBar:
  def __init__(self,player):self.player=player;self.thread=None;self.hwnd=None;self.ready=threading.Event();self.status='';self.post=None
  def start(self):
@@ -79,6 +90,8 @@ class FloatingBar:
    _fields_=[('style',w.UINT),('proc',PROC),('clsExtra',ctypes.c_int),('wndExtra',ctypes.c_int),('instance',w.HINSTANCE),('icon',w.HICON),('cursor',w.HANDLE),('brush',w.HBRUSH),('menu',w.LPCWSTR),('name',w.LPCWSTR)]
   class DRAWITEM(ctypes.Structure):
    _fields_=[('type',w.UINT),('id',w.UINT),('item',w.UINT),('action',w.UINT),('state',w.UINT),('hwnd',w.HWND),('dc',w.HDC),('rect',w.RECT),('data',ctypes.c_size_t)]
+  class PAINTSTRUCT(ctypes.Structure):
+   _fields_=[('dc',w.HDC),('erase',w.BOOL),('rect',w.RECT),('restore',w.BOOL),('update',w.BOOL),('reserved',ctypes.c_byte*32)]
   class MINMAXINFO(ctypes.Structure):
    _fields_=[('reserved',w.POINT),('maxSize',w.POINT),('maxPosition',w.POINT),('minTrackSize',w.POINT),('maxTrackSize',w.POINT)]
   def bind(dll,name,result,args):
@@ -90,6 +103,8 @@ class FloatingBar:
   setstyle=bind(user,'SetWindowLongW',ctypes.c_long,[w.HWND,ctypes.c_int,ctypes.c_long])
   setpos=bind(user,'SetWindowPos',w.BOOL,[w.HWND,w.HWND,ctypes.c_int,ctypes.c_int,ctypes.c_int,ctypes.c_int,w.UINT])
   getrect=bind(user,'GetWindowRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT)]);clientrect=bind(user,'GetClientRect',w.BOOL,[w.HWND,ctypes.POINTER(w.RECT)]);metrics=bind(user,'GetSystemMetrics',ctypes.c_int,[ctypes.c_int])
+  beginpaint=bind(user,'BeginPaint',w.HDC,[w.HWND,ctypes.POINTER(PAINTSTRUCT)]);endpaint=bind(user,'EndPaint',w.BOOL,[w.HWND,ctypes.POINTER(PAINTSTRUCT)])
+  keystate=bind(user,'GetAsyncKeyState',ctypes.c_short,[ctypes.c_int])
   getcursor=bind(user,'GetCursorPos',w.BOOL,[ctypes.POINTER(w.POINT)]);screenclient=bind(user,'ScreenToClient',w.BOOL,[w.HWND,ctypes.POINTER(w.POINT)])
   getmessage=bind(user,'GetMessageW',ctypes.c_int,[ctypes.POINTER(w.MSG),w.HWND,w.UINT,w.UINT]);translate=bind(user,'TranslateMessage',w.BOOL,[ctypes.POINTER(w.MSG)]);dispatch=bind(user,'DispatchMessageW',LRESULT,[ctypes.POINTER(w.MSG)]);quitmessage=bind(user,'PostQuitMessage',None,[ctypes.c_int])
   timer=bind(user,'SetTimer',ctypes.c_size_t,[w.HWND,ctypes.c_size_t,w.UINT,ctypes.c_void_p]);killtimer=bind(user,'KillTimer',w.BOOL,[w.HWND,ctypes.c_size_t]);send=bind(user,'SendMessageW',LRESULT,[w.HWND,w.UINT,w.WPARAM,w.LPARAM])
@@ -109,20 +124,26 @@ class FloatingBar:
   controls={};labels={101:'−15',102:'Play',103:'+15',105:'Open',106:'1x',108:'−'};palette={};resources=[];font=None
   progress_ratio=0.;last_progress=None;hot_control=None
   texts={};enabled={};visible=self.player.saved.get('floatingVisible',False)
-  collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE);hovered=False
-  def apply_mode():
-   setstyle(self.hwnd,-16,ctypes.c_int32(0x82000000 if collapsed else FRAMELESS_STYLE).value)
+  collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE);hovered=False;hover_intent=HoverIntent();sizing=False;hover_origin=None;last_layout=None
+  def apply_mode(mode_change=False):
+   nonlocal hover_origin
+   if mode_change:setstyle(self.hwnd,-16,ctypes.c_int32(0x82000000 if collapsed else FRAMELESS_STYLE).value)
    size=(HOVER_SIZE if hovered else COLLAPSED_SIZE) if collapsed else expanded_size
    rect=w.RECT();getrect(self.hwnd,ctypes.byref(rect))
    # Keep the restored window on screen, even after dragging the pill to an edge.
    left,top,width,height=(metrics(i) for i in [76,77,78,79])
-   x=max(left,min(rect.left,left+max(0,width-size[0])));y=max(top,min(rect.top,top+max(0,height-size[1])))
-   setpos(self.hwnd,None,x,y,*size,0x0034)
+   origin=hover_origin or (rect.left,rect.top)
+   x=max(left,min(origin[0],left+max(0,width-size[0])));y=max(top,min(origin[1],top+max(0,height-size[1])))
+   setpos(self.hwnd,None,x,y,*size,0x0034 if mode_change else 0x0014)
+   if not hovered:hover_origin=None
    resize();invalidate(self.hwnd,None,False)
   def resize():
-   nonlocal last_progress
+   nonlocal last_progress,last_layout
    if not self.hwnd:return
    rect=w.RECT();clientrect(self.hwnd,ctypes.byref(rect))
+   signature=(rect.right,rect.bottom,collapsed,hovered)
+   if signature==last_layout:return
+   last_layout=signature
    bounds=layout(rect.right,rect.bottom,collapsed,hovered)
    for ident,handle in controls.items():show(handle,5 if ident in bounds else 0)
    for ident,(x,y,width,height) in bounds.items():
@@ -179,7 +200,7 @@ class FloatingBar:
      if ident in labels:labels[ident]=text
      settext(controls[ident],text)
   def proc(hwnd,msg,wp,lp):
-   nonlocal visible,collapsed,expanded_size,hovered
+   nonlocal visible,collapsed,expanded_size,hovered,sizing,hover_origin
    try:
     if msg==0x0024:
      info=ctypes.cast(lp,ctypes.POINTER(MINMAXINFO)).contents
@@ -190,7 +211,9 @@ class FloatingBar:
      x=ctypes.c_short(lp&0xffff).value-rect.left;y=ctypes.c_short((lp>>16)&0xffff).value-rect.top
      return hit_test(x,y,rect.right-rect.left,rect.bottom-rect.top,collapsed)
     if msg==0x0005:resize();return 0
+    if msg==0x0231:sizing=True;return 0
     if msg==0x0232:
+     sizing=False;hover_origin=None;hover_intent.candidate=None
      rect=w.RECT()
      if getrect(hwnd,ctypes.byref(rect)):
       with self.player.lock:
@@ -201,6 +224,9 @@ class FloatingBar:
      return 0
     if msg in (0x0010,0x8001,0x8003):
      visible=bool(wp) if msg==0x8003 else False if msg==0x0010 else not visible;show(hwnd,4 if visible else 0)
+     if not visible:
+      hover_intent.reset()
+      if hovered:hovered=False;apply_mode()
      with self.player.lock:self.player.saved['floatingVisible']=visible;self.player.persist()
      return 0
     if msg==0x8002:destroy(hwnd);return 0
@@ -211,14 +237,17 @@ class FloatingBar:
       point=w.POINT();rect=w.RECT()
       if getcursor(ctypes.byref(point)) and getrect(hwnd,ctypes.byref(rect)):
        inside=rect.left<=point.x<rect.right and rect.top<=point.y<rect.bottom
-       if inside!=hovered:hovered=inside;apply_mode()
+       desired=hover_intent.update(inside,time.monotonic(),blocked=sizing or bool(keystate(1)&0x8000))
+       if desired!=hovered:
+        if desired:hover_origin=(rect.left,rect.top)
+        hovered=desired;apply_mode()
      update();return 0
     if msg==0x0111:
      ident=wp&0xffff
      if (wp>>16)==0 and ident==108:
-      collapsed=not collapsed;hovered=False
+      collapsed=not collapsed;hovered=False;hover_origin=None;hover_intent.reset()
       with self.player.lock:self.player.saved['floatingCollapsed']=collapsed;self.player.persist()
-      apply_mode();update();return 0
+      apply_mode(mode_change=True);update();return 0
      if (wp>>16)==0 and ident==107:
       point=w.POINT();rect=w.RECT()
       if getcursor(ctypes.byref(point)) and screenclient(controls[107],ctypes.byref(point)) and clientrect(controls[107],ctypes.byref(rect)) and rect.right>0:
@@ -234,6 +263,12 @@ class FloatingBar:
      if (wp>>16)==0 and ident in (101,102,103,106):
       action={'op':'speed_cycle'} if ident==106 else {'op':'toggle'} if ident==102 else {'op':'skip','direction':-1 if ident==101 else 1}
       self.player.command(action);update();return 0
+    if msg==0x000F:
+     paint=PAINTSTRUCT();dc=beginpaint(hwnd,ctypes.byref(paint))
+     try:
+      if dc and resources:fill(dc,ctypes.byref(paint.rect),resources[0])
+     finally:endpaint(hwnd,ctypes.byref(paint))
+     return 0
     if msg==0x0014:
      rect=w.RECT();clientrect(hwnd,ctypes.byref(rect))
      if resources:fill(wp,ctypes.byref(rect),resources[0])
