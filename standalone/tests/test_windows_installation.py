@@ -10,7 +10,7 @@ def run():
  version=os.environ.get('SHIUR_INSTALLER_VERSION','')
  if not re.fullmatch(r'\d+\.\d+\.\d+',version):raise ValueError('A candidate version is required')
  origin='https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/qa/'
- with urllib.request.urlopen(origin+f'shiur-player-setup-{version}.json',timeout=30) as response:metadata=json.load(response)
+ with urllib.request.urlopen(origin+f'shiur-player-setup-{version}.json?check={time.time_ns()}',timeout=30) as response:metadata=json.load(response)
  assert metadata['version']==version and re.fullmatch(r'[0-9a-f]{64}',metadata['sha256'])
  url=origin+f'shiur-player-setup-{version}.exe?sha256='+metadata['sha256']
  with urllib.request.urlopen(url,timeout=60) as response:payload=response.read(50*1024*1024)
