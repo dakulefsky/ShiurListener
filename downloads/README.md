@@ -41,3 +41,7 @@ Download **shiur-player-windows-x64-0.3.0.zip**. This update removes decorative 
 ## Standalone Windows app 0.4.0 — library and keyboard improvements
 
 Download **shiur-player-windows-x64-0.4.0.zip**. Select several recordings and add them to a collection in one action, sort by column, and use right-click actions. Window size and sorting are remembered. Space on a focused button no longer triggers playback twice; skipping during loading uses the saved resume position. Existing standalone positions carry over. Extract the entire ZIP and run Shiur Player.exe. Actual Windows GUI and speaker output remain unverified here.
+
+## נגן שיעורים 1.4.3 — author metadata
+
+Download **shiur-player-1.4.3.otzplugin**. The manifest credits **DanTheMAn** as author. Install as an update. Plugin ID, permissions, saved-data keys and playback code are unchanged.

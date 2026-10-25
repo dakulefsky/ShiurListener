@@ -32,9 +32,9 @@ void main() {
       '$root/plugin',
       '--force',
       '--output',
-      '$root/shiur-player-1.4.2.otzplugin',
+      '$root/shiur-player-1.4.3.otzplugin',
     ]);
     expect(code, PluginPackagerCliExitCode.success);
-    expect(File('$root/shiur-player-1.4.2.otzplugin').existsSync(), isTrue);
+    expect(File('$root/shiur-player-1.4.3.otzplugin').existsSync(), isTrue);
   });
 }
