@@ -134,8 +134,17 @@ class Player:
                 if raw['duration']:value=min(raw['duration'],value)
                 return self.command({'op':'seek','value':value})
             if op=='speed_step':
-                rates=[.75,1,1.25,1.5,1.75,2];index=rates.index(self.saved['speed']);index=max(0,min(len(rates)-1,index+int(data.get('direction',1))))
+                rates=[.5,.75,1,1.25,1.5,1.75,2];index=rates.index(self.saved['speed']);index=max(0,min(len(rates)-1,index+int(data.get('direction',1))))
                 return self.command({'op':'speed','value':rates[index]})
+            if op=='speed_cycle':
+                middle=self.saved.get('miniSpeedMiddle',.5)
+                if middle not in (.5,1.5):middle=.5
+                cycle=[1,middle,2,middle];phase=self.saved.get('miniSpeedCycleIndex')
+                if not isinstance(phase,int) or not 0<=phase<len(cycle) or cycle[phase]!=self.saved['speed']:
+                    phase=cycle.index(self.saved['speed']) if self.saved['speed'] in cycle else -1
+                phase=(phase+1)%len(cycle)
+                self.command({'op':'speed','value':cycle[phase]});self.saved['miniSpeedCycleIndex']=phase
+                self.persist();return self.snapshot()
             if op=='sleep_timer':
                 minutes=data.get('minutes',0)
                 if not isinstance(minutes,(int,float)) or not 0<=minutes<=180:raise ValueError('Sleep timer must be between 0 and 180 minutes.')
@@ -198,8 +207,8 @@ class Player:
                 else:self.backend.seek(value)
             elif op=='speed':
                 value=float(data['value'])
-                if value not in (.75,1,1.25,1.5,1.75,2):raise ValueError('Invalid speed.')
-                self.backend.speed(value);self.saved['speed']=value
+                if value not in (.5,.75,1,1.25,1.5,1.75,2):raise ValueError('Invalid speed.')
+                self.backend.speed(value);self.saved['speed']=value;self.saved['miniSpeedCycleIndex']=None
             elif op=='volume':
                 value=float(data['value'])
                 if not 0<=value<=1:raise ValueError('Invalid volume.')

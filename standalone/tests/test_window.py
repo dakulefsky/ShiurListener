@@ -103,4 +103,33 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_column_dividers_are_locked_but_headings_still_sort(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.update()
+   y=12;separator=next(x for x in range(window.tree.winfo_width()) if window.tree.identify_region(x,y)=='separator')
+   before=[window.tree.column(c,'width') for c in ('name','resume','duration')]
+   window.tree.event_generate('<ButtonPress-1>',x=separator,y=y)
+   window.tree.event_generate('<B1-Motion>',x=separator+80,y=y)
+   window.tree.event_generate('<ButtonRelease-1>',x=separator+80,y=y);window.root.update()
+   self.assertEqual([window.tree.column(c,'width') for c in ('name','resume','duration')],before)
+   window.sort_by('name');window.sort_by('name');self.assertTrue(fixture.library.descending)
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+ def test_idle_refresh_does_not_rebuild_list_or_canvas_items(self):
+  from unittest.mock import patch
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.update();window.refresh();window.root.update()
+   items=window.seek.find_all()
+   with patch.object(window.tree,'move',wraps=window.tree.move) as move,patch.object(window.tree,'item',wraps=window.tree.item) as item,patch.object(window.seek,'coords',wraps=window.seek.coords) as coords:
+    window.refresh();window.refresh()
+    self.assertFalse(move.called);self.assertFalse(coords.called)
+    self.assertFalse(any(call.kwargs for call in item.call_args_list),item.call_args_list)
+   self.assertEqual(window.seek.find_all(),items)
+   fixture.player.command({'op':'speed_cycle'});window.refresh();self.assertEqual(window.speed.get(),'0.5')
+  finally:
+   if window:window.close()
+   fixture.tearDown()
 if __name__=='__main__':unittest.main(verbosity=2)

@@ -53,3 +53,7 @@ Download **shiur-player-1.4.4.otzplugin**. Author **DanTheMAn**, project homepag
 ## נגן שיעורים 1.4.5 — author spelling
 
 Download **shiur-player-1.4.5.otzplugin**. The author is exactly **DanTheMan**. All other manifest settings and playback behavior are retained. The official validator passes with zero errors or warnings. [Screenshot](../previews/shiur-player-plugin-1.4.5.png).
+
+## Standalone Windows app 0.5.0 — stronger contrast and resizable mini player
+
+Download **shiur-player-windows-x64-0.5.0.zip**. Bold navy/blue styling, a clear Mini player button, locked column dividers, and a smaller resizable floating player with saved size/position and clickable speed. Settings offers 0.5× or 1.5× speed-cycle steps. Repeated idle redraws and the floating player’s full-window erase loop were removed. Existing saved positions carry over. [Preview](../previews/shiur-player-0.5.0.png). Windows GUI and physical audio remain unverified here.

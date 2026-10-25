@@ -1,5 +1,6 @@
-SHIUR PLAYER 0.4.0 — ENGLISH STANDALONE WINDOWS APP
+SHIUR PLAYER 0.5.0 — ENGLISH STANDALONE WINDOWS APP
 
+Close any older Shiur Player window first so its saved positions are written.
 Extract the ENTIRE ZIP. Open Shiur Player.exe. No separate installation needed.
 Choose your audio folder once, select a recording and click Play selected.
 On future days open the app and press Play to continue the last recording.
@@ -12,7 +13,7 @@ most recently listened to first. Positions survive closing and restarting.
 Keep your recordings at the same path so their saved identities stay the same.
 The app saves about once per second, on pause, on switching and on normal close.
 Sudden power loss can lose the newest interval. Seek accuracy depends on the file.
-Upgrading from standalone 0.1.0, 0.2.0 or 0.3.0 reuses the same saved positions automatically.
+Upgrading from standalone 0.1.0, 0.2.0, 0.3.0 or 0.4.0 reuses the same saved positions automatically.
 
 YOUR LIBRARY
 Open audio folder selects the folder containing your recordings. Refresh recordings
@@ -24,6 +25,7 @@ or Shift to select a range, then add them together. Ctrl+A selects the visible l
 Right-click a recording for Play and collection actions. In a collection, More
 or right-click can remove all selected members without affecting their positions.
 Click a column heading to sort by name, resume position or duration.
+Column dividers are locked so dragging a heading cannot change column widths.
 Continue listening opens with the most recently listened-to recording first.
 The window size and library sort preference are remembered.
 More also offers collection rename/delete and an individual position reset.
@@ -38,7 +40,12 @@ MINI PLAYER
 Minimizing automatically shows a floating, always-on-top mini player with
 play/pause, skips and Open player. Restoring the main window hides a mini player
 that was opened automatically. A manually opened mini player stays visible.
-Show / hide mini player opens it manually. Settings can disable automatic showing.
+Click Mini player at the top right to show or hide the floating player manually.
+It starts smaller than before. Drag any edge or corner to resize it; your chosen
+size and position are remembered. Click Open to return to the full app.
+Click its speed button to cycle 1x -> 0.5x -> 2x -> 0.5x -> 1x.
+Settings also offers a 1x -> 1.5x -> 2x -> 1.5x -> 1x cycle.
+The main speed selector stays in sync. Settings can disable automatic showing.
 Closing the main window saves and stops playback; minimizing keeps playing.
 
 KEYBOARD
@@ -57,8 +64,10 @@ It is a local player, not an operating-system browser lockdown mechanism.
 TESTING
 Three independent resume positions after restart, real desktop-toolkit controls,
 search, batch collection assignment, sorting, focused-button keyboard handling,
-window-size restore and sliders were tested on Linux. Minimize/restore
-logic and native floating-window messages were checked with simulated Windows APIs. Real VLC WAV/MP3 decoding,
+window-size restore, locked column dividers and stable idle redraws were tested
+on Linux. Minimize/restore
+logic, resize persistence, speed clicks and native repaint messages were checked
+with simulated Windows APIs. Real VLC WAV/MP3 decoding,
 seeking, pause/resume and automatic next-track tests passed with dummy output.
 The Windows x64 launcher, archive contents and bundled runtime were checked.
 Actual Windows rendering, global keys and physical sound remain untested here.

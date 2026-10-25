@@ -24,6 +24,9 @@ def run():
    player.command({'op':'load','id':ids[0],'queue':ids,'position':5})
    wait(player,lambda s:s['status']=='paused' and s['position']>=4.5,'paused load at saved position')
    player.command({'op':'play'});wait(player,lambda s:s['status']=='playing' and s['position']>5.3,'real WAV playback')
+   for expected in [.5,2,.5,1]:
+    state=player.command({'op':'speed_cycle'});assert state['speed']==expected
+   wait(player,lambda s:s['status']=='playing' and s['position']>5.4,'playback after mini-player speed cycling')
    player.command({'op':'speed','value':1.5});player.command({'op':'volume','value':.4})
    player.command({'op':'seek','value':12});wait(player,lambda s:s['position']>=11.5,'real seek')
    player.command({'op':'pause'});paused=wait(player,lambda s:s['status']=='paused','real pause')['position'];time.sleep(.3);assert abs(player.snapshot()['position']-paused)<.15
