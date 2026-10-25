@@ -1,7 +1,7 @@
 /* Shared data helpers: no filesystem paths or expiring playback URLs are persisted. */
 (function (root) {
   'use strict';
-  const extensions = ['mp3','m4a','m4b','wav','ogg','oga','opus','flac','aac','aiff','aif','wma'];
+  const extensions = ['mp3','wav'];
   const fresh = () => ({version:1,tracks:[],playlists:[],currentId:null,speed:1,volume:1,autoNext:false,skipSeconds:15});
   function normalize(value) {
     const state = fresh();

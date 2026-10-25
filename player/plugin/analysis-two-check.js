@@ -1,4 +1,4 @@
-/* Offline browser two-check prototype. No connection to released playback. */
+/* Shared offline two-check analyzer used by the development player. */
 (function(root){
 'use strict';
 const MODEL_SHA='e193da5676a2fdb7a3702c10fba62aa27d76f64e4534467443811c1a2ff1667d',models=new Map();
@@ -11,23 +11,41 @@ function decide(rows){
  if(!music&&rows.every(r=>r.speech>=.5))return {decision:'provisional_speech',reason:'Both checks indicate speech'};
  return {decision:'uncertain',reason:'Insufficient clear speech evidence'};
 }
+function abortable(action,signal){
+ return new Promise((resolve,reject)=>{
+  const aborted=()=>{signal.removeEventListener('abort',aborted);reject(signal.reason||new DOMException('Scan cancelled','AbortError'));};
+  signal.addEventListener('abort',aborted,{once:true});
+  Promise.resolve(action).then(value=>{signal.removeEventListener('abort',aborted);if(signal.aborted)aborted();else resolve(value);},error=>{signal.removeEventListener('abort',aborted);reject(error);});
+  if(signal.aborted)aborted();
+ });
+}
 function loadModel(base){
  if(!models.has(base))models.set(base,(async()=>{
   if(!root.tf||!root.tflite)throw Error('Bundled local model runtime is missing');
-  tflite.setWasmPath(base);const response=await fetch(new URL('yamnet.tflite',base));if(!response.ok)throw Error('Bundled model could not be loaded');
-  const bytes=await response.arrayBuffer(),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
-  if(hash!==MODEL_SHA)throw Error('Model checksum mismatch');
-  return tflite.loadTFLiteModel(bytes,{numThreads:1});
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);timer.unref?.();
+  try{
+   tflite.setWasmPath(base);const response=await fetch(new URL('yamnet.tflite',base),{signal:controller.signal});if(!response.ok)throw Error('Bundled model could not be loaded');
+   const reader=response.body.getReader(),chunks=[];let count=0;
+   try{while(true){const {done,value}=await abortable(reader.read(),controller.signal);if(done)break;count+=value.length;if(count>16061524)throw Error('Oversized model file');chunks.push(value);}}
+   catch(error){await reader.cancel();throw error;}
+   if(count!==16061524)throw Error('Truncated model file');
+   const bytes=new Uint8Array(count);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
+   const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+   if(hash!==MODEL_SHA)throw Error('Model checksum mismatch');
+   return await abortable(tflite.loadTFLiteModel(bytes.buffer,{numThreads:1}),controller.signal);
+  }finally{clearTimeout(timer);controller.abort();}
  })().catch(e=>{models.delete(base);throw e;}));
  return models.get(base);
 }
 async function scan(url,{assetBase=new URL('../../plugin/',document.baseURI).href,duration,budgetMs=5000,signal,onProgress=()=>{}}={}){
+ if(!Number.isFinite(budgetMs)||budgetMs<=0||budgetMs>5000)throw Error('Invalid fast-check time budget');
+ if(signal?.aborted)throw signal.reason||new DOMException('Scan cancelled','AbortError');
  if(new URL(assetBase).origin!==location.origin)throw Error('Model assets must be local to this page');
  const started=performance.now(),controller=new AbortController(),cancel=()=>controller.abort(),timer=setTimeout(cancel,budgetMs);signal?.addEventListener('abort',cancel,{once:true});if(signal?.aborted)cancel();
  try{
   onProgress('Reading local metadata and loading bundled model');
-  const preparedPromise=RangeAudio.prepare(url,{duration,budgetMs,signal:controller.signal}),netPromise=loadModel(assetBase);netPromise.catch(()=>{});const prepared=await preparedPromise;
-  onProgress('Reading two bounded excerpts');const [samples,net]=await Promise.all([prepared.samples(),netPromise]);prepared.file.check();
+  const preparedPromise=RangeAudio.prepare(url,{duration,budgetMs,signal:controller.signal}),netPromise=loadModel(assetBase);netPromise.catch(()=>{});const prepared=await abortable(preparedPromise,controller.signal);
+  onProgress('Reading two bounded excerpts');const [samples,net]=await abortable(Promise.all([prepared.samples(),netPromise]),controller.signal);prepared.file.check();
   const checks=[];
   for(let i=0;i<samples.length;i++){
    prepared.file.check();onProgress(`Checking excerpt ${i+1}/2`);const input=tf.tensor1d(samples[i]);let output;

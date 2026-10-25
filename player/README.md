@@ -91,3 +91,7 @@ Current resource limits: 40 MiB encoded file, at most 90 minutes, and at most 48
 Actual Chromium tests ran with all requests outside the local test server blocked: a full spoken recording was analyzed and played, a five-minute music recording was blocked, short files were blocked, saved positions and keyboard controls remained functional. Twenty-four Node tests pass. The official validator accepts source and archive with no errors/warnings/design violations. Actual installed Otzaria/WebView support and physical sound still need a device check; unsupported environments report an error instead of bypassing analysis.
 
 Developer browser tests require Playwright and FFmpeg plus local reference files selected through `SHIUR_TEST_SPEECH` and `SHIUR_TEST_MUSIC`. Neither reference recording is bundled or uploaded by the plugin.
+
+## Development review
+
+The 1.6.0 source has received a [deep lifecycle/parser/persistence review](experiments/browser-two-check/CODE_REVIEW.md). This is source development only; no new download was published. New imports are limited to implemented fast-decoder formats (MP3 and supported WAV); existing library data is retained.

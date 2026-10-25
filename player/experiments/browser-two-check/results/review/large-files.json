@@ -1,0 +1,94 @@
+{
+  "cross_origin_audio": true,
+  "local_csp": true,
+  "outside_requests": [],
+  "results": [
+    {
+      "file": "hour-192k.mp3",
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 792.1245924086619,
+          "speech": 0.9998538494110107,
+          "music": 9.286321756007965e-07,
+          "singing": 5.614823805899505e-08
+        },
+        {
+          "startSeconds": 2822.7417214852417,
+          "speech": 0.9509116411209106,
+          "music": 0.00019500046619214118,
+          "singing": 1.357734618068207e-05
+        }
+      ],
+      "encodedBytes": 86401742,
+      "sourceBytesRead": 262144,
+      "sourceRangeRequests": 3,
+      "duration": 3600.0391836734693,
+      "format": "mp3",
+      "positionAccuracy": "approximate MPEG byte seek",
+      "wallMs": 283.39999997615814
+    },
+    {
+      "file": "hour-music.wav",
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 1204.378706314601,
+          "speech": 0.014181382954120636,
+          "music": 0.0036268960684537888,
+          "singing": 0.001352973747998476
+        },
+        {
+          "startSeconds": 2510.2345926314592,
+          "speech": 0.03425350785255432,
+          "music": 0.09227245301008224,
+          "singing": 0.07572223991155624
+        }
+      ],
+      "encodedBytes": 115200078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 3600,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 43.29999998211861
+    },
+    {
+      "file": "hour-stereo.wav",
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 1159.8047195607796,
+          "speech": 0.9658128619194031,
+          "music": 0.004773888271301985,
+          "singing": 5.3672210924560204e-05
+        },
+        {
+          "startSeconds": 2437.742529711686,
+          "speech": 0.9955429434776306,
+          "music": 2.5079485567403026e-05,
+          "singing": 3.653974317785469e-06
+        }
+      ],
+      "encodedBytes": 635040194,
+      "sourceBytesRead": 409520,
+      "sourceRangeRequests": 3,
+      "duration": 3600,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.10000002384186
+    }
+  ]
+}

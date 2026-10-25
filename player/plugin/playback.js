@@ -10,24 +10,25 @@ class VisiblePlayback {
  apply(state){
   const old=this.state;if(old.updatedAt>state.updatedAt)return old;this.state=state;
   if(['speed','volume','skipSeconds','autoNext'].some(key=>old[key]!==state[key]))this.emit('statechange');
-  if(old.currentId!==state.currentId)this.emit('trackchange');this.emit('timeupdate');
+  if(old.currentId!==state.currentId||old.loaded!==state.loaded)this.emit('trackchange');this.emit('timeupdate');
   if(old.status!==state.status){if(state.status==='playing')this.emit('play');else if(state.status==='paused')this.emit('pause');}
   if(state.error){this.error=state.error;this.emit('error');}return state;
  }
  async init(){
   await this.local.init();
-  if(this.local.current)await this.local.serial(async()=>{try{await this.local.load(this.local.current);}catch(error){this.local.error='השיעור האחרון אינו זמין: '+error.message;}await this.local.publish();});
+  if(this.local.current&&this.local.visible)await this.local.serial(async()=>{try{await this.local.load(this.local.current);}catch(error){if(error.name!=='AbortError')this.local.error='השיעור האחרון אינו זמין: '+error.message;}await this.local.publish();});
   return this.apply(this.local.snapshot());
  }
  async refresh(){return this.apply(this.local.snapshot());}
  send(op,args={}){
+  if(['stop','clear'].includes(op)&&this.local.loadController)this.cancel();
   return this.local.serial(async()=>{try{await this.local.execute({op,...args});await this.local.publish();return this.apply(this.local.snapshot());}catch(error){this.error=error.message;this.emit('error');throw error;}});
  }
  load(track,position){
   const revision=++this.revision,queue=this.queue;
   return this.local.serial(async()=>{if(revision!==this.revision)return false;await this.local.execute({op:'load',track,queue,positionMs:Math.round(position*1000)});await this.local.publish();return revision===this.revision;});
  }
- cancel(){this.revision++;globalThis.OfflineSpeechAnalysis?.cancel();}
+ cancel(){this.revision++;this.local.cancelLoad();}
  clear(){this.cancel();return this.send('clear');}
  play(){
   // Keep audio.play() in the original click handler, before any storage awaits.

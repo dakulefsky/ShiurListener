@@ -112,7 +112,7 @@ async function selectTrack(id,autoplay=false,newQueue){
     const loaded=await engine.load(url,t.position,state.speed);if(!loaded||revision!==loadRevision)return false;
     loadedId=id;loading=false;await engine.setVolume(state.volume);t.duration=engine.duration;renderPlayer();await save();
     if(revision!==loadRevision)return false;if(autoplay)await engine.play();status(autoplay?'':'השיעור מוכן. לחצו על ניגון.');return true;
-  }catch(e){if(revision===loadRevision){loadedId=null;loading=false;renderPlayer();status(e.message,true);}return false;}
+  }catch(e){if(revision===loadRevision){loadedId=null;loading=false;renderPlayer();status(e.name==='AbortError'?'טעינת השיעור בוטלה.':e.message,e.name!=='AbortError');}return false;}
 }
 async function adjacent(delta){const id=state.currentId;let ids=queue.filter(id=>state.tracks.some(t=>t.id===id));if(!ids.includes(id))ids=C.viewTracks(state,view).map(t=>t.id);const next=ids[ids.indexOf(id)+delta];if(next)await selectTrack(next,false,ids);}
 async function addFile(){
@@ -143,7 +143,7 @@ async function addFolder(){
   if(firstAdded&&!loadedId){view='all';render();await selectTrack(firstAdded,false);$('play').focus();}
 }
 function wire(){
-  $('retry-setup').onclick=safe(async()=>{if(!ready)await initialize();else if(current())await selectTrack(current().id,false);});
+  $('retry-setup').onclick=safe(async()=>{if(!ready||!engine.local.ready)await initialize();else if(current())await selectTrack(current().id,false);});
   $('sound-check').onclick=()=>{if(!engine.paused)engine.pause().catch(error=>status(error.message,true));const tone=$('sound-check-audio');tone.currentTime=0;const action=tone.play();action.then(()=>{$('sound-check-result').textContent='צליל הבדיקה מופעל. אם לא שומעים, בדקו את עוצמת השמע ואת התקן הפלט של אוצריא.';}).catch(error=>{$('sound-check-result').textContent='אוצריא לא הצליחה להפעיל גם את צליל הבדיקה: '+error.message;});};
   $('welcome-add').onclick=()=>$('add-file').click();
   $('compact-player').onclick=()=>{const compact=document.body.classList.toggle('compact-mode');$('compact-player').textContent=compact?'ספריית השיעורים':'נגן קטן';$('compact-player').setAttribute('aria-pressed',String(compact));};
@@ -191,7 +191,7 @@ function wire(){
   window.addEventListener('pagehide',()=>{if(ready){capture();save();}});
 }
 async function initialize(payload){
-  if(ready||initializing)return;initializing=true;applyTheme(payload?.theme);status('פותח את הספרייה…');
+  if((ready&&engine.local.ready)||initializing)return;initializing=true;ready=false;applyTheme(payload?.theme);status('פותח את הספרייה…');
   try{
   try{const saved=await rpc('storage.get',{key:'library-v1'});state=C.normalize(saved);}
   catch(e){throw Error('לא ניתן לטעון את הספרייה השמורה: '+e.message);}
@@ -208,9 +208,9 @@ $('add-file').disabled=$('add-folder').disabled=$('new-playlist').disabled=$('we
 render();
 if(window.Otzaria){
   window.Otzaria.on('plugin.boot',safe(initialize));window.Otzaria.on('theme.changed',applyTheme);
-  window.Otzaria.on('plugin.suspended',()=>{$('sound-check-audio').pause();if(!ready){engine.local.audio.pause();return;}const pending=engine.suspend();capture();save();return pending;});
+  window.Otzaria.on('plugin.suspended',()=>{$('sound-check-audio').pause();const pending=engine.suspend();if(ready){capture();save();}return pending;});
   const externalControl=safe(async payload=>{const args=ShiurProtocol.control(payload.command||payload.itemId);if(args)await engine.send(args.op,args);});
   window.Otzaria.on('app.command',externalControl);window.Otzaria.on('reader.toolbar_item_clicked',externalControl);
-  window.Otzaria.on('plugin.resumed',safe(async()=>{if(!ready)return;await engine.resume();mergeHostProgress();render();}));
+  window.Otzaria.on('plugin.resumed',safe(async()=>{await engine.resume();if(!ready)return;mergeHostProgress();render();}));
 }else status('נגן זה מיועד להפעלה כתוסף בתוך אוצריא.',true);
 })();

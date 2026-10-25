@@ -1,0 +1,4248 @@
+{
+  "summary": {
+    "constructed_music": {
+      "music_detected_in_samples": 0,
+      "provisional_speech": 4,
+      "uncertain": 1
+    },
+    "music": {
+      "music_detected_in_samples": 55,
+      "provisional_speech": 0,
+      "uncertain": 9
+    },
+    "non_speech": {
+      "music_detected_in_samples": 0,
+      "provisional_speech": 0,
+      "uncertain": 2
+    },
+    "shiur": {
+      "music_detected_in_samples": 0,
+      "provisional_speech": 1,
+      "uncertain": 0
+    },
+    "speech": {
+      "music_detected_in_samples": 0,
+      "provisional_speech": 64,
+      "uncertain": 0
+    }
+  },
+  "outside_requests": [],
+  "files": [
+    {
+      "source": "bagpipe.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 83.60021438333206,
+          "speech": 0.0008738138130865991,
+          "music": 0.8987601399421692,
+          "singing": 0.010390173643827438
+        },
+        {
+          "startSeconds": 210.6249364244286,
+          "speech": 2.3049751689541154e-05,
+          "music": 0.9724055528640747,
+          "singing": 8.67005655891262e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 454.69999998807907
+    },
+    {
+      "source": "ballad.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 88.11921535525471,
+          "speech": 0.0001044305827235803,
+          "music": 0.9924629926681519,
+          "singing": 0.00012982281623408198
+        },
+        {
+          "startSeconds": 205.65063259913586,
+          "speech": 0.00025805761106312275,
+          "music": 0.9971112608909607,
+          "singing": 0.00026834310847334564
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 51.29999998211861
+    },
+    {
+      "source": "bartok.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 68.46293179434724,
+          "speech": 0.0002171736559830606,
+          "music": 0.6355403661727905,
+          "singing": 0.0004150543245486915
+        },
+        {
+          "startSeconds": 229.99241878744215,
+          "speech": 0.0007661004783585668,
+          "music": 0.911130964756012,
+          "singing": 0.0033322619274258614
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 44.29999998211861
+    },
+    {
+      "source": "beat.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 60.035523616243154,
+          "speech": 0.0004159187665209174,
+          "music": 0.8999249935150146,
+          "singing": 0.0002819947840180248
+        },
+        {
+          "startSeconds": 225.2585429605097,
+          "speech": 7.75332773628179e-06,
+          "music": 0.9768191576004028,
+          "singing": 8.072518539847806e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 75.09999999403954
+    },
+    {
+      "source": "beatles.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 71.6752227593679,
+          "speech": 0.00014595521497540176,
+          "music": 0.9935573935508728,
+          "singing": 0.00254455697722733
+        },
+        {
+          "startSeconds": 228.071273106616,
+          "speech": 0.00016047130338847637,
+          "music": 0.8607610464096069,
+          "singing": 0.015629196539521217
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.400000005960464
+    },
+    {
+      "source": "bigband.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 85.28625847189687,
+          "speech": 0.0003449148207437247,
+          "music": 0.9659795761108398,
+          "singing": 0.0007710235076956451
+        },
+        {
+          "startSeconds": 197.8889828233514,
+          "speech": 0.0010362450266256928,
+          "music": 0.36050304770469666,
+          "singing": 0.0003755117941182107
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.599999994039536
+    },
+    {
+      "source": "birdland.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 72.23004115163349,
+          "speech": 0.00017965264851227403,
+          "music": 0.6825787425041199,
+          "singing": 0.05414262413978577
+        },
+        {
+          "startSeconds": 234.98961778124794,
+          "speech": 0.00027984680491499603,
+          "music": 0.9023720622062683,
+          "singing": 0.02127702161669731
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 41.20000001788139
+    },
+    {
+      "source": "blues.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 75.86788748041727,
+          "speech": 0.004426698200404644,
+          "music": 0.9462745189666748,
+          "singing": 0.011738957837224007
+        },
+        {
+          "startSeconds": 215.79510522075,
+          "speech": 0.0033439933322370052,
+          "music": 0.32552245259284973,
+          "singing": 0.005029058549553156
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 36.80000001192093
+    },
+    {
+      "source": "bmarsalis.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 65.9706624574028,
+          "speech": 8.644439367344603e-05,
+          "music": 0.9755963087081909,
+          "singing": 0.006845971569418907
+        },
+        {
+          "startSeconds": 199.22465087031014,
+          "speech": 0.00038841916830278933,
+          "music": 0.8779880404472351,
+          "singing": 0.02042151615023613
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.5
+    },
+    {
+      "source": "brahms.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 60.831922476645566,
+          "speech": 2.0932052393618505e-06,
+          "music": 0.992192268371582,
+          "singing": 0.00020526564912870526
+        },
+        {
+          "startSeconds": 198.86418231530115,
+          "speech": 5.187624537938973e-06,
+          "music": 0.9808627367019653,
+          "singing": 3.7780540878884494e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.099999994039536
+    },
+    {
+      "source": "canonaki.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 66.88823299133219,
+          "speech": 0.0021897198166698217,
+          "music": 0.9217096567153931,
+          "singing": 9.126238728640601e-05
+        },
+        {
+          "startSeconds": 232.8271453839261,
+          "speech": 0.0001901774521684274,
+          "music": 0.9796484112739563,
+          "singing": 0.001489144517108798
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 38.5
+    },
+    {
+      "source": "caravan.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 100.97740455530584,
+          "speech": 0.0003408864140510559,
+          "music": 0.9250215888023376,
+          "singing": 0.0012378849787637591
+        },
+        {
+          "startSeconds": 229.78507735650055,
+          "speech": 0.00045136440894566476,
+          "music": 0.9111969470977783,
+          "singing": 0.0012607512762770057
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 41
+    },
+    {
+      "source": "chaka.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 63.12356462236494,
+          "speech": 3.4488504752516747e-05,
+          "music": 0.957512378692627,
+          "singing": 0.005425249692052603
+        },
+        {
+          "startSeconds": 234.83697527786717,
+          "speech": 8.348625851795077e-05,
+          "music": 0.9909895658493042,
+          "singing": 0.0009943158365786076
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.400000005960464
+    },
+    {
+      "source": "classical.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 78.00082161091268,
+          "speech": 0.00010919991473201662,
+          "music": 0.9797956943511963,
+          "singing": 0.00018210076086688787
+        },
+        {
+          "startSeconds": 237.35577230108902,
+          "speech": 0.00017440626106690615,
+          "music": 0.9329195022583008,
+          "singing": 0.00010983832908095792
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 43
+    },
+    {
+      "source": "classical1.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 76.47991427918898,
+          "speech": 2.2084688680479303e-05,
+          "music": 0.9699525237083435,
+          "singing": 0.0009610934066586196
+        },
+        {
+          "startSeconds": 202.52634325646795,
+          "speech": 2.3770528059685603e-05,
+          "music": 0.9911781549453735,
+          "singing": 8.440304372925311e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 45.79999998211861
+    },
+    {
+      "source": "classical2.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 88.9778013783507,
+          "speech": 0.000370391906471923,
+          "music": 0.9852614998817444,
+          "singing": 0.0002728074323385954
+        },
+        {
+          "startSeconds": 218.87933866353706,
+          "speech": 6.216941983439028e-05,
+          "music": 0.9426370859146118,
+          "singing": 0.00018559400632511824
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 38.400000005960464
+    },
+    {
+      "source": "copland.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 89.34106795932166,
+          "speech": 0.000402949342969805,
+          "music": 0.9457075595855713,
+          "singing": 0.0014451768947765231
+        },
+        {
+          "startSeconds": 212.55220955936238,
+          "speech": 0.0002713964495342225,
+          "music": 0.008636600337922573,
+          "singing": 6.421370198950171e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 38
+    },
+    {
+      "source": "copland2.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 99.96668123756535,
+          "speech": 6.719064458593493e-06,
+          "music": 0.9904863238334656,
+          "singing": 2.0712926925625652e-05
+        },
+        {
+          "startSeconds": 230.17019308637828,
+          "speech": 6.3959387262002565e-06,
+          "music": 0.9979135394096375,
+          "singing": 1.117941428674385e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 43.900000005960464
+    },
+    {
+      "source": "corea.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 66.32978845154867,
+          "speech": 0.002333433600142598,
+          "music": 0.6780014038085938,
+          "singing": 0.007554613519459963
+        },
+        {
+          "startSeconds": 224.8937886650674,
+          "speech": 0.0003825203166343272,
+          "music": 0.29827117919921875,
+          "singing": 0.03676258772611618
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 45.400000005960464
+    },
+    {
+      "source": "corea1.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 94.91322013316676,
+          "speech": 1.8701617591432296e-05,
+          "music": 0.9893073439598083,
+          "singing": 5.942932330071926e-05
+        },
+        {
+          "startSeconds": 208.8139101548586,
+          "speech": 0.00038971196045167744,
+          "music": 0.9197555780410767,
+          "singing": 0.005749552045017481
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 49
+    },
+    {
+      "source": "cure.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 87.77792412322015,
+          "speech": 0.00031954250880517066,
+          "music": 0.9809221029281616,
+          "singing": 0.0015986054204404354
+        },
+        {
+          "startSeconds": 198.44994761282578,
+          "speech": 0.00034145466634072363,
+          "music": 0.9795109033584595,
+          "singing": 0.0036691937129944563
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 40.20000001788139
+    },
+    {
+      "source": "debussy.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 71.56881075818092,
+          "speech": 0.00021426349121611565,
+          "music": 0.9763320684432983,
+          "singing": 0.0006293170154094696
+        },
+        {
+          "startSeconds": 217.93327040271834,
+          "speech": 0.0013535016914829612,
+          "music": 0.9672805070877075,
+          "singing": 0.002347922418266535
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 63
+    },
+    {
+      "source": "deedee.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 78.1821326748468,
+          "speech": 0.00039458859828300774,
+          "music": 0.7578833103179932,
+          "singing": 0.04575721174478531
+        },
+        {
+          "startSeconds": 216.0344227636233,
+          "speech": 0.0007848843815736473,
+          "music": 0.949350893497467,
+          "singing": 0.000334995478624478
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.69999998807907
+    },
+    {
+      "source": "deedee1.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 61.21223317575641,
+          "speech": 0.09176982939243317,
+          "music": 0.135307177901268,
+          "singing": 0.006092737894505262
+        },
+        {
+          "startSeconds": 199.09454147913493,
+          "speech": 0.025023333728313446,
+          "music": 0.08332930505275726,
+          "singing": 0.006610226351767778
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 44.30000001192093
+    },
+    {
+      "source": "duke.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 94.37363469740376,
+          "speech": 0.00016314767708536237,
+          "music": 0.9368912577629089,
+          "singing": 0.004404583014547825
+        },
+        {
+          "startSeconds": 216.01438238751143,
+          "speech": 7.181356522778515e-06,
+          "music": 0.9722988605499268,
+          "singing": 0.00047786295181140304
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 38
+    },
+    {
+      "source": "echoes.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 103.01653587492183,
+          "speech": 0.0006364702712744474,
+          "music": 0.03431875258684158,
+          "singing": 0.27283599972724915
+        },
+        {
+          "startSeconds": 220.13841498526745,
+          "speech": 6.947609654162079e-05,
+          "music": 0.017832493409514427,
+          "singing": 0.156679168343544
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 53
+    },
+    {
+      "source": "eguitar.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 83.86231543729082,
+          "speech": 0.00042995045077987015,
+          "music": 0.966346263885498,
+          "singing": 0.00024020734417717904
+        },
+        {
+          "startSeconds": 217.3767456226051,
+          "speech": 0.0002985296887345612,
+          "music": 0.9706137776374817,
+          "singing": 2.0411987861734815e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 44.20000001788139
+    },
+    {
+      "source": "georose.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 65.30117752379738,
+          "speech": 0.00132624467369169,
+          "music": 0.9651579260826111,
+          "singing": 0.00010540502989897504
+        },
+        {
+          "startSeconds": 238.81197707145475,
+          "speech": 0.0004173952911514789,
+          "music": 0.9143823385238647,
+          "singing": 0.0002223597257398069
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 40.29999998211861
+    },
+    {
+      "source": "gismonti.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 68.61088839475997,
+          "speech": 0.003913145046681166,
+          "music": 0.6938896775245667,
+          "singing": 0.002178834518417716
+        },
+        {
+          "startSeconds": 197.67611068789847,
+          "speech": 0.00025772221852093935,
+          "music": 0.7651177644729614,
+          "singing": 0.001102177775464952
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 43
+    },
+    {
+      "source": "glass.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 86.40589368296787,
+          "speech": 0.001288420520722866,
+          "music": 0.4679515063762665,
+          "singing": 0.011361286044120789
+        },
+        {
+          "startSeconds": 197.18455253052525,
+          "speech": 0.0001609931350685656,
+          "music": 0.6778347492218018,
+          "singing": 0.04425957426428795
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 36.29999998211861
+    },
+    {
+      "source": "glass1.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 93.10946729150601,
+          "speech": 2.2735164748155512e-05,
+          "music": 0.9842819571495056,
+          "singing": 0.0005263355560600758
+        },
+        {
+          "startSeconds": 210.43943393742666,
+          "speech": 8.604190225014463e-05,
+          "music": 0.9369451999664307,
+          "singing": 0.0003745400463230908
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 38.70000001788139
+    },
+    {
+      "source": "gravity.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 61.670543634099886,
+          "speech": 0.0023020412772893906,
+          "music": 0.07707729935646057,
+          "singing": 0.12936151027679443
+        },
+        {
+          "startSeconds": 198.33163872594014,
+          "speech": 0.00019767068442888558,
+          "music": 0.9698363542556763,
+          "singing": 0.005666046403348446
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 40.5
+    },
+    {
+      "source": "gravity2.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 91.36554026277736,
+          "speech": 0.0001448848779546097,
+          "music": 0.7640194892883301,
+          "singing": 0.00045866036089137197
+        },
+        {
+          "startSeconds": 229.7467191168107,
+          "speech": 3.798378020292148e-05,
+          "music": 0.9496495723724365,
+          "singing": 0.0010683437576517463
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.5
+    },
+    {
+      "source": "guitar.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 84.09951069275849,
+          "speech": 1.2712681382254232e-05,
+          "music": 0.9981410503387451,
+          "singing": 0.0006823829025961459
+        },
+        {
+          "startSeconds": 204.1171269735787,
+          "speech": 9.42170481721405e-06,
+          "music": 0.9985549449920654,
+          "singing": 0.00036189286038279533
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 38.400000005960464
+    },
+    {
+      "source": "hendrix.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 90.03854605020024,
+          "speech": 0.0001179548489744775,
+          "music": 0.9733578562736511,
+          "singing": 0.00031177292112261057
+        },
+        {
+          "startSeconds": 211.88350650016218,
+          "speech": 0.0017521438421681523,
+          "music": 0.9447260499000549,
+          "singing": 0.00020564667647704482
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.79999998211861
+    },
+    {
+      "source": "ipanema.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 60.75624381308444,
+          "speech": 0.0007033836445771158,
+          "music": 0.9646580815315247,
+          "singing": 0.009576376527547836
+        },
+        {
+          "startSeconds": 234.37747750198469,
+          "speech": 0.00028528118855319917,
+          "music": 0.9433095455169678,
+          "singing": 0.008894628845155239
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 41.69999998807907
+    },
+    {
+      "source": "jazz.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 89.56108844373375,
+          "speech": 2.4282748199766502e-05,
+          "music": 0.9865432381629944,
+          "singing": 7.221892883535475e-05
+        },
+        {
+          "startSeconds": 209.52166914241388,
+          "speech": 2.2354965039994568e-05,
+          "music": 0.9811679720878601,
+          "singing": 5.561765647144057e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 38
+    },
+    {
+      "source": "jazz1.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 90.9615359979216,
+          "speech": 5.922262062085792e-06,
+          "music": 0.997111976146698,
+          "singing": 6.331234180834144e-05
+        },
+        {
+          "startSeconds": 213.3961832220666,
+          "speech": 6.72947135171853e-05,
+          "music": 0.99400794506073,
+          "singing": 0.0004897278267890215
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 35.900000005960464
+    },
+    {
+      "source": "led.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 73.99955364642665,
+          "speech": 0.00010580996604403481,
+          "music": 0.9921094179153442,
+          "singing": 0.00027133277035318315
+        },
+        {
+          "startSeconds": 229.81412780703977,
+          "speech": 6.057522477931343e-05,
+          "music": 0.9401796460151672,
+          "singing": 0.0009159392793662846
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 35.5
+    },
+    {
+      "source": "loreena.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 71.23409508727491,
+          "speech": 0.0010266334284096956,
+          "music": 0.6432207822799683,
+          "singing": 0.0011944660218432546
+        },
+        {
+          "startSeconds": 198.93786628497764,
+          "speech": 0.00031082233181223273,
+          "music": 0.9294746518135071,
+          "singing": 0.022152336314320564
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.19999998807907
+    },
+    {
+      "source": "madradeus.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 78.02662844303995,
+          "speech": 3.7384681490948424e-05,
+          "music": 0.9623083472251892,
+          "singing": 0.0015722420066595078
+        },
+        {
+          "startSeconds": 209.90574421710335,
+          "speech": 0.002615875331684947,
+          "music": 0.9087945818901062,
+          "singing": 0.00890696607530117
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 34.099999994039536
+    },
+    {
+      "source": "magkas.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 102.11538824485615,
+          "speech": 0.00011185065523022786,
+          "music": 0.9681006669998169,
+          "singing": 0.0028452130500227213
+        },
+        {
+          "startSeconds": 236.58400576910935,
+          "speech": 0.00028115962049923837,
+          "music": 0.9810671806335449,
+          "singing": 0.0006857242551632226
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 38.400000005960464
+    },
+    {
+      "source": "march.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 87.71409549051896,
+          "speech": 9.865868378255982e-06,
+          "music": 0.9983712434768677,
+          "singing": 3.4813676847988972e-06
+        },
+        {
+          "startSeconds": 203.59849698725156,
+          "speech": 0.0008295784355141222,
+          "music": 0.9522093534469604,
+          "singing": 7.536425982834771e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 34.80000001192093
+    },
+    {
+      "source": "marlene.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 96.11420947825536,
+          "speech": 0.0001484077947679907,
+          "music": 0.9509768486022949,
+          "singing": 0.0003158205945510417
+        },
+        {
+          "startSeconds": 205.54662226466462,
+          "speech": 0.0018547340296208858,
+          "music": 0.6088181734085083,
+          "singing": 0.03960549086332321
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.80000001192093
+    },
+    {
+      "source": "mingus.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 62.76424729032443,
+          "speech": 8.641662134323269e-05,
+          "music": 0.9238008856773376,
+          "singing": 0.001812355942092836
+        },
+        {
+          "startSeconds": 210.15976658323783,
+          "speech": 6.738147203577682e-05,
+          "music": 0.8874881863594055,
+          "singing": 0.0014401883818209171
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 38.69999998807907
+    },
+    {
+      "source": "mingus1.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 101.98191267088987,
+          "speech": 6.99454903951846e-05,
+          "music": 0.9730744957923889,
+          "singing": 0.002287217415869236
+        },
+        {
+          "startSeconds": 197.7783439855557,
+          "speech": 1.7987815681408392e-06,
+          "music": 0.997434675693512,
+          "singing": 7.901671779109165e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 36.30000001192093
+    },
+    {
+      "source": "misirlou.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 76.95738409180194,
+          "speech": 0.00045358113129623234,
+          "music": 0.9905205965042114,
+          "singing": 0.0053666625171899796
+        },
+        {
+          "startSeconds": 197.24073272896933,
+          "speech": 0.00019892404088750482,
+          "music": 0.9947923421859741,
+          "singing": 0.0009478912688791752
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.599999994039536
+    },
+    {
+      "source": "moanin.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 68.70846988284029,
+          "speech": 1.9549139324226417e-05,
+          "music": 0.980879545211792,
+          "singing": 6.216255769686541e-06
+        },
+        {
+          "startSeconds": 199.11161602358334,
+          "speech": 0.0007517958874814212,
+          "music": 0.8436696529388428,
+          "singing": 0.00021831529738847166
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 40.19999998807907
+    },
+    {
+      "source": "narch.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 91.78654300631024,
+          "speech": 0.0001894543820526451,
+          "music": 0.9427365064620972,
+          "singing": 0.001764441141858697
+        },
+        {
+          "startSeconds": 217.5270829664078,
+          "speech": 0.00019266677554696798,
+          "music": 0.9417791366577148,
+          "singing": 0.0010269832564517856
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 35.30000001192093
+    },
+    {
+      "source": "ncherry.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 84.57267561228946,
+          "speech": 0.00036657488089986145,
+          "music": 0.8331484794616699,
+          "singing": 0.13502879440784454
+        },
+        {
+          "startSeconds": 207.8253949934151,
+          "speech": 0.002402952406555414,
+          "music": 0.8637648224830627,
+          "singing": 0.07361145317554474
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 59.20000001788139
+    },
+    {
+      "source": "nearhou.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 60.06740462500603,
+          "speech": 0.00011649844964267686,
+          "music": 0.9828917384147644,
+          "singing": 0.0003280719101894647
+        },
+        {
+          "startSeconds": 237.39377625868656,
+          "speech": 2.2620965864916798e-06,
+          "music": 0.9961179494857788,
+          "singing": 0.0004512183368206024
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 43
+    },
+    {
+      "source": "opera.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 97.17197586083785,
+          "speech": 0.020690519362688065,
+          "music": 0.013404710218310356,
+          "singing": 0.011923395097255707
+        },
+        {
+          "startSeconds": 205.47317796503194,
+          "speech": 0.0027356732171028852,
+          "music": 0.02501535229384899,
+          "singing": 0.001327065983787179
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 41.20000001788139
+    },
+    {
+      "source": "opera1.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 76.97240322595462,
+          "speech": 2.2043830085749505e-06,
+          "music": 0.9147216081619263,
+          "singing": 0.06730365008115768
+        },
+        {
+          "startSeconds": 208.06203015963547,
+          "speech": 1.5646609199393424e-06,
+          "music": 0.903272807598114,
+          "singing": 0.06679949164390564
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.20000001788139
+    },
+    {
+      "source": "pop.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 86.50489853345789,
+          "speech": 5.619493458652869e-05,
+          "music": 0.9957495927810669,
+          "singing": 0.00016891074483282864
+        },
+        {
+          "startSeconds": 212.40477637737058,
+          "speech": 0.0004227993485983461,
+          "music": 0.9850290417671204,
+          "singing": 0.0003369463956914842
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.89999997615814
+    },
+    {
+      "source": "prodigy.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 63.937690128805116,
+          "speech": 9.360637341160327e-05,
+          "music": 0.98412024974823,
+          "singing": 9.060725460585672e-06
+        },
+        {
+          "startSeconds": 218.27467438182794,
+          "speech": 4.734901722258655e-06,
+          "music": 0.9979532361030579,
+          "singing": 1.3906545973441098e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.79999998211861
+    },
+    {
+      "source": "redhot.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 89.88490660325624,
+          "speech": 0.00027808398590423167,
+          "music": 0.953372597694397,
+          "singing": 0.006409069057554007
+        },
+        {
+          "startSeconds": 214.11759234848435,
+          "speech": 0.00020869672880508006,
+          "music": 0.9881152510643005,
+          "singing": 0.0019402171019464731
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.099999994039536
+    },
+    {
+      "source": "rock.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 99.38216753304005,
+          "speech": 0.00027004111325368285,
+          "music": 0.9706738591194153,
+          "singing": 0.007983695715665817
+        },
+        {
+          "startSeconds": 203.4367779828608,
+          "speech": 0.00016995439364109188,
+          "music": 0.9903758764266968,
+          "singing": 0.0006277409847825766
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 81.90000000596046
+    },
+    {
+      "source": "rock2.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 75.9654335968662,
+          "speech": 0.0003677138010971248,
+          "music": 0.98371821641922,
+          "singing": 0.0027470237109810114
+        },
+        {
+          "startSeconds": 212.7440096740611,
+          "speech": 0.00019153155153617263,
+          "music": 0.9745634198188782,
+          "singing": 0.00011186036135768518
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 43
+    },
+    {
+      "source": "russo.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 87.96952913864516,
+          "speech": 1.4281920812209137e-05,
+          "music": 0.9926298260688782,
+          "singing": 0.0006856083055026829
+        },
+        {
+          "startSeconds": 210.82573900697753,
+          "speech": 0.00031159608624875546,
+          "music": 0.9593246579170227,
+          "singing": 0.0016460040351375937
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 45
+    },
+    {
+      "source": "tony.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 82.70306876627728,
+          "speech": 4.0588700358057395e-05,
+          "music": 0.9856125116348267,
+          "singing": 0.00046761392150074244
+        },
+        {
+          "startSeconds": 239.50576275587082,
+          "speech": 0.00014746382657904178,
+          "music": 0.9890527725219727,
+          "singing": 0.00017019292863551527
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 66.5
+    },
+    {
+      "source": "u2.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 84.28517644875683,
+          "speech": 0.0009317478397861123,
+          "music": 0.6982267498970032,
+          "singing": 0.002973922761157155
+        },
+        {
+          "startSeconds": 202.38282128004357,
+          "speech": 1.3062555808573961e-05,
+          "music": 0.9647555947303772,
+          "singing": 0.0007345624617300928
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.69999998807907
+    },
+    {
+      "source": "unpoco.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 74.16151947691105,
+          "speech": 0.0003488705260679126,
+          "music": 0.9711835384368896,
+          "singing": 0.0007166936993598938
+        },
+        {
+          "startSeconds": 212.6017290574964,
+          "speech": 0.00022643199190497398,
+          "music": 0.9807251691818237,
+          "singing": 0.00030574799166060984
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 48.5
+    },
+    {
+      "source": "vlobos.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 73.87615735293366,
+          "speech": 1.935812406372861e-06,
+          "music": 0.9955593347549438,
+          "singing": 0.0001177019439637661
+        },
+        {
+          "startSeconds": 226.47752960328944,
+          "speech": 7.76077649788931e-06,
+          "music": 0.9922971129417419,
+          "singing": 7.693827501498163e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 40.900000005960464
+    },
+    {
+      "source": "winds.wav",
+      "label": "music",
+      "repeated_to_five_minutes": true,
+      "decision": "music_detected_in_samples",
+      "reason": "Both checks indicate music or singing",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 98.25255386531353,
+          "speech": 4.937077756039798e-05,
+          "music": 0.9846475720405579,
+          "singing": 0.00026145364972762764
+        },
+        {
+          "startSeconds": 199.38230567844585,
+          "speech": 0.00012246689584571868,
+          "music": 0.9635029435157776,
+          "singing": 0.00036810050369240344
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.29999998211861
+    },
+    {
+      "source": "acomic.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 90.24638684350066,
+          "speech": 0.9951469302177429,
+          "music": 0.000375839852495119,
+          "singing": 6.181371190905338e-06
+        },
+        {
+          "startSeconds": 211.537559927674,
+          "speech": 0.9433043003082275,
+          "music": 6.907221541041508e-05,
+          "singing": 0.00019662176782730967
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 36.89999997615814
+    },
+    {
+      "source": "acomic2.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 88.43092681956477,
+          "speech": 0.9836018681526184,
+          "music": 2.898160892073065e-05,
+          "singing": 2.2500253180623986e-05
+        },
+        {
+          "startSeconds": 205.01594744157046,
+          "speech": 0.9887333512306213,
+          "music": 4.5059507101541385e-05,
+          "singing": 2.5993222152465023e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.5
+    },
+    {
+      "source": "allison.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 95.53459259681404,
+          "speech": 0.9952484369277954,
+          "music": 1.9424922356847674e-05,
+          "singing": 1.506857984168164e-06
+        },
+        {
+          "startSeconds": 208.84519326151351,
+          "speech": 0.9897381663322449,
+          "music": 0.00016446704103145748,
+          "singing": 1.320399678661488e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.10000002384186
+    },
+    {
+      "source": "amal.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 84.18413012288511,
+          "speech": 0.9914121627807617,
+          "music": 0.0001691533107077703,
+          "singing": 2.4031047360040247e-05
+        },
+        {
+          "startSeconds": 211.38152433559299,
+          "speech": 0.9783039093017578,
+          "music": 2.662111546669621e-05,
+          "singing": 2.1236994143691845e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 34.099999994039536
+    },
+    {
+      "source": "austria.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 81.73851690022275,
+          "speech": 0.9970115423202515,
+          "music": 0.0006017831619828939,
+          "singing": 4.062376774527365e-06
+        },
+        {
+          "startSeconds": 195.5707996536512,
+          "speech": 0.9548912644386292,
+          "music": 0.00010366887727286667,
+          "singing": 1.12314444322692e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 35.80000001192093
+    },
+    {
+      "source": "bathroom1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 102.77536325971596,
+          "speech": 0.9194371700286865,
+          "music": 6.255118023545947e-06,
+          "singing": 6.142170150269521e-06
+        },
+        {
+          "startSeconds": 214.19846822158433,
+          "speech": 0.9840536713600159,
+          "music": 2.7626379960565828e-05,
+          "singing": 4.225927114021033e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 33.19999998807907
+    },
+    {
+      "source": "chant.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 99.51030518626796,
+          "speech": 0.9708346128463745,
+          "music": 0.013697384856641293,
+          "singing": 4.818362867808901e-05
+        },
+        {
+          "startSeconds": 239.8437803098932,
+          "speech": 0.9831843972206116,
+          "music": 0.0005887520965188742,
+          "singing": 2.367514571233187e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 38.900000005960464
+    },
+    {
+      "source": "charles.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 79.71222373307683,
+          "speech": 0.030592044815421104,
+          "music": 0.0006172501016408205,
+          "singing": 0.00020480429520830512
+        },
+        {
+          "startSeconds": 213.0371826107148,
+          "speech": 0.9906999468803406,
+          "music": 1.9801524103968404e-05,
+          "singing": 3.1040244721225463e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 35.89999997615814
+    },
+    {
+      "source": "china.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 84.48120006825775,
+          "speech": 0.9968492984771729,
+          "music": 2.1888829451199854e-06,
+          "singing": 1.424629544999334e-06
+        },
+        {
+          "startSeconds": 211.25143721932545,
+          "speech": 0.00577046163380146,
+          "music": 0.0013954550959169865,
+          "singing": 1.5023601918073837e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 34.5
+    },
+    {
+      "source": "comedy.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 82.96498491545208,
+          "speech": 0.9634726643562317,
+          "music": 6.17930490989238e-05,
+          "singing": 5.8566296502249315e-05
+        },
+        {
+          "startSeconds": 230.82209516549483,
+          "speech": 0.9657500982284546,
+          "music": 1.0715469215938356e-05,
+          "singing": 5.530971520784078e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 35.70000001788139
+    },
+    {
+      "source": "comedy1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 70.39680884219706,
+          "speech": 0.8692947626113892,
+          "music": 0.0014635120751336217,
+          "singing": 1.0536906302149873e-05
+        },
+        {
+          "startSeconds": 201.5675352467224,
+          "speech": 0.6934229135513306,
+          "music": 0.00031744857551530004,
+          "singing": 0.0028423003386706114
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 36
+    },
+    {
+      "source": "conversion.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 92.85698667168617,
+          "speech": 0.9625813961029053,
+          "music": 0.00019617198267951608,
+          "singing": 1.590604711054766e-06
+        },
+        {
+          "startSeconds": 225.06560183828697,
+          "speech": 0.9922999739646912,
+          "music": 0.00015471734513994306,
+          "singing": 4.21548611484468e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37
+    },
+    {
+      "source": "danie.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 75.80532937659882,
+          "speech": 0.9986838102340698,
+          "music": 6.34239477221854e-05,
+          "singing": 9.549502237859997e-07
+        },
+        {
+          "startSeconds": 210.17713460954838,
+          "speech": 0.059929464012384415,
+          "music": 0.007202879060059786,
+          "singing": 0.0001586613361723721
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 56.599999994039536
+    },
+    {
+      "source": "danie1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 98.45144094200806,
+          "speech": 0.996807873249054,
+          "music": 3.606408427003771e-05,
+          "singing": 2.3828285975469043e-06
+        },
+        {
+          "startSeconds": 239.7360651323106,
+          "speech": 0.9962332248687744,
+          "music": 0.00035005673998966813,
+          "singing": 7.3834421527863014e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.20000001788139
+    },
+    {
+      "source": "dialogue.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 84.67153795994818,
+          "speech": 0.9906895756721497,
+          "music": 0.0005448724259622395,
+          "singing": 6.555560958076967e-06
+        },
+        {
+          "startSeconds": 206.95437050890177,
+          "speech": 0.9945928454399109,
+          "music": 0.00010894292063312605,
+          "singing": 5.9712106121878605e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 49.900000005960464
+    },
+    {
+      "source": "dialogue1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 86.13168128184043,
+          "speech": 0.9919344186782837,
+          "music": 0.00025743903825059533,
+          "singing": 1.3273258446133696e-05
+        },
+        {
+          "startSeconds": 238.01298024016432,
+          "speech": 0.9963973760604858,
+          "music": 0.00013203102571424097,
+          "singing": 1.002227327262517e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 45.19999998807907
+    },
+    {
+      "source": "dialogue2.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 87.88599692517892,
+          "speech": 0.9968490600585938,
+          "music": 0.0001271864166483283,
+          "singing": 9.983199333873927e-07
+        },
+        {
+          "startSeconds": 206.98879428324292,
+          "speech": 0.9889121651649475,
+          "music": 9.496640996076167e-05,
+          "singing": 1.2846546269429382e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 37.599999994039536
+    },
+    {
+      "source": "diamond.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 98.7621706968639,
+          "speech": 0.973339319229126,
+          "music": 0.00014932506019249558,
+          "singing": 0.0001730020740069449
+        },
+        {
+          "startSeconds": 219.89906376809813,
+          "speech": 0.9931674003601074,
+          "music": 0.00024114888219628483,
+          "singing": 1.0494845810171682e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 137.69999998807907
+    },
+    {
+      "source": "ellhnika.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 90.30789024196565,
+          "speech": 0.9910028576850891,
+          "music": 0.0002510345366317779,
+          "singing": 6.645409484917764e-06
+        },
+        {
+          "startSeconds": 235.60366716468707,
+          "speech": 0.9909757971763611,
+          "music": 0.0009893595706671476,
+          "singing": 2.0668394427048042e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 66.7999999821186
+    },
+    {
+      "source": "emil.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 70.2232397440821,
+          "speech": 0.995572030544281,
+          "music": 3.0426637749769725e-05,
+          "singing": 1.1929420224987553e-06
+        },
+        {
+          "startSeconds": 229.16912888525985,
+          "speech": 0.995460569858551,
+          "music": 1.2514160516730044e-05,
+          "singing": 3.2625894164084457e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.099999994039536
+    },
+    {
+      "source": "fem_rock.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 79.27245150902309,
+          "speech": 0.9850047826766968,
+          "music": 0.005164535716176033,
+          "singing": 6.143177870399086e-06
+        },
+        {
+          "startSeconds": 227.80670780455694,
+          "speech": 0.9979780316352844,
+          "music": 2.357776611461304e-05,
+          "singing": 1.5336354408646002e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.5
+    },
+    {
+      "source": "female.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 78.29084212426096,
+          "speech": 0.996415913105011,
+          "music": 1.1628948413999751e-05,
+          "singing": 2.957026936201146e-06
+        },
+        {
+          "startSeconds": 198.4194314922206,
+          "speech": 0.991081178188324,
+          "music": 1.1095336958533153e-05,
+          "singing": 5.414592123997863e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 50.29999998211861
+    },
+    {
+      "source": "fire.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 60.64063976635225,
+          "speech": 0.9977043867111206,
+          "music": 2.4404605937888846e-05,
+          "singing": 9.303507795266341e-06
+        },
+        {
+          "startSeconds": 226.46104422281496,
+          "speech": 0.9946531057357788,
+          "music": 9.20730599318631e-05,
+          "singing": 3.530179583322024e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 44.099999994039536
+    },
+    {
+      "source": "geography.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 74.70889709657058,
+          "speech": 0.9458380341529846,
+          "music": 0.0012977547012269497,
+          "singing": 4.6127264795359224e-05
+        },
+        {
+          "startSeconds": 199.0975702169817,
+          "speech": 0.9974172115325928,
+          "music": 2.0275367205613293e-05,
+          "singing": 5.082133156975033e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 45.30000001192093
+    },
+    {
+      "source": "geography1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 74.65425932547078,
+          "speech": 0.9895442128181458,
+          "music": 1.9354012692929246e-05,
+          "singing": 2.0278760075598257e-06
+        },
+        {
+          "startSeconds": 207.32178278965876,
+          "speech": 0.9691755175590515,
+          "music": 0.0009147169766947627,
+          "singing": 3.120184919680469e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 78.90000000596046
+    },
+    {
+      "source": "georg.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 77.6907657191623,
+          "speech": 0.98052978515625,
+          "music": 3.2052827009465545e-05,
+          "singing": 1.850772719080851e-06
+        },
+        {
+          "startSeconds": 207.49802126199938,
+          "speech": 0.9875720739364624,
+          "music": 5.081660128780641e-05,
+          "singing": 4.6866571210557595e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 55.900000005960464
+    },
+    {
+      "source": "god.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 100.3882966353558,
+          "speech": 0.9814336895942688,
+          "music": 0.00012585283548105508,
+          "singing": 1.7077703660106636e-06
+        },
+        {
+          "startSeconds": 234.85811874386854,
+          "speech": 0.9511215686798096,
+          "music": 8.699663885636255e-05,
+          "singing": 2.0929319362039678e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 62
+    },
+    {
+      "source": "greek.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 104.90589181543328,
+          "speech": 0.9820634722709656,
+          "music": 1.83996744453907e-05,
+          "singing": 1.5865732621023199e-06
+        },
+        {
+          "startSeconds": 217.2105302824639,
+          "speech": 0.9353482127189636,
+          "music": 4.038075348944403e-05,
+          "singing": 1.3464613175528939e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 53.19999998807907
+    },
+    {
+      "source": "greek1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 78.45593546284363,
+          "speech": 0.9952688217163086,
+          "music": 1.9479073671391234e-05,
+          "singing": 1.8101185332852765e-06
+        },
+        {
+          "startSeconds": 212.4222395173274,
+          "speech": 0.9729541540145874,
+          "music": 0.0001239099510712549,
+          "singing": 1.413714107911801e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 48.39999997615814
+    },
+    {
+      "source": "india.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 66.0350421059411,
+          "speech": 0.20544807612895966,
+          "music": 0.00028499955078586936,
+          "singing": 3.25258843076881e-05
+        },
+        {
+          "startSeconds": 199.13866764167324,
+          "speech": 0.9917682409286499,
+          "music": 2.4696937543922104e-05,
+          "singing": 4.801189788850024e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 80.10000002384186
+    },
+    {
+      "source": "jony.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 98.77789594349451,
+          "speech": 0.9962294101715088,
+          "music": 0.0003137363528367132,
+          "singing": 9.349447282147594e-06
+        },
+        {
+          "startSeconds": 216.6258457233198,
+          "speech": 0.9671661257743835,
+          "music": 0.0012533594854176044,
+          "singing": 2.4291317458846606e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 44.79999998211861
+    },
+    {
+      "source": "jvoice.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 74.275416926248,
+          "speech": 0.9958089590072632,
+          "music": 0.00016996200429275632,
+          "singing": 2.636340923345415e-06
+        },
+        {
+          "startSeconds": 196.77363237831742,
+          "speech": 0.8739252090454102,
+          "music": 0.0001840914919739589,
+          "singing": 9.251685696654022e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 55.5
+    },
+    {
+      "source": "kedar.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 82.24723990657367,
+          "speech": 0.9966132044792175,
+          "music": 0.0002116228424711153,
+          "singing": 5.685666110366583e-06
+        },
+        {
+          "startSeconds": 195.75334843131714,
+          "speech": 0.9970148801803589,
+          "music": 3.449778159847483e-05,
+          "singing": 7.5528710112848785e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 82.7000000178814
+    },
+    {
+      "source": "kid.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 88.47706642001867,
+          "speech": 0.997345507144928,
+          "music": 4.406560037750751e-05,
+          "singing": 3.4263023280800553e-06
+        },
+        {
+          "startSeconds": 226.13851359696127,
+          "speech": 0.9945061206817627,
+          "music": 0.0007430954719893634,
+          "singing": 3.868031853926368e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 88.59999999403954
+    },
+    {
+      "source": "lena.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 98.42411123332568,
+          "speech": 0.9977852702140808,
+          "music": 0.00015651127614546567,
+          "singing": 4.766553047375055e-06
+        },
+        {
+          "startSeconds": 211.53331940760836,
+          "speech": 0.9870299100875854,
+          "music": 3.79155644623097e-05,
+          "singing": 5.196470010560006e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 60.599999994039536
+    },
+    {
+      "source": "male.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 65.54791751434095,
+          "speech": 0.9954358339309692,
+          "music": 2.3048674847814254e-05,
+          "singing": 8.580138455727138e-06
+        },
+        {
+          "startSeconds": 237.53861500066705,
+          "speech": 0.987600564956665,
+          "music": 2.4658032998559065e-05,
+          "singing": 1.9289163901703432e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 63.400000005960464
+    },
+    {
+      "source": "my_voice.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 80.84811824373901,
+          "speech": 0.9364148378372192,
+          "music": 0.0026854979805648327,
+          "singing": 7.828741217963398e-06
+        },
+        {
+          "startSeconds": 203.58780185692012,
+          "speech": 0.8957180380821228,
+          "music": 0.0008386443369090557,
+          "singing": 3.7490290196728893e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 86
+    },
+    {
+      "source": "nether.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 77.14970361208543,
+          "speech": 0.9975078701972961,
+          "music": 6.456683331634849e-05,
+          "singing": 6.080636921979021e-06
+        },
+        {
+          "startSeconds": 228.76116109080613,
+          "speech": 0.9922032356262207,
+          "music": 7.062336953822523e-05,
+          "singing": 3.5165178360330174e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 52.599999994039536
+    },
+    {
+      "source": "news1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 101.88775212038308,
+          "speech": 0.9291001558303833,
+          "music": 0.01947198063135147,
+          "singing": 1.8631320926942863e-05
+        },
+        {
+          "startSeconds": 239.38785379054025,
+          "speech": 0.905417263507843,
+          "music": 0.0037121912464499474,
+          "singing": 0.00011184798495378345
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 46.599999994039536
+    },
+    {
+      "source": "news2.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 95.7836326234974,
+          "speech": 0.9923078417778015,
+          "music": 3.58720681106206e-05,
+          "singing": 1.8617164414536091e-06
+        },
+        {
+          "startSeconds": 227.32916509034112,
+          "speech": 0.9921813011169434,
+          "music": 0.00010648956958903,
+          "singing": 5.651393166772323e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 44.5
+    },
+    {
+      "source": "nj105.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 62.512100354069844,
+          "speech": 0.9967214465141296,
+          "music": 0.0002063691063085571,
+          "singing": 4.604753030434949e-06
+        },
+        {
+          "startSeconds": 235.28359202784486,
+          "speech": 0.9940030574798584,
+          "music": 0.0002169265499105677,
+          "singing": 6.135549483587965e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.599999994039536
+    },
+    {
+      "source": "nj105a.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 89.54033848713152,
+          "speech": 0.9661532044410706,
+          "music": 0.005655874032527208,
+          "singing": 6.114479037933052e-05
+        },
+        {
+          "startSeconds": 239.57793280715123,
+          "speech": 0.818664014339447,
+          "music": 0.1523444801568985,
+          "singing": 5.0797851145034656e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 41.5
+    },
+    {
+      "source": "oneday.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 77.69323914544657,
+          "speech": 0.9494589567184448,
+          "music": 8.291792619274929e-05,
+          "singing": 4.291591267246986e-06
+        },
+        {
+          "startSeconds": 210.72138755000196,
+          "speech": 0.0009005264146253467,
+          "music": 0.23484288156032562,
+          "singing": 2.9685312256333418e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 41.19999998807907
+    },
+    {
+      "source": "psychic.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 79.62918083416298,
+          "speech": 0.9960023760795593,
+          "music": 0.0001766349741956219,
+          "singing": 4.936975415148481e-07
+        },
+        {
+          "startSeconds": 229.12496223812923,
+          "speech": 0.9968846440315247,
+          "music": 6.839683192083612e-05,
+          "singing": 1.9858257473970298e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 76.5
+    },
+    {
+      "source": "pulp.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 81.3454561738763,
+          "speech": 0.9606143236160278,
+          "music": 0.00017139429110102355,
+          "singing": 9.341888471681159e-06
+        },
+        {
+          "startSeconds": 234.37539979582652,
+          "speech": 0.982458770275116,
+          "music": 5.717777457903139e-05,
+          "singing": 2.1605101210298017e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.30000001192093
+    },
+    {
+      "source": "pulp1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 74.50466211419553,
+          "speech": 0.4307646155357361,
+          "music": 0.0001502076192991808,
+          "singing": 5.333829903975129e-06
+        },
+        {
+          "startSeconds": 231.09483915148303,
+          "speech": 0.9037893414497375,
+          "music": 4.5252469135448337e-05,
+          "singing": 1.3699614100914914e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 44.69999998807907
+    },
+    {
+      "source": "pulp2.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 86.21498980326578,
+          "speech": 0.8672640919685364,
+          "music": 0.00021816237131133676,
+          "singing": 0.0013585659908130765
+        },
+        {
+          "startSeconds": 234.59294472704642,
+          "speech": 0.9014449119567871,
+          "music": 8.076421363512054e-05,
+          "singing": 9.001322905533016e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.099999994039536
+    },
+    {
+      "source": "relation.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 82.22054632147774,
+          "speech": 0.9968135952949524,
+          "music": 0.00039091194048523903,
+          "singing": 5.146685452928068e-06
+        },
+        {
+          "startSeconds": 222.27291726507246,
+          "speech": 0.8880101442337036,
+          "music": 0.00908029917627573,
+          "singing": 0.00024470689822919667
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 72.40000000596046
+    },
+    {
+      "source": "serbian.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 88.28177851159126,
+          "speech": 0.9580585956573486,
+          "music": 2.5861385438474827e-05,
+          "singing": 2.9842589356121607e-05
+        },
+        {
+          "startSeconds": 199.6124673646409,
+          "speech": 0.9915323257446289,
+          "music": 1.3282983672979753e-05,
+          "singing": 4.275133505871054e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 47
+    },
+    {
+      "source": "shannon.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 101.50731125031598,
+          "speech": 0.9923312067985535,
+          "music": 0.0020279139280319214,
+          "singing": 5.919958312006202e-06
+        },
+        {
+          "startSeconds": 222.1936569409445,
+          "speech": 0.9978028535842896,
+          "music": 0.0015913130482658744,
+          "singing": 8.18415264802752e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.30000001192093
+    },
+    {
+      "source": "sleep.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 85.81624547601677,
+          "speech": 0.9937482476234436,
+          "music": 3.763981658266857e-05,
+          "singing": 3.385363379493356e-05
+        },
+        {
+          "startSeconds": 234.82066364376806,
+          "speech": 0.9819821119308472,
+          "music": 0.000816618965473026,
+          "singing": 3.137889507343061e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.19999998807907
+    },
+    {
+      "source": "smoke1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 95.31209893757477,
+          "speech": 0.9969448447227478,
+          "music": 0.00019339655409567058,
+          "singing": 4.666511813411489e-06
+        },
+        {
+          "startSeconds": 203.20907442597675,
+          "speech": 0.977116048336029,
+          "music": 2.5509179977234453e-05,
+          "singing": 1.9835335933748866e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 40.29999998211861
+    },
+    {
+      "source": "smoking.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 96.5072580089327,
+          "speech": 0.9909849166870117,
+          "music": 6.026247865520418e-05,
+          "singing": 3.142319826565654e-07
+        },
+        {
+          "startSeconds": 204.97516735573302,
+          "speech": 0.99117511510849,
+          "music": 0.00043136492604389787,
+          "singing": 2.3464803234674037e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.5
+    },
+    {
+      "source": "stupid.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 71.57949156593531,
+          "speech": 0.9958463907241821,
+          "music": 0.00016982996021397412,
+          "singing": 3.237150394852506e-06
+        },
+        {
+          "startSeconds": 222.31036652927287,
+          "speech": 0.9901535511016846,
+          "music": 0.00156193517614156,
+          "singing": 1.9459504983387887e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 48
+    },
+    {
+      "source": "teachers.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 98.41146717430094,
+          "speech": 0.9805728793144226,
+          "music": 0.0036239491309970617,
+          "singing": 4.7180757974274457e-05
+        },
+        {
+          "startSeconds": 233.43710309942253,
+          "speech": 0.9908599853515625,
+          "music": 0.0005992784863337874,
+          "singing": 1.217154294863576e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 51.80000001192093
+    },
+    {
+      "source": "teachers1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 88.96857243147679,
+          "speech": 0.9954856634140015,
+          "music": 0.0001414035214111209,
+          "singing": 1.3831349860993214e-06
+        },
+        {
+          "startSeconds": 204.13254728657193,
+          "speech": 0.8765711784362793,
+          "music": 0.0010273692896589637,
+          "singing": 0.00011690005339914933
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 41.5
+    },
+    {
+      "source": "teachers2.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 99.34450639528222,
+          "speech": 0.9708192944526672,
+          "music": 5.476535443449393e-05,
+          "singing": 9.886683983495459e-05
+        },
+        {
+          "startSeconds": 211.49507890222594,
+          "speech": 0.9934812188148499,
+          "music": 0.0004079136124346405,
+          "singing": 7.746195478830487e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 40.60000002384186
+    },
+    {
+      "source": "thlui.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 88.45075101591647,
+          "speech": 0.9845351576805115,
+          "music": 1.3426720215647947e-05,
+          "singing": 4.7222525267898163e-07
+        },
+        {
+          "startSeconds": 202.5464322580956,
+          "speech": 0.99627286195755,
+          "music": 3.310316606075503e-05,
+          "singing": 2.879583860249113e-07
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.69999998807907
+    },
+    {
+      "source": "undergrad.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 71.81378935463727,
+          "speech": 0.9986267685890198,
+          "music": 3.95370734622702e-05,
+          "singing": 3.2588422982371412e-06
+        },
+        {
+          "startSeconds": 195.78797142254191,
+          "speech": 0.995108425617218,
+          "music": 8.871226600604132e-05,
+          "singing": 7.66676862440363e-07
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.900000005960464
+    },
+    {
+      "source": "vegetables.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 71.21640535304323,
+          "speech": 0.9561540484428406,
+          "music": 1.4607946468458977e-05,
+          "singing": 2.880272859329125e-06
+        },
+        {
+          "startSeconds": 203.99398188572377,
+          "speech": 0.9501031637191772,
+          "music": 0.000333826697897166,
+          "singing": 1.850792432378512e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 45.20000001788139
+    },
+    {
+      "source": "vegetables1.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 89.86757696606219,
+          "speech": 0.9870427250862122,
+          "music": 8.122571307467297e-05,
+          "singing": 6.028099960531108e-06
+        },
+        {
+          "startSeconds": 200.13085103826597,
+          "speech": 0.9678899049758911,
+          "music": 0.0003120465262327343,
+          "singing": 4.08398636864149e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 45.80000001192093
+    },
+    {
+      "source": "vegetables2.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 83.00002272706479,
+          "speech": 0.9723132252693176,
+          "music": 0.0025581575464457273,
+          "singing": 2.403719463472953e-06
+        },
+        {
+          "startSeconds": 226.9473870343063,
+          "speech": 0.9422345161437988,
+          "music": 0.0006463333265855908,
+          "singing": 1.1480335615488002e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 41
+    },
+    {
+      "source": "voice.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 99.47869254508987,
+          "speech": 0.9962955713272095,
+          "music": 9.23850093386136e-05,
+          "singing": 2.4749795556999743e-05
+        },
+        {
+          "startSeconds": 215.45743153430521,
+          "speech": 0.9959838390350342,
+          "music": 9.969397797249258e-05,
+          "singing": 2.4612029392301338e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.599999994039536
+    },
+    {
+      "source": "voices.wav",
+      "label": "speech",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 69.54316329094581,
+          "speech": 0.9945017099380493,
+          "music": 0.00020326391677372158,
+          "singing": 2.404622819085489e-06
+        },
+        {
+          "startSeconds": 212.0345268538222,
+          "speech": 0.9882234930992126,
+          "music": 0.001921219751238823,
+          "singing": 2.46083686761267e-06
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 47.5
+    },
+    {
+      "source": "shiur_freifeld.mp3",
+      "label": "shiur",
+      "repeated_to_five_minutes": false,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 140.2559415071618,
+          "speech": 0.9737833738327026,
+          "music": 0.00044591177720576525,
+          "singing": 2.9222086595837027e-05
+        },
+        {
+          "startSeconds": 364.7755454329478,
+          "speech": 0.9873291254043579,
+          "music": 2.030716132139787e-05,
+          "singing": 2.5759013624337967e-06
+        }
+      ],
+      "encodedBytes": 7365866,
+      "sourceBytesRead": 262144,
+      "sourceRangeRequests": 3,
+      "duration": 460.102688,
+      "format": "mp3",
+      "positionAccuracy": "approximate MPEG byte seek",
+      "wallMs": 63.30000001192093
+    },
+    {
+      "source": "shiur_plus_music_-10dB.wav",
+      "label": "constructed_music",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 74.88311062683351,
+          "speech": 0.8532697558403015,
+          "music": 0.42131221294403076,
+          "singing": 2.7876898457179777e-05
+        },
+        {
+          "startSeconds": 200.28280992410146,
+          "speech": 0.8129044771194458,
+          "music": 0.310984343290329,
+          "singing": 3.9268150430871174e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 41.599999994039536
+    },
+    {
+      "source": "shiur_plus_music_-20dB.wav",
+      "label": "constructed_music",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 103.50859974394552,
+          "speech": 0.5119690895080566,
+          "music": 0.4889363944530487,
+          "singing": 1.1617787095019594e-05
+        },
+        {
+          "startSeconds": 200.47656232025474,
+          "speech": 0.021829865872859955,
+          "music": 0.4606110751628876,
+          "singing": 0.0002134057431248948
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 46.099999994039536
+    },
+    {
+      "source": "shiur_plus_music_0dB.wav",
+      "label": "constructed_music",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 95.90601712698117,
+          "speech": 0.5958168506622314,
+          "music": 0.4810722768306732,
+          "singing": 9.944815974449739e-05
+        },
+        {
+          "startSeconds": 197.35174701316282,
+          "speech": 0.8846585750579834,
+          "music": 0.5206979513168335,
+          "singing": 1.916704604809638e-05
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 41.19999998807907
+    },
+    {
+      "source": "silence.wav",
+      "label": "non_speech",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 104.78995653684251,
+          "speech": 2.3031522522476422e-10,
+          "music": 1.2868486387162398e-13,
+          "singing": 0
+        },
+        {
+          "startSeconds": 234.62359115481377,
+          "speech": 2.3031522522476422e-10,
+          "music": 1.2868486387162398e-13,
+          "singing": 0
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 43.099999994039536
+    },
+    {
+      "source": "six_minutes_speech_then_15sec_music.wav",
+      "label": "constructed_music",
+      "repeated_to_five_minutes": false,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 111.27976961288367,
+          "speech": 0.3802037537097931,
+          "music": 0.0012406990863382816,
+          "singing": 1.379112927679671e-05
+        },
+        {
+          "startSeconds": 279.1809178030235,
+          "speech": 0.9889307022094727,
+          "music": 0.00019439138122834265,
+          "singing": 1.7423019016860053e-05
+        }
+      ],
+      "encodedBytes": 12000044,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 375,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 39.79999998211861
+    },
+    {
+      "source": "spoken_intro_then_music.wav",
+      "label": "constructed_music",
+      "repeated_to_five_minutes": true,
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 83.13971344032325,
+          "speech": 0.9887130856513977,
+          "music": 0.00021029110939707607,
+          "singing": 3.0975788831710815e-05
+        },
+        {
+          "startSeconds": 221.273979479447,
+          "speech": 1.47766295413021e-05,
+          "music": 0.9831605553627014,
+          "singing": 0.0012812959030270576
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 42.099999994039536
+    },
+    {
+      "source": "white_noise.wav",
+      "label": "non_speech",
+      "repeated_to_five_minutes": true,
+      "decision": "uncertain",
+      "reason": "Insufficient clear speech evidence",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 64.78128722403198,
+          "speech": 0.0013082680525258183,
+          "music": 0.01644734852015972,
+          "singing": 8.048275776673108e-05
+        },
+        {
+          "startSeconds": 216.74579867860302,
+          "speech": 0.0027082953602075577,
+          "music": 0.008788424544036388,
+          "singing": 0.00010135748016182333
+        }
+      ],
+      "encodedBytes": 9600078,
+      "sourceBytesRead": 127936,
+      "sourceRangeRequests": 3,
+      "duration": 300,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 43.79999998211861
+    }
+  ]
+}

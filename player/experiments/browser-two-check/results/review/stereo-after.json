@@ -1,0 +1,36 @@
+{
+  "cross_origin_audio": true,
+  "local_csp": true,
+  "outside_requests": [],
+  "results": [
+    {
+      "file": "opposite-phase-speech.wav",
+      "decision": "provisional_speech",
+      "reason": "One check strongly indicates speech",
+      "policy": "two-interior-checks-v2-speech-priority",
+      "scope": "sampled_only",
+      "fullFileApproved": false,
+      "checks": [
+        {
+          "startSeconds": 143.8361933620876,
+          "speech": 0.9891835451126099,
+          "music": 5.0274098612135276e-05,
+          "singing": 5.019941454520449e-06
+        },
+        {
+          "startSeconds": 339.2631358076797,
+          "speech": 0.9985513687133789,
+          "music": 9.806583875615615e-06,
+          "singing": 2.903682616306469e-05
+        }
+      ],
+      "encodedBytes": 58892328,
+      "sourceBytesRead": 315136,
+      "sourceRangeRequests": 3,
+      "duration": 460.0946875,
+      "format": "wav",
+      "positionAccuracy": "PCM sample position",
+      "wallMs": 228.40000000596046
+    }
+  ]
+}

@@ -1,25 +1,36 @@
 (function(root){
 'use strict';
 const P=ShiurProtocol,K=P.keys;
+function loadError(message,name='AbortError'){const error=Error(message);error.name=name;return error;}
+function waitFor(action,signal){
+ return new Promise((resolve,reject)=>{
+  const aborted=()=>{signal.removeEventListener('abort',aborted);reject(signal.reason||loadError('טעינת השיעור בוטלה'));};
+  signal.addEventListener('abort',aborted,{once:true});
+  Promise.resolve(action).then(value=>{signal.removeEventListener('abort',aborted);if(signal.aborted)aborted();else resolve(value);},error=>{signal.removeEventListener('abort',aborted);reject(error);});
+  if(signal.aborted)aborted();
+ });
+}
 class LocalAudioEngine {
  constructor(audio){
   this.audio=audio;this.audio.muted=true;this.session=ShiurCore.uuid();this.queue=[];this.current=null;this.loaded=false;this.positions=Object.create(null);this.savedPositions=Object.create(null);this.savedAt=0;this.restored=false;
   this.speed=1;this.volume=1;this.skipSeconds=15;this.autoNext=false;this.sleepUntil=0;this.error='';this.storageError='';
-  this.tail=Promise.resolve();this.ready=false;this.running=false;this.closed=false;this.visible=true;this.lastAccess=0;
+  this.tail=Promise.resolve();this.ready=false;this.running=false;this.closed=false;this.visible=true;this.lastAccess=0;this.loadController=null;this.seekTarget=null;
  }
- serial(action){const next=this.tail.then(action);this.tail=next.catch(error=>{this.error=error.message;});return next;}
+ serial(action){const next=this.tail.then(action);this.tail=next.catch(error=>{if(error.name!=='AbortError')this.error=error.message;});return next;}
  capture(){
   if(this.current&&this.loaded&&this.audio.readyState>0){
-   const positionMs=Math.round(this.audio.currentTime*1000),durationMs=Number.isFinite(this.audio.duration)?Math.round(this.audio.duration*1000):0;
+   let positionMs=Math.round(this.audio.currentTime*1000);const durationMs=Number.isFinite(this.audio.duration)?Math.round(this.audio.duration*1000):0;
+   if(this.seekTarget?.id===this.current.id){if(!this.audio.seeking&&Math.abs(positionMs-this.seekTarget.positionMs)<500)this.seekTarget=null;else positionMs=this.seekTarget.positionMs;}
+   const completed=this.audio.ended&&!this.seekTarget;
    const old=this.positions[this.current.id];
-   if(!old||old.positionMs!==positionMs||old.durationMs!==durationMs||old.completed!==this.audio.ended){
-    this.positions[this.current.id]={positionMs,durationMs,completed:this.audio.ended,lastListenedAt:Date.now()};
+   if(!old||old.positionMs!==positionMs||old.durationMs!==durationMs||old.completed!==completed){
+    this.positions[this.current.id]={positionMs,durationMs,completed,lastListenedAt:Date.now()};
    }
   }
  }
  snapshot(){
   this.capture();const progress=this.positions[this.current?.id]||{};
-  return {session:this.session,ready:this.ready,savedAt:this.savedAt,savedPositionMs:this.savedPositions[this.current?.id]?.positionMs??null,updatedAt:Date.now(),currentId:this.current?.id||null,status:this.error?'error':!this.current?'empty':!this.loaded?'paused':this.audio.ended?'ended':this.audio.paused?'paused':'playing',
+  return {session:this.session,ready:this.ready,loaded:this.loaded,savedAt:this.savedAt,savedPositionMs:this.savedPositions[this.current?.id]?.positionMs??null,updatedAt:Date.now(),currentId:this.current?.id||null,status:this.error?'error':!this.current?'empty':!this.loaded?'paused':this.audio.ended?'ended':this.audio.paused?'paused':'playing',
    positionMs:progress.positionMs||0,durationMs:progress.durationMs||0,positions:this.positions,speed:this.speed,volume:this.volume,skipSeconds:this.skipSeconds,autoNext:this.autoNext,
    sleepRemaining:Math.max(0,Math.ceil((this.sleepUntil-Date.now())/1000)),error:this.error||this.storageError};
  }
@@ -88,8 +99,8 @@ class LocalAudioEngine {
   this.audio.addEventListener('seeked',()=>{this.capture();if(this.ready&&!this.closed)this.serial(()=>this.publish());});
   }
   this.ready=true;this.setupMediaSession();try{await this.publish();}catch(error){this.ready=false;throw error;}
-  this.timer=setInterval(()=>this.tick(),250);
-  window.addEventListener('pagehide',()=>{this.closed=true;this.audio.pause();this.capture();this.publish().catch(error=>console.error(error.message));});
+  if(this.visible&&!this.closed)this.timer=setInterval(()=>this.tick(),250);
+  window.addEventListener('pagehide',()=>{this.capture();this.closed=true;this.cancelLoad();this.publish().catch(error=>console.error(error.message));});
  }
  setupMediaSession(){
   if(!navigator.mediaSession)return;
@@ -110,25 +121,45 @@ class LocalAudioEngine {
   this.audio.removeAttribute('src');this.audio.load();
   return Error(this.error);
  }
+ cancelLoad(reason=loadError('טעינת השיעור בוטלה')){
+  this.capture();const controller=this.loadController;this.loadController=null;this.loaded=false;this.seekTarget=null;
+  controller?.abort(reason);root.OfflineSpeechAnalysis?.cancel?.();this.audio.pause();this.audio.muted=true;this.audio.removeAttribute?.('src');this.audio.load?.();
+ }
+ seekTo(positionMs){
+  const previous=this.seekTarget;this.seekTarget={id:this.current.id,positionMs};
+  try{this.audio.currentTime=positionMs/1000;}catch(error){this.seekTarget=previous;throw error;}
+ }
  async load(track,initial=0){
-  const url=await this.resolve(track);
-  this.audio.pause();this.capture();await this.publish();this.audio.muted=true;
-  this.current=track;this.loaded=false;this.error='';this.sleepExpired=false;
-  const start=this.positions[track.id]?.positionMs??P.position(initial);
-  await new Promise((resolve,reject)=>{
-   const clean=()=>{clearTimeout(timer);this.audio.removeEventListener('loadedmetadata',ready);this.audio.removeEventListener('error',failed);};
-   const ready=()=>{clean();if(!this.allowedDuration()){reject(this.blockShortAudio());return;}resolve();};
-   const failed=()=>{clean();reject(Error(this.audio.error?.code===4?'פורמט השמע אינו נתמך בנגן של אוצריא. נסו קובץ MP3 או WAV.':'לא ניתן לקרוא את השיעור. בדקו שהקובץ קיים ושהגישה אליו מאושרת.'));};
-   const timer=setTimeout(()=>{clean();reject(Error('טעינת השיעור ארכה זמן רב מדי'));},15000);
-   this.audio.addEventListener('loadedmetadata',ready,{once:true});this.audio.addEventListener('error',failed,{once:true});
-   this.audio.src=url;this.audio.load();
-  });
-  if(!root.OfflineSpeechAnalysis)throw Error('רכיב בדיקת השמע חסר');
-  try{await root.OfflineSpeechAnalysis.analyze(url,{duration:this.audio.duration});}catch(error){this.audio.pause();this.loaded=false;this.audio.muted=true;this.audio.removeAttribute('src');this.audio.load();throw error;}
-  this.audio.playbackRate=this.speed;this.audio.volume=this.volume;
-  this.audio.currentTime=Math.min(start/1000,Number.isFinite(this.audio.duration)?this.audio.duration:start/1000);
-  this.loaded=true;this.audio.muted=false;this.capture();this.lastAccess=Date.now();
-  if(navigator.mediaSession&&root.MediaMetadata)navigator.mediaSession.metadata=new MediaMetadata({title:track.title,artist:'נגן שיעורים — אוצריא'});
+  this.cancelLoad();const controller=new AbortController();this.loadController=controller;
+  const deadline=performance.now()+5000;
+  const timer=setTimeout(()=>controller.abort(loadError('טעינת השיעור חרגה מחמש שניות. אפשר לנסות שוב.','TimeoutError')),5000);
+  const ensure=()=>{if(performance.now()>=deadline&&!controller.signal.aborted)controller.abort(loadError('טעינת השיעור חרגה מחמש שניות. אפשר לנסות שוב.','TimeoutError'));if(controller.signal.aborted)throw controller.signal.reason||loadError('טעינת השיעור בוטלה');if(this.closed||!this.visible)throw loadError('טעינת השיעור בוטלה');};
+  try{
+   ensure();const url=await waitFor(this.resolve(track),controller.signal);ensure();await waitFor(this.publish(),controller.signal);ensure();
+   this.current=track;this.error='';this.sleepExpired=false;
+   const start=this.positions[track.id]?.positionMs??P.position(initial);
+   await new Promise((resolve,reject)=>{
+    const clean=()=>{this.audio.removeEventListener('loadedmetadata',ready);this.audio.removeEventListener('error',failed);controller.signal.removeEventListener('abort',aborted);};
+    const ready=()=>{if(this.audio.readyState<1)return;clean();if(!this.allowedDuration()){reject(this.blockShortAudio());return;}resolve();};
+    const failed=()=>{clean();reject(Error(this.audio.error?.code===4?'פורמט השמע אינו נתמך בנגן של אוצריא. נסו קובץ MP3 או WAV.':'לא ניתן לקרוא את השיעור. בדקו שהקובץ קיים ושהגישה אליו מאושרת.'));};
+    const aborted=()=>{clean();reject(controller.signal.reason||loadError('טעינת השיעור בוטלה'));};
+    this.audio.addEventListener('loadedmetadata',ready);this.audio.addEventListener('error',failed);controller.signal.addEventListener('abort',aborted,{once:true});
+    this.audio.src=url;this.audio.load();if(controller.signal.aborted)aborted();
+   });
+   ensure();if(!root.OfflineSpeechAnalysis)throw Error('רכיב בדיקת השמע חסר');
+   const result=await waitFor(root.OfflineSpeechAnalysis.analyze(url,{duration:this.audio.duration,signal:controller.signal}),controller.signal);ensure();
+   if(result?.decision!=='provisional_speech')throw Error('ההקלטה לא אושרה בבדיקת השמע');
+   const {permissions=[]}=await waitFor(P.rpc('app.getGrantedPermissions'),controller.signal);ensure();
+   if(!permissions.includes('fs.user_files.read'))throw Error('הרשאת קריאת הקבצים בוטלה');
+   if(!this.allowedDuration())throw this.blockShortAudio();
+   if(Number.isFinite(result.duration)&&Math.abs(result.duration-this.audio.duration)>Math.max(2,this.audio.duration*.02))throw Error('משך ההקלטה השתנה בזמן הבדיקה');
+   this.audio.playbackRate=this.speed;this.audio.volume=this.volume;this.seekTo(Math.round(Math.min(start/1000,this.audio.duration)*1000));ensure();
+   this.loaded=true;this.audio.muted=false;this.capture();this.lastAccess=Date.now();
+   if(navigator.mediaSession&&root.MediaMetadata)navigator.mediaSession.metadata=new MediaMetadata({title:track.title,artist:'נגן שיעורים — אוצריא'});
+  }catch(error){
+   if(this.loadController===controller){this.loaded=false;this.seekTarget=null;this.audio.pause();this.audio.muted=true;this.audio.removeAttribute('src');this.audio.load();}
+   throw error;
+  }finally{clearTimeout(timer);if(this.loadController===controller)this.loadController=null;}
  }
  play(){
   if(!this.ready||!this.visible||this.closed)return Promise.reject(Error('פתחו את נגן השיעורים כדי להפעיל את השמע'));
@@ -153,7 +184,7 @@ class LocalAudioEngine {
     const queue=args.queue.map(P.source);
     if(new Set(queue.map(t=>t.id)).size!==queue.length)throw Error('מזהים כפולים בתור');
     const index=queue.findIndex(t=>t.id===track.id);if(index<0){if(queue.length>=2000)throw Error('תור ההשמעה מלא');queue.push(track);}else queue[index]=track;
-    P.position(args.positionMs??0);await this.resolve(track);
+    P.position(args.positionMs??0);
     await this.load(track,args.positionMs??0);this.queue=queue;
     await P.rpc('storage.set',{key:K.queue,value:queue});break;
    }
@@ -163,13 +194,13 @@ class LocalAudioEngine {
    case 'clear':this.audio.pause();this.capture();this.current=null;this.loaded=false;this.queue=[];this.sleepUntil=0;this.audio.removeAttribute('src');this.audio.load();await P.rpc('storage.set',{key:K.queue,value:[]});break;
    case 'reset_progress':{
     if(typeof args.id!=='string'||!Object.hasOwn(this.positions,args.id))throw Error('לא נמצא מיקום שמור לשיעור');
-    if(this.current?.id===args.id){this.audio.pause();if(this.loaded)this.audio.currentTime=0;}
+    if(this.current?.id===args.id){this.audio.pause();if(this.loaded)this.seekTo(0);}
     this.positions[args.id]={...this.positions[args.id],positionMs:0,completed:false,lastListenedAt:Date.now()};
     break;
    }
    case 'seek':{
     const value=P.position(args.positionMs);if(!this.current)throw Error('יש לבחור שיעור');if(!this.loaded)await this.load(this.current);
-    this.audio.currentTime=Math.min(value/1000,Number.isFinite(this.audio.duration)?this.audio.duration:value/1000);this.capture();break;
+    this.seekTo(Math.min(value,Math.round(this.audio.duration*1000)));this.capture();break;
    }
    case 'skip':if(![-1,1].includes(args.direction))throw Error('כיוון דילוג לא תקין');await this.execute({op:'seek',positionMs:Math.max(0,this.snapshot().positionMs+args.direction*this.skipSeconds*1000)});break;
    case 'speed':if(!P.rates.includes(args.value))throw Error('מהירות לא תקינה');this.speed=args.value;this.audio.playbackRate=this.speed;break;
@@ -190,7 +221,7 @@ class LocalAudioEngine {
    await this.expireSleep();
    if(Date.now()-(this.lastPermissionCheck||0)>5000){
     this.lastPermissionCheck=Date.now();const {permissions=[]}=await P.rpc('app.getGrantedPermissions');
-    if(!permissions.includes('fs.user_files.read')){this.audio.pause();this.capture();this.ready=false;clearInterval(this.timer);this.timer=null;this.error='הרשאת קריאת הקבצים בוטלה';await this.publish();return;}
+    if(!permissions.includes('fs.user_files.read')){this.cancelLoad();this.ready=false;clearInterval(this.timer);this.timer=null;this.error='הרשאת קריאת הקבצים בוטלה';await this.publish();return;}
    }
    if(this.current&&this.loaded&&Date.now()-this.lastAccess>5000){this.lastAccess=Date.now();try{await this.resolve(this.current);}catch(error){this.audio.pause();this.error='הגישה לקובץ בוטלה: '+error.message;}}
    if(Date.now()-(this.lastPublished||0)>=(this.audio.paused?2000:500)){await this.publish();this.lastPublished=Date.now();}
@@ -199,11 +230,11 @@ class LocalAudioEngine {
  }
  resume(){
   this.visible=true;if(this.ready&&!this.closed&&!this.timer)this.timer=setInterval(()=>this.tick(),250);
-  return this.serial(()=>this.publish());
+  return this.restored?this.serial(()=>this.publish()):Promise.resolve(this.snapshot());
  }
  suspend(){
-  this.visible=false;this.audio.pause();this.capture();clearInterval(this.timer);this.timer=null;
-  return this.serial(()=>this.publish());
+  this.visible=false;if(this.loadController)this.cancelLoad();else{this.audio.pause();this.capture();}clearInterval(this.timer);this.timer=null;
+  return this.restored?this.serial(()=>this.publish()):Promise.resolve(this.snapshot());
  }
 }
 root.LocalAudioEngine=LocalAudioEngine;

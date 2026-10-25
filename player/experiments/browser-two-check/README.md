@@ -67,3 +67,7 @@ python player/experiments/browser-two-check/evaluate_files.py --assets /path/to/
 ```
 
 Actual outputs are in `results/`. Source helper modules live in `player/plugin` so the browser experiment and development player exercise the same implementation.
+
+## Deep review follow-up
+
+[Code review and fixes](CODE_REVIEW.md) records reproduced lifecycle, seek, timeout, permission, parser and stereo issues, plus the final regression results. The current picker now advertises MP3/WAV only; existing other-format library entries are preserved. Old validation counts and benchmark files above describe the earlier integration checkpoint; review results are in `results/review/`.
