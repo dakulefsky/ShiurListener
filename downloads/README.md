@@ -9,3 +9,7 @@ The plugin-only player must remain visible. The companion ZIP is the older indep
 Both plugin IDs can remain installed. Their libraries and positions are separate. `shiur-player-1.3.0.otzplugin` is kept here as an older build; use 1.4.0 for the update.
 
 These builds are experimental. Browser/service/package checks pass; actual Otzaria desktop integration and the companion Windows executable still need real-device verification. Physical audio output is unverified here. See the installation guide for the exact scope of the tests.
+
+## Sidekick 1.0.0 facelift
+
+Use **sidekick-windows-x64-1.0.0.zip** for the updated companion, with **Sidekick.exe** and **sidekick-1.0.0.otzplugin** inside. Close the old companion first, extract the whole ZIP, and install the plugin as an update to preserve its data. The old companion ZIP is retained as an older build. [Setup and testing](../sidekick/README.md).

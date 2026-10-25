@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "org.shiurplayer.companion",
+  "name": "Sidekick",
+  "version": "1.0.0",
+  "description": "Sidekick — נגן מלווה לשיעורים, עם חיבור פשוט, נגן צף ושמירת מיקום.",
+  "entrypoint": "index.html",
+  "minAppVersion": "0.9.98",
+  "sdkVersion": "1.x",
+  "permissions": [
+    "fs.user_files.read",
+    "network.localhost"
+  ],
+  "network": {
+    "enabled": true,
+    "allowlist": [
+      "http://127.0.0.1:18473"
+    ]
+  },
+  "contributes": {
+    "toolTab": {
+      "title": "Sidekick",
+      "order": 201,
+      "defaultPinned": true,
+      "iconName": "headphones_24_regular"
+    }
+  }
+}

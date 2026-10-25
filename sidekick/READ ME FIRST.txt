@@ -1,0 +1,48 @@
+SIDEKICK 1.0.0 — WINDOWS x64
+
+This is Sidekick, the separate companion application. It includes its own Otzaria
+plugin, Python and a reduced VLC runtime. No separate runtime installation needed.
+
+UPDATING
+Close the old companion window first. Extract the ENTIRE new ZIP into a new
+folder. Do not delete Sidekick's data folder or uninstall its Otzaria plugin.
+Saved positions and folders are reused. Your Inside player is separate.
+
+1. Open Sidekick.exe in the extracted folder.
+2. Choose your recordings folder. Keep Sidekick's console window open.
+3. Copy the pairing code shown there.
+4. In Otzaria, install the included sidekick-1.0.0.otzplugin as an update.
+5. Open the Sidekick tab and approve its local connection permission if asked.
+6. Paste the code into the connection card and press חיבור.
+7. Choose a recording. The connection card collapses after a successful connection.
+
+The large Play/Pause button, skip buttons, speed and volume are together at the
+top. Timer, automatic next recording and bookmarks are in an expandable section.
+The folder library is underneath. No organizational folders are pre-created.
+Use הגדרות חיבור in the header to show connection settings again.
+
+A Windows floating bar has larger, rounded controls. Drag its title bar to move
+it. Closing the bar hides it; playback continues. Show/hide it from the player
+or with Ctrl+Alt+Shift+F. Ctrl+Alt+Shift+P toggles playback from other programs.
+Ctrl+Alt+Shift+Left/Right skips. Conflicts are reported in the shortcut help.
+
+Closing Otzaria leaves Sidekick playing. Close Sidekick's console window to stop
+it. Each restart creates a new pairing code. Remembered pairing is optional.
+Progress remains at %LOCALAPPDATA%\ShiurPlayerCompanion\state.json.
+
+WINDOWS TESTING STATUS
+This is an unsigned experimental Windows build. UI/connection/playback-command
+and persistence tests pass with a simulated decoder. Floating-bar commands and
+window flags pass with mocked Windows APIs. The ZIP and x64 launcher are checked.
+The Windows application and its appearance/speaker output have not been tested
+on a Windows desktop here. The audio backend is unchanged from the earlier
+companion. Its earlier real VLC checks ran on Linux with dummy audio output.
+
+Keep the runtime folders beside Sidekick.exe. If the recordings folder picker
+fails, run: Sidekick.exe --folder "C:\Your\Shiurim"
+If the port is busy, close any other companion instance before starting it.
+
+The service accepts local recording IDs only and listens at 127.0.0.1:18473.
+There is no browser viewer or URL-opening control. This is not a device lockdown
+tool: the bundled Python interpreter is general purpose. Runtime licenses and
+source URLs are in THIRD-PARTY-NOTICES.txt and the runtime folders.

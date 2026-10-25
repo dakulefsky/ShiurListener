@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 player/*.otzplugin
 player/*-preview.png
+sidekick/*.otzplugin
+sidekick/*.zip
+sidekick/*-preview.png
+sidekick/build/windows/*.exe

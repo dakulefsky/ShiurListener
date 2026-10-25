@@ -5,7 +5,7 @@ A Hebrew local-shiur player for Otzaria 0.9.98 or newer.
 ## Download
 
 - **[Plugin-only player 1.4.0](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-1.4.0.otzplugin)** — redesigned controls, recovery actions, saved positions and a bundled sound check. Install directly in Otzaria; no companion is required.
-- [Windows companion ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-companion-windows-x64.zip) — the earlier experimental comparison build, including its runtime and a separately named plugin.
+- [Sidekick 1.0.0 — Windows companion ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/sidekick-windows-x64-1.0.0.zip) — redesigned connection and playback controls, a refreshed floating bar, bundled runtimes and its Otzaria plugin.
 - [Plugin source and developer documents](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-source-1.4.0.zip).
 - [Checksums](downloads/SHA256SUMS.txt).
 
@@ -30,11 +30,17 @@ It includes a forwardable request, inspected host code paths, a proposed native 
 
 [Plugin source, installation details and verification](player/README.md). No Otzaria native source is modified by the 1.4.0 update.
 
-## Companion comparison
+## Sidekick — the companion player
 
-Extract the entire companion ZIP, run **Shiur Player.exe**, choose a recordings folder and copy its pairing code. Install the included comparison plugin, approve its local connection permission, open **נגן מלווה**, choose **נגן מלווה · האזנה ברקע**, and connect using that code.
+[Download Sidekick 1.0.0](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/sidekick-windows-x64-1.0.0.zip). Close the older companion, extract the whole new ZIP, run **Sidekick.exe**, choose a recordings folder and copy its pairing code. Install the included **sidekick-1.0.0.otzplugin** in Otzaria as an update, then open the **Sidekick** tab and connect using that code.
 
-The companion plays independently of the visible Otzaria tab. It includes a Windows floating bar and global shortcuts. Both plugins can remain installed, with separate libraries and positions. Closing Otzaria leaves the companion playing; close the companion window to stop it.
+The new connection card opens first and collapses after connecting. Playback controls are grouped at the top; timer and bookmarks are under a disclosure, and the recording library is below. The floating bar has larger rounded controls and Sidekick branding. The interface follows Otzaria's colors and font in light and dark modes.
+
+![Sidekick](previews/sidekick-1.0.0.png)
+
+[Sidekick setup and source](sidekick/README.md) · [Dark preview](previews/sidekick-dark-1.0.0.png) · [Source ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/sidekick-source-1.0.0.zip)
+
+Sidekick plays independently of the visible Otzaria tab. Both plugins can remain installed, with separate libraries and positions. Existing Sidekick data is reused; do not uninstall or clear data before updating. Closing Otzaria leaves Sidekick playing; close its console window to stop it. The Windows executable and native floating-bar appearance remain unverified on a real Windows desktop.
 
 ## Verification and limitations
 

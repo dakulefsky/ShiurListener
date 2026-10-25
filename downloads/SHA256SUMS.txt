@@ -2,3 +2,6 @@
 27ceedf6c8c89c476600a1db4a41a38556077d97d1c5b895bbc5bac1395ea019  shiur-player-1.3.0.otzplugin
 a7106aed55304d69c9bbb7395fa0399988ce11dda7eaad80a625b4f4994d7446  shiur-player-1.4.0.otzplugin
 38bd6211be76f1beea4325b29226bc61d4b6d19d4cf2c24e95b5495dbd7de00d  shiur-player-source-1.4.0.zip
+5a43f7bfd4999c434d0202bb042035eff0ee1ab97bc9902dd4f755f0da334b31  sidekick-windows-x64-1.0.0.zip
+8ce98a7bc0d8df4eac5364f22e3a6bf28b0fe272e25b99d016bd8233deca412b  sidekick-1.0.0.otzplugin
+9fd9ee885402a15a00d82ce10560bcdb8e4670471c03b3a260be75e33a771560  sidekick-source-1.0.0.zip
