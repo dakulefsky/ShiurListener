@@ -1,52 +1,28 @@
-"""Real native window callbacks exercised through mock Win32 APIs."""
-import ctypes,pathlib,sys,unittest,unittest.mock
+"""Exercise the real desktop toolkit, including persistence across a new window."""
+import os,pathlib,sys,unittest
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/'app'))
 from window import PlayerWindow
+from engine import Player
+from controller import LibraryController
 import test_player
-class Function:
- def __init__(self,fn):self.fn=fn
- def __call__(self,*args):return self.fn(*args)
+@unittest.skipUnless(os.environ.get('DISPLAY') or sys.platform=='win32','Needs a desktop display')
 class Tests(unittest.TestCase):
- def test_play_bookmark_collection_and_close(self):
-  from ctypes import wintypes as w
-  fixture=test_player.Tests();fixture.setUp();player=fixture.player;library=fixture.library
-  callbacks={};handles={};next_handle=10;shown=[];destroyed=[];captions=[]
-  messages=[(0x111,203),(0x111,230),(0x111,220),(0x111,223),(0x10,0)]
-  def register(pointer):callbacks['proc']=pointer._obj.proc;return 1
-  def create(ex,cls,title,style,x,y,width,height,parent,ident,*_):
-   nonlocal next_handle
-   next_handle+=1;handles[next_handle]={'id':ident,'text':title,'items':[],'selected':-1,'position':0};return next_handle
-  def send(hwnd,msg,wp,lp):
-   control=handles.get(hwnd,{})
-   if msg in (0x014B,0x0184):control['items']=[];control['selected']=-1
-   elif msg in (0x0143,0x0180):control['items'].append(ctypes.cast(lp,ctypes.c_wchar_p).value)
-   elif msg in (0x014E,0x0186):control['selected']=wp
-   elif msg in (0x0147,0x0188):return control.get('selected',-1)
-   elif msg==0x0405:control['position']=lp
-   elif msg==0x0400:return control.get('position',0)
-   return 1
-  def getmessage(pointer,*_):
-   player.tick()
-   if not messages:return 0
-   msg,wp=messages.pop(0)
-   if msg==0x10:fixture.backend.position=41.123
-   value=ctypes.cast(pointer,ctypes.POINTER(w.MSG)).contents;value.hWnd=11;value.message=msg;value.wParam=wp;value.lParam=0;return 1
-  def dispatch(pointer):
-   value=ctypes.cast(pointer,ctypes.POINTER(w.MSG)).contents;return callbacks['proc'](value.hWnd,value.message,value.wParam,value.lParam)
-  def settext(hwnd,value):handles[hwnd]['text']=value;captions.append(value);return 1
-  def field(hwnd):
-   ident=handles[hwnd]['id'];return 'Review' if ident==233 else 'My series' if ident==226 else handles[hwnd]['text']
-  def gettext(hwnd,buffer,size):buffer.value=field(hwnd)[:size-1];return len(buffer.value)
-  def destroy(hwnd):destroyed.append(hwnd);callbacks['proc'](hwnd,2,0,0);return 1
-  class Library:
-   def __init__(self,mapping):self.mapping=mapping
-   def __getattr__(self,name):fn=Function(self.mapping.get(name,lambda *_:1));setattr(self,name,fn);return fn
-  functions={'RegisterClassW':register,'CreateWindowExW':create,'GetMessageW':getmessage,'DispatchMessageW':dispatch,'SendMessageW':send,'SetWindowTextW':settext,'GetWindowTextLengthW':lambda hwnd:len(field(hwnd)),'GetWindowTextW':gettext,'DestroyWindow':destroy,'ShowWindow':lambda hwnd,mode:shown.append(mode) or 1,'GetSystemMetrics':lambda i:1280 if i==0 else 800,'IsDialogMessageW':lambda *_:0,'MessageBoxW':lambda *_:6}
-  libs={'user32':Library(functions),'gdi32':Library({}),'kernel32':Library({}),'comctl32':Library({})}
+ def test_multiple_resume_rows_and_reopen(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
   try:
-   with unittest.mock.patch.object(ctypes,'WinDLL',side_effect=lambda name,**_:libs[name],create=True),unittest.mock.patch.object(ctypes,'WINFUNCTYPE',ctypes.CFUNCTYPE,create=True):PlayerWindow(player,library,lambda _:None).run()
-   self.assertEqual(shown,[5]);self.assertEqual(destroyed,[11]);self.assertIn('Shiur Player',captions);self.assertEqual(player.error,'')
-   self.assertEqual(player.saved['language'],'en');self.assertEqual(len(library.bookmarks()),1);self.assertEqual(len(player.saved['folders'][0]['trackIds']),1)
-   self.assertEqual(player.saved['tracks'][player.saved['currentId']]['position'],41.123)
-  finally:fixture.tearDown()
+   (fixture.audio/'03.wav').write_bytes(b'fake');fixture.player.scan();ids=[t['id'] for t in fixture.player.tracks]
+   for ident,position in zip(ids,[65.432,23.789,119.9]):
+    fixture.library.selected=ident;fixture.library.play(force=True);fixture.player.tick();fixture.backend.position=position;fixture.player.command({'op':'pause'})
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.update()
+   self.assertEqual([window.tree.item(i,'values')[1] for i in ids],['1:05','0:23','1:59'])
+   window.navigate('continue');window.root.update();self.assertEqual(list(window.tree.get_children()),ids[::-1])
+   window.tree.selection_set(ids[0]);window.root.update();window.resume();fixture.player.tick();self.assertEqual(fixture.backend.position,65.432)
+   window.query.set('03');window.root.update();self.assertEqual(list(window.tree.get_children()),[ids[2]])
+   window.toggle();self.assertEqual(fixture.backend.status,'paused');window.close();window=None
+   backend=test_player.Audio();player=Player(None,fixture.root/'data',backend);library=LibraryController(player);window=PlayerWindow(player,library,lambda _:None);window.root.update()
+   for ident,position in zip(ids,[65.432,23.789,119.9]):
+    window.tree.selection_set(ident);window.root.update();window.resume();player.tick();self.assertEqual(backend.position,position)
+  finally:
+   if window:window.close()
+   fixture.tearDown()
 if __name__=='__main__':unittest.main(verbosity=2)

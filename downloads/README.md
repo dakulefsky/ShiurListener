@@ -22,6 +22,10 @@ Use **inside-1.4.1.otzplugin**. It clearly shows Inside 1.4.1 in its heading and
 
 Use **sidekick-windows-x64-1.1.0.zip**. It includes a console-free GUI launcher and **sidekick-1.1.0.otzplugin**. Close the old companion, extract the whole ZIP, choose the actual recordings folder in the normal app window, and connect. Both interfaces support Hebrew/English. Rescan discovers newly added files. The code form and setup window hide after connection. Exit player stops the service. Update both parts from the same ZIP; keep existing data. [Full instructions](../sidekick/README.md).
 
-## Standalone Windows app 0.1.0 — current direction
+## Standalone Windows app 0.1.0 — previous build
 
 Download **shiur-player-windows-x64-0.1.0.zip** for the English-only standalone desktop player. Extract the complete ZIP and open **Shiur Player.exe**. Choose a recordings folder once; after a restart, open the app and press Play. No Otzaria, plugin, pairing code or connection service is needed. A separate standalone profile leaves earlier Inside/Sidekick data untouched. The native Windows interface remains unverified on a real Windows desktop; see [the guide](../standalone/README.md).
+
+## Standalone Windows app 0.2.0 — redesigned player
+
+Download **shiur-player-windows-x64-0.2.0.zip**. Extract everything and run **Shiur Player.exe**. The new library shows a separate resume time for every shiur, with recent-first Continue listening and a dedicated Now Playing panel. It reuses standalone 0.1.0 positions. No separate runtime installation. [Instructions](../standalone/README.md). Windows desktop execution remains unverified.

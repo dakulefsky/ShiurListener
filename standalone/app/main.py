@@ -1,6 +1,10 @@
 """Standalone local shiur player entrypoint. No network service or pairing."""
 import argparse,ctypes,os,pathlib,sys,threading
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent))
+runtime=pathlib.Path(__file__).resolve().parent/'runtime'
+if (runtime/'tcl/tcl8.6').is_dir():
+ os.environ['TCL_LIBRARY']=str(runtime/'tcl/tcl8.6')
+ os.environ['TK_LIBRARY']=str(runtime/'tcl/tk8.6')
 from engine import Player,VLC
 from controller import LibraryController
 from floating_bar import FloatingBar
@@ -15,6 +19,7 @@ def main():
  try:
   player=Player(args.folder,data,backend);controller=LibraryController(player);player.saved['language']='en'
   player.saved.setdefault('floatingVisible',False)
+  player.saved.setdefault('floatingTheme',{'primary':'#245C49','onPrimary':'#FFFFFF','surface':'#F5F3ED','onSurface':'#20352F','surfaceContainer':'#E7EEE7','fontFamily':'Rubik'})
   bar=FloatingBar(player);player.floating_bar=bar
   def shortcuts(enabled):
    nonlocal keys

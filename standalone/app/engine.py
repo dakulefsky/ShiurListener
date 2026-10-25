@@ -74,15 +74,23 @@ class Player:
             self.persist()
             return self.snapshot()
     def persist(self):
-        temporary=self.file.with_suffix('.tmp');temporary.write_text(json.dumps(self.saved,ensure_ascii=False),'utf-8');os.replace(temporary,self.file)
+        temporary=self.file.with_suffix('.tmp')
+        with temporary.open('w',encoding='utf-8') as stream:
+            json.dump(self.saved,stream,ensure_ascii=False);stream.flush();os.fsync(stream.fileno())
+        os.replace(temporary,self.file)
     def capture(self):
         raw=self.backend.state() if self.active else {'position':0,'duration':0,'status':'stopped'}
         if raw['status']=='ended' and raw['duration']:raw['position']=raw['duration']
         if self.active and self.pending is None and raw['status'] not in ('loading','stopped','error'):
-            self.saved['tracks'][self.active]={'position':raw['duration'] if raw['status']=='ended' and raw['duration'] else raw['position'],'duration':raw['duration']}
+            previous=self.saved['tracks'].get(self.active,{})
+            position=raw['duration'] if raw['status']=='ended' and raw['duration'] else raw['position']
+            completed=raw['status']=='ended'
+            changed=position!=previous.get('position') or completed!=previous.get('completed',False)
+            self.saved['tracks'][self.active]={**previous,'position':position,'duration':raw['duration'],'completed':completed,'lastListenedAt':time.time_ns() if changed else previous.get('lastListenedAt',0)}
         return raw
     def snapshot(self):
         raw=self.capture();ident=self.saved['currentId'];progress=self.saved['tracks'].get(ident,{})
+        if self.pending:raw={**raw,'position':self.pending['position'],'status':'loading'}
         if not self.active:raw={'position':progress.get('position',0),'duration':progress.get('duration',0),'status':'paused'}
         return {**raw,'currentId':ident,'speed':self.saved['speed'],'volume':self.saved['volume'],'autoNext':self.saved['autoNext'],'queue':self.saved['queue'],'error':self.error,'skipSeconds':self.saved['skipSeconds'],'folders':self.saved['folders'],'hotkeys':self.hotkey_status,'sleepMinutes':self.sleep_minutes,'sleepRemaining':max(0,int(self.sleep_deadline-time.monotonic()+.999)) if self.sleep_deadline else 0,'floatingAvailable':bool(self.floating_bar and self.floating_bar.hwnd),'floatingStatus':self.floating_bar.status if self.floating_bar else '', 'loaded':self.active is not None,'libraryCount':len(self.tracks),'folderName':self.root.name if self.root else '', 'hasFolder':self.root is not None,'libraryRevision':self.library_revision,'language':self.saved.get('language','en')}
     def library(self):return [{**t,**self.saved['tracks'].get(t['id'],{})} for t in self.tracks]

@@ -21,11 +21,12 @@ func fail(message string) {
 	os.Exit(1)
 }
 func main() {
-	className := ptr("ShiurPlayerStandaloneWindow")
-	existing, _, _ := user.NewProc("FindWindowW").Call(uintptr(unsafe.Pointer(className)), 0)
+	className := ptr("Shiur Player — Your listening library")
+	existing, _, _ := user.NewProc("FindWindowW").Call(0, uintptr(unsafe.Pointer(className)))
 	runtime.KeepAlive(className)
 	if existing != 0 {
-		user.NewProc("PostMessageW").Call(existing, 0x800B, 0, 0)
+		user.NewProc("ShowWindow").Call(existing, 9)
+		user.NewProc("SetForegroundWindow").Call(existing)
 		return
 	}
 	executable, err := os.Executable()
@@ -35,7 +36,7 @@ func main() {
 	directory := filepath.Dir(executable)
 	python := filepath.Join(directory, "runtime", "python", "pythonw.exe")
 	script := filepath.Join(directory, "main.py")
-	for _, file := range []string{python, script, filepath.Join(directory, "window.py"), filepath.Join(directory, "engine.py"), filepath.Join(directory, "controller.py"), filepath.Join(directory, "folder_picker.py"), filepath.Join(directory, "floating_bar.py"), filepath.Join(directory, "hotkeys.py"), filepath.Join(directory, "runtime", "vlc", "libvlc.dll")} {
+	for _, file := range []string{python, script, filepath.Join(directory, "window.py"), filepath.Join(directory, "engine.py"), filepath.Join(directory, "controller.py"), filepath.Join(directory, "folder_picker.py"), filepath.Join(directory, "floating_bar.py"), filepath.Join(directory, "hotkeys.py"), filepath.Join(directory, "runtime", "vlc", "libvlc.dll"), filepath.Join(directory, "runtime", "python", "_tkinter.pyd"), filepath.Join(directory, "runtime", "tcl", "tk8.6", "tk.tcl")} {
 		if _, err := os.Stat(file); err != nil {
 			fail("Extract the entire ZIP first. Missing file: " + file)
 		}

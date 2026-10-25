@@ -28,6 +28,13 @@ class Tests(unittest.TestCase):
   self.library.selected=ids[1];self.library.play(force=True);self.player.tick();self.backend.position=23.789;self.player.command({'op':'pause'})
   self.library.selected=ids[0];self.library.play();self.player.tick();self.assertEqual(self.backend.position,65.432)
   self.assertEqual(self.player.saved['tracks'][ids[1]]['position'],23.789)
+ def test_finished_tracks_and_near_end_are_distinguished(self):
+  ids=[t['id'] for t in self.player.tracks]
+  self.library.selected=ids[0];self.library.play();self.player.tick();self.backend.position=119.9;self.player.command({'op':'pause'})
+  self.library.selected=ids[1];self.library.play(force=True);self.player.tick();self.backend.status='ended';self.player.tick()
+  self.library.view='continue';self.assertEqual([t['id'] for t in self.library.tracks()],[ids[0]])
+  self.library.selected=ids[1];self.library.reset();self.assertFalse(self.player.saved['tracks'][ids[1]]['completed'])
+  self.assertEqual(self.player.saved['tracks'][ids[0]]['position'],119.9)
  def test_collections_are_user_created_and_do_not_copy_audio(self):
   self.assertEqual(self.player.saved['folders'],[]);self.library.selected=self.player.tracks[0]['id']
   self.library.collection('folder_create','My series');folder=self.library.view;self.library.add_to(folder)

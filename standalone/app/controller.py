@@ -13,7 +13,7 @@ class LibraryController:
   with self.player.lock:
    values=self.player.library();folder=next((f for f in self.player.saved['folders'] if f['id']==self.view),None)
    if folder:values=[t for t in values if t['id'] in folder['trackIds']]
-   elif self.view=='continue':values=[t for t in values if t.get('position',0)>0 and (not t.get('duration') or t['position']<t['duration']-.2)]
+   elif self.view=='continue':values=sorted([t for t in values if t.get('position',0)>0 and not t.get('completed',False)],key=lambda t:t.get('lastListenedAt',0),reverse=True)
    q=self.query.casefold();return [t for t in values if q in (t['name']+' '+t['source']).casefold()]
  def play(self,force=False):
   with self.player.lock:
@@ -47,7 +47,7 @@ class LibraryController:
     if self.player.pending:self.player.pending['position']=0;self.player.pending['autoplay']=False
     else:self.player.backend.seek(0)
    previous=self.player.saved['tracks'].get(ident,{})
-   self.player.saved['tracks'][ident]={**previous,'position':0};self.player.persist();self.revision+=1
+   self.player.saved['tracks'][ident]={**previous,'position':0,'completed':False};self.player.persist();self.revision+=1
  def bookmarks(self):return self.player.saved['bookmarks'].get(self.player.saved['currentId'],[])
  def mark(self,name):
   with self.player.lock:
