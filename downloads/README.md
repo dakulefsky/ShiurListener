@@ -1,6 +1,10 @@
 # Shiur Player downloads
 
-## Current standalone: 0.7.0
+## Current standalone: 0.8.0
+
+[Download setup](shiur-player-setup-0.8.0.exe) or use Check for updates. Light styling with rounded controls and corrected half-speed mini-player cycle, including migration of existing settings. Saved places carry over. [Screenshot](../previews/shiur-player-0.8.0.png).
+
+## Standalone: 0.7.0
 
 Download **[shiur-player-setup-0.7.0.exe](shiur-player-setup-0.7.0.exe)** or click **Check for updates** in standalone 0.6.0. No extraction. New full-width library, permanent playback dock, Favorites, queue editing, section repeat, sleep presets, profile backups and clickable mini-player progress. Existing standalone positions carry over. [Full guide](../standalone/README.md). Earlier variants below are retained for reference. Actual Windows setup/rendering and speaker output remain unverified here.
 

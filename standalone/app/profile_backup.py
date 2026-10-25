@@ -51,7 +51,7 @@ def _validate(payload):
                'speed', 'volume', 'skipSeconds', 'language', 'libraryRoot',
                'librarySort', 'librarySortDescending', 'floatingVisible',
                'floatingPosition', 'floatingSize', 'windowSize', 'floatingTheme',
-               'miniOnMinimize', 'globalShortcuts', 'miniSpeedMiddle', 'miniSpeedCycleIndex'}
+               'halfSpeedCycleMigration', 'miniOnMinimize', 'globalShortcuts', 'miniSpeedMiddle', 'miniSpeedCycleIndex'}
     _require(not (set(state) - allowed), 'this profile contains settings from a newer player.')
     tracks = state.get('tracks')
     _require(isinstance(tracks, dict) and len(tracks) <= 100000, 'recording positions are missing.')

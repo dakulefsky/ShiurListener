@@ -143,7 +143,7 @@ class Tests(unittest.TestCase):
     self.assertFalse(move.called);self.assertFalse(coords.called)
     self.assertFalse(any(call.kwargs for call in item.call_args_list),item.call_args_list)
    self.assertEqual(window.seek.find_all(),items)
-   fixture.player.command({'op':'speed_cycle'});window.refresh();self.assertEqual(window.speed.get(),'1.5')
+   fixture.player.command({'op':'speed_cycle'});window.refresh();self.assertEqual(window.speed.get(),'0.5')
   finally:
    if window:window.close()
    fixture.tearDown()
