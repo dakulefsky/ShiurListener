@@ -129,7 +129,10 @@ class FloatingBar:
   collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE);hovered=False;hover_intent=HoverIntent();sizing=False;hover_origin=None;last_layout=None
   def apply_mode(mode_change=False):
    nonlocal hover_origin
-   if mode_change:setstyle(self.hwnd,-16,ctypes.c_int32(0x82000000 if collapsed else FRAMELESS_STYLE).value)
+   if mode_change:
+    # Replacing GWL_STYLE must retain WS_VISIBLE or Windows hides every child.
+    style=(0x82000000 if collapsed else FRAMELESS_STYLE)|(0x10000000 if visible else 0)
+    setstyle(self.hwnd,-16,ctypes.c_int32(style).value)
    size=(HOVER_SIZE if hovered else COLLAPSED_SIZE) if collapsed else expanded_size
    rect=w.RECT();getrect(self.hwnd,ctypes.byref(rect))
    # Keep the restored window on screen, even after dragging the pill to an edge.
