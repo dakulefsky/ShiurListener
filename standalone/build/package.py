@@ -22,7 +22,7 @@ def main():
      bundle.write(path,prefix+'runtime/tcl/'+path.relative_to(args.tk/'tcl').as_posix())
   bundle.writestr(prefix+'TK-RUNTIME-NOTICE.txt','Python Tk runtime: https://www.python.org/ftp/python/3.13.17/amd64/tcltk.msi\nSHA256: ae3e5f9dd998b36d14655cd3444d0af906c1849c60aee40994eeb1e460a3cabf\nTcl license: assets/TCL-LICENSE.txt\nTk license: runtime/tcl/tk8.6/license.terms\nTcl license: https://www.tcl-lang.org/software/tcltk/license.html\nPython license is included in runtime/python/LICENSE.txt.\n')
   for path in sorted((ROOT/'app').rglob('*')):
-   if path.is_file() and '__pycache__' not in path.parts:bundle.write(path,prefix+path.relative_to(ROOT/'app').as_posix())
+   if path.is_file() and '__pycache__' not in path.parts and path.relative_to(ROOT/'app').parts[0]!='runtime':bundle.write(path,prefix+path.relative_to(ROOT/'app').as_posix())
   bundle.write(ROOT/'build/Shiur Player.exe',prefix+'Shiur Player.exe')
   bundle.write(ROOT/'READ ME FIRST.txt',prefix+'READ ME FIRST.txt')
   info=json.loads(base.read('Sidekick/BUILD-INFO.json'))
@@ -34,7 +34,7 @@ def main():
   assert not any(name.endswith('.otzplugin') for name in bundle.namelist())
   assert not any(name.endswith(('/companion.py','/desktop.py')) for name in bundle.namelist())
   for path in (ROOT/'app').rglob('*'):
-   if path.is_file() and '__pycache__' not in path.parts:assert bundle.read(prefix+path.relative_to(ROOT/'app').as_posix())==path.read_bytes()
+   if path.is_file() and '__pycache__' not in path.parts and path.relative_to(ROOT/'app').parts[0]!='runtime':assert bundle.read(prefix+path.relative_to(ROOT/'app').as_posix())==path.read_bytes()
   for name in base.namelist():
    relative=name.split('/',1)[1]
    if relative.startswith('runtime/'):assert bundle.read(prefix+relative)==base.read(name)

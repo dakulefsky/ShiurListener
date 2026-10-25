@@ -26,6 +26,9 @@ jobs:
       - name: Unit and desktop tests (Linux)
         if: runner.os == 'Linux'
         run: xvfb-run -a python -m unittest discover -s standalone/tests -v
+      - name: Native Windows mini-player mouse input
+        if: runner.os == 'Windows'
+        run: python standalone/tests/run_suite.py test_windows_native.py
       - name: Unit and desktop tests (Windows, including native mini-player mouse input)
         if: runner.os == 'Windows'
         run: python standalone/tests/run_suite.py

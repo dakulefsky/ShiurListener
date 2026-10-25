@@ -11,3 +11,5 @@ standalone/build/*.exe
 
 standalone/build/installer/payload.zip
 standalone/build/installer/*.exe
+
+standalone/app/runtime/

@@ -14,7 +14,7 @@ class Audio:
  def state(self):return {'position':self.position,'duration':self.duration,'status':self.status}
 class Tests(unittest.TestCase):
  def setUp(self):
-  self.tmp=tempfile.TemporaryDirectory();self.root=pathlib.Path(self.tmp.name);self.audio=self.root/'audio';self.audio.mkdir();(self.audio/'01.wav').write_bytes(b'fake');(self.audio/'02.mp3').write_bytes(b'fake')
+  self.tmp=tempfile.TemporaryDirectory();self.root=pathlib.Path(self.tmp.name).resolve();self.audio=self.root/'audio';self.audio.mkdir();(self.audio/'01.wav').write_bytes(b'fake');(self.audio/'02.mp3').write_bytes(b'fake')
   self.backend=Audio();self.player=Player(self.audio,self.root/'data',self.backend);self.library=LibraryController(self.player)
  def tearDown(self):self.tmp.cleanup()
  def test_next_day_open_and_play_needs_no_connection(self):

@@ -148,7 +148,7 @@ class Tests(unittest.TestCase):
  def test_batch_collections_sorting_and_saved_window_size(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
-   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.geometry('1120x740');window.root.update()
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);wanted=[min(1120,window.root.winfo_screenwidth()-40),min(740,window.root.winfo_screenheight()-80)];window.root.geometry(f'{wanted[0]}x{wanted[1]}');window.root.update()
    ids=list(window.tree.get_children());window.select_all();window.root.update()
    self.assertEqual(window.selection_info.cget('text'),'2 selected')
    window.assign_collection('A series')
@@ -160,9 +160,9 @@ class Tests(unittest.TestCase):
    self.assertEqual(window.tree.get_children(),());self.assertEqual(len(fixture.player.paths),2)
    window.close();window=None
    restored=Player(None,fixture.root/'data',test_player.Audio());library=LibraryController(restored)
-   self.assertEqual(restored.saved['windowSize'],[1120,740]);self.assertTrue(library.descending)
+   self.assertEqual(restored.saved['windowSize'],wanted);self.assertTrue(library.descending)
    window=PlayerWindow(restored,library,lambda _:None);window.root.update()
-   self.assertEqual([window.root.winfo_width(),window.root.winfo_height()],[1120,740])
+   self.assertEqual([window.root.winfo_width(),window.root.winfo_height()],wanted)
   finally:
    if window:window.close()
    fixture.tearDown()

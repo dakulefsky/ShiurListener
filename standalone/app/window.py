@@ -225,7 +225,8 @@ class PlayerWindow:
   self.button(row,'Cancel',pop.destroy).pack(side='right',padx=8)
   pop.bind('<Return>',accept);pop.bind('<Escape>',lambda _:pop.destroy())
   pop.update_idletasks();pop.geometry(f'+{self.root.winfo_rootx()+max(0,(self.root.winfo_width()-pop.winfo_reqwidth())//2)}+{self.root.winfo_rooty()+max(0,(self.root.winfo_height()-pop.winfo_reqheight())//2)}')
-  entry.focus_set();entry.selection_range(0,'end');pop.grab_set();self.root.wait_window(pop)
+  if not pop.winfo_viewable():pop.wait_visibility()
+  entry.selection_range(0,'end');pop.grab_set();pop.lift();entry.focus_force();self.root.wait_window(pop)
   return result
  def set_options(self,widget,**options):
   changed={key:value for key,value in options.items() if str(widget.cget(key))!=str(value)}
