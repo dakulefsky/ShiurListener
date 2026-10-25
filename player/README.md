@@ -1,17 +1,17 @@
-# נגן שיעורים 1.4.5
+# נגן שיעורים — development source 1.6.0
 
-Author: **DanTheMan**. Version 1.4.5 corrects the author spelling to `DanTheMan` and retains the homepage and explicit `stability: experimental`. Playback is unchanged.
+Author: **DanTheMan**. Current source is 1.6.0 in development, with fast two-excerpt offline analysis and bounded MP3/WAV reads. No 1.6.0 download has been published. The current packaged download remains 1.5.0. See [the browser development results](experiments/browser-two-check/README.md) for actual measurements, supported formats and limits.
 
 A Hebrew Otzaria player for local shiurim, with a simpler layout, separate saved listening positions and recovery controls. Install the plugin directly; no companion, Python or VLC installation is needed.
 
 
 ## Store upload requirements
 
-See [the publishing review](STORE_UPLOAD.md) for the official sources, field requirements, validation results and first-upload requirements. This package was built and checked with the official Otzaria validator; the repository now checks manifest metadata and runs the official validator in CI with store publishing explicitly disabled.
+See [the publishing review](STORE_UPLOAD.md) for the official sources, field requirements, validation results and first-upload requirements. Published packages were built and checked with the official Otzaria validator; the current development source has been validated without publishing a new archive; the repository now checks manifest metadata and runs the official validator in CI with store publishing explicitly disabled.
 
 ## Recognizing the correct player
 
-The heading must say **נגן שיעורים 1.4.5**, including in compact mode. The Hebrew error “מנוע הדפדפן של אוצריא חסם שמע ללא לחיצה במופע הרקע. בגרסה זו נדרש שינוי מדיניות באוצריא.” was found in the old 1.2 background player's `background.js`; it is absent from the visible-page player. Seeing it means that older UI/code is running.
+Current development source shows **נגן שיעורים 1.6.0**, including in compact mode; existing published versions show their own release numbers. The Hebrew error “מנוע הדפדפן של אוצריא חסם שמע ללא לחיצה במופע הרקע. בגרסה זו נדרש שינוי מדיניות באוצריא.” was found in the old 1.2 background player's `background.js`; it is absent from the visible-page player. Seeing it means that older UI/code is running.
 
 Install this package as an update, fully quit Otzaria (including its tray instance if it remains running), reopen it and open **נגן שיעורים** from the plugin list. Do not uninstall or clear data. If the heading does not say נגן שיעורים 1.4.5, the new page is not running yet. This update replaces the former Inside display name with נגן שיעורים in the plugin list, tab, page heading and error details. The plugin ID and storage keys are unchanged. The audio engine is unchanged.
 

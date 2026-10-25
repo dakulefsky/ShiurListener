@@ -124,7 +124,7 @@ class LocalAudioEngine {
    this.audio.src=url;this.audio.load();
   });
   if(!root.OfflineSpeechAnalysis)throw Error('רכיב בדיקת השמע חסר');
-  try{await root.OfflineSpeechAnalysis.analyze(url);}catch(error){this.audio.pause();this.loaded=false;this.audio.muted=true;this.audio.removeAttribute('src');this.audio.load();throw error;}
+  try{await root.OfflineSpeechAnalysis.analyze(url,{duration:this.audio.duration});}catch(error){this.audio.pause();this.loaded=false;this.audio.muted=true;this.audio.removeAttribute('src');this.audio.load();throw error;}
   this.audio.playbackRate=this.speed;this.audio.volume=this.volume;
   this.audio.currentTime=Math.min(start/1000,Number.isFinite(this.audio.duration)?this.audio.duration:start/1000);
   this.loaded=true;this.audio.muted=false;this.capture();this.lastAccess=Date.now();

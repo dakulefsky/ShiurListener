@@ -40,7 +40,7 @@ def main():
   subprocess.run(['ffmpeg','-v','error','-stream_loop','-1','-i',os.environ.get('SHIUR_TEST_SPEECH','/workspace/inside-audio-experiment/shiur_freifeld.mp3'),'-t','600','-ac','1','-ar','8000',str(pathlib.Path(directory)/'sample.wav')],check=True)
   with wave.open(str(pathlib.Path(directory)/'short.wav'),'wb') as wav:
    wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(8000);wav.writeframes(b'\x00\x00'*80000)
-  subprocess.run(['ffmpeg','-v','error','-stream_loop','-1','-i',os.environ.get('SHIUR_TEST_MUSIC','/workspace/inside-audio-experiment/data/music_wav/opera.wav'),'-t','300','-ac','1','-ar','8000',str(pathlib.Path(directory)/'music.wav')],check=True)
+  subprocess.run(['ffmpeg','-v','error','-stream_loop','-1','-i',os.environ.get('SHIUR_TEST_MUSIC','/workspace/inside-audio-experiment/data/music_wav/rock.wav'),'-t','300','-ac','1','-ar','8000',str(pathlib.Path(directory)/'music.wav')],check=True)
   server=http.server.ThreadingHTTPServer(('127.0.0.1',0),functools.partial(Quiet,directory=directory));threading.Thread(target=server.serve_forever,daemon=True).start()
   url=f'http://127.0.0.1:{server.server_port}/'
   try:
@@ -55,7 +55,7 @@ def main():
     context.route('**/*',restrict)
     page=context.new_page();page.set_default_timeout(120000);expect.set_options(timeout=120000);errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(url)
     expect(page.locator('#add-folder')).to_be_enabled()
-    expect(page.locator('header h1')).to_contain_text('נגן שיעורים');expect(page.locator('header h1')).to_contain_text('1.5.0')
+    expect(page.locator('header h1')).to_contain_text('נגן שיעורים');expect(page.locator('header h1')).to_contain_text('1.6.0')
     expect(page.locator('#welcome')).to_be_visible();assert page.locator('#audio').get_attribute('controls') is not None
     assert 'nodownload' in page.locator('#audio').get_attribute('controlslist')
     page.locator('#add-folder').click();expect(page.locator('.track')).to_have_count(2)
