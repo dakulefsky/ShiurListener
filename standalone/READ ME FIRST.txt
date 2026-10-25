@@ -1,30 +1,37 @@
-SHIUR PLAYER 0.3.0 — ENGLISH STANDALONE WINDOWS APP
+SHIUR PLAYER 0.4.0 — ENGLISH STANDALONE WINDOWS APP
 
 Extract the ENTIRE ZIP. Open Shiur Player.exe. No separate installation needed.
-Choose your audio folder once, select a recording and click Resume selected.
+Choose your audio folder once, select a recording and click Play selected.
 On future days open the app and press Play to continue the last recording.
 
 EVERY SHIUR KEEPS ITS OWN PLACE
 Switch between recordings freely. Each row shows that shiur's resume time.
-Double-click a recording, or select it and click Resume selected, to return to
+Double-click a recording, or select it and click Play selected, to return to
 its own saved position. Continue listening lists unfinished recordings with the
 most recently listened to first. Positions survive closing and restarting.
 Keep your recordings at the same path so their saved identities stay the same.
 The app saves about once per second, on pause, on switching and on normal close.
 Sudden power loss can lose the newest interval. Seek accuracy depends on the file.
-Upgrading from standalone 0.1.0 or 0.2.0 reuses the same saved positions automatically.
+Upgrading from standalone 0.1.0, 0.2.0 or 0.3.0 reuses the same saved positions automatically.
 
 YOUR LIBRARY
 Open audio folder selects the folder containing your recordings. Refresh recordings
 finds files added there. Search filters the list. No Save button is needed.
-Select a recording and click Organize selected. Choose an existing collection
+Select a recording and click Add to collection. Choose an existing collection
 or type a new name, then click Add recording. New names create the collection
-and add the recording in that same action. More offers rename/delete and reset.
+and add the recording in that same action. Hold Ctrl to select several recordings,
+or Shift to select a range, then add them together. Ctrl+A selects the visible list.
+Right-click a recording for Play and collection actions. In a collection, More
+or right-click can remove all selected members without affecting their positions.
+Click a column heading to sort by name, resume position or duration.
+Continue listening opens with the most recently listened-to recording first.
+The window size and library sort preference are remembered.
+More also offers collection rename/delete and an individual position reset.
 Deleting a collection never deletes recordings. No collections are pre-created.
 
 NOW PLAYING
 Play/Pause controls the current recording, even with another row selected.
-Resume selected switches to the selected shiur. Speed, volume and 10/15/60-second
+Play selected switches to the selected shiur. Speed, volume and 10/15/60-second
 skip options are beside the playback controls. Add bookmarks and revisit them.
 Settings includes automatic next recording, sleep timer and global shortcuts.
 MINI PLAYER
@@ -49,7 +56,8 @@ It is a local player, not an operating-system browser lockdown mechanism.
 
 TESTING
 Three independent resume positions after restart, real desktop-toolkit controls,
-search, collection assignment and sliders were tested on Linux. Minimize/restore
+search, batch collection assignment, sorting, focused-button keyboard handling,
+window-size restore and sliders were tested on Linux. Minimize/restore
 logic and native floating-window messages were checked with simulated Windows APIs. Real VLC WAV/MP3 decoding,
 seeking, pause/resume and automatic next-track tests passed with dummy output.
 The Windows x64 launcher, archive contents and bundled runtime were checked.

@@ -37,3 +37,7 @@ Use **shiur-player-1.4.2.otzplugin** to replace the former Inside name with **נ
 ## Standalone Windows app 0.3.0 — flat controls and automatic mini player
 
 Download **shiur-player-windows-x64-0.3.0.zip**. This update removes decorative slogans, replaces old scrollbars and sliders, simplifies collection assignment into one dialog, and shows the floating mini player automatically when minimized. Existing standalone listening positions carry over. Extract the entire ZIP. Windows desktop execution remains unverified here.
+
+## Standalone Windows app 0.4.0 — library and keyboard improvements
+
+Download **shiur-player-windows-x64-0.4.0.zip**. Select several recordings and add them to a collection in one action, sort by column, and use right-click actions. Window size and sorting are remembered. Space on a focused button no longer triggers playback twice; skipping during loading uses the saved resume position. Existing standalone positions carry over. Extract the entire ZIP and run Shiur Player.exe. Actual Windows GUI and speaker output remain unverified here.

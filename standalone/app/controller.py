@@ -8,13 +8,34 @@ def clock(seconds):
 class LibraryController:
  def __init__(self,player):
   self.player=player;self.view='all';self.query='';self.selected=player.saved['currentId'];self.revision=0
+  self.sort=player.saved.get('librarySort','name');self.descending=bool(player.saved.get('librarySortDescending',False));self.explicit_sort=False
   self.player.saved.setdefault('bookmarks',{})
  def tracks(self):
   with self.player.lock:
    values=self.player.library();folder=next((f for f in self.player.saved['folders'] if f['id']==self.view),None)
    if folder:values=[t for t in values if t['id'] in folder['trackIds']]
    elif self.view=='continue':values=sorted([t for t in values if t.get('position',0)>0 and not t.get('completed',False)],key=lambda t:t.get('lastListenedAt',0),reverse=True)
-   q=self.query.casefold();return [t for t in values if q in (t['name']+' '+t['source']).casefold()]
+   q=self.query.casefold();values=[t for t in values if q in (t['name']+' '+t['source']).casefold()]
+   if self.view!='continue' or self.explicit_sort:
+    key={'name':lambda t:(t['name'].casefold(),t['source'].casefold()),'resume':lambda t:(t.get('position',0),t['name'].casefold()),'duration':lambda t:(t.get('duration',0),t['name'].casefold())}.get(self.sort)
+    if key:values.sort(key=key,reverse=self.descending)
+   return values
+ def set_sort(self,column):
+  if column not in ('name','resume','duration'):raise ValueError('Unknown sort column.')
+  with self.player.lock:
+   self.descending=not self.descending if column==self.sort and self.explicit_sort else False
+   self.sort=column;self.explicit_sort=True
+   self.player.saved.update(librarySort=column,librarySortDescending=self.descending);self.player.persist()
+ def assign_many(self,ids,name):
+  name=name.strip();ids=list(dict.fromkeys(ids))
+  if not name or len(name)>160:raise ValueError('Enter a collection name of 1–160 characters.')
+  if not ids or any(ident not in self.player.paths for ident in ids):raise ValueError('Select available recordings first.')
+  with self.player.lock:
+   folder=next((f for f in self.player.saved['folders'] if f['name'].casefold()==name.casefold()),None)
+   if folder is None:
+    folder={'id':secrets.token_hex(12),'name':name,'trackIds':[]};self.player.saved['folders'].append(folder)
+   folder['trackIds']=list(dict.fromkeys(folder['trackIds']+ids));self.player.persist();self.revision+=1
+   return folder['id']
  def play(self,force=False):
   with self.player.lock:
    if not force and self.player.active and ((self.player.pending and self.player.pending['autoplay']) or (not self.player.pending and self.player.backend.state()['status']=='playing')):

@@ -67,4 +67,16 @@ class Tests(unittest.TestCase):
    self.backend.position=10;self.player.command({'op':'skip_interval','value':n});self.player.command({'op':'skip','direction':1});self.assertEqual(self.backend.position,10+n)
   self.player.command({'op':'sleep_timer','minutes':15});self.player.sleep_deadline=0.01;self.player.tick();self.assertEqual(self.backend.status,'paused')
   restored=Player(None,self.root/'data',Audio());self.assertEqual(restored.saved['language'],'en')
+ def test_skip_while_loading_uses_the_saved_position(self):
+  ident=self.player.tracks[0]['id'];self.player.saved['tracks'][ident]={'position':65.432,'duration':120}
+  self.player.load(ident,autoplay=True)
+  self.assertEqual(self.backend.position,0)
+  self.player.command({'op':'skip','direction':1})
+  self.assertEqual(self.player.pending['position'],80.432)
+  self.player.tick();self.assertEqual(self.backend.position,80.432)
+ def test_batch_collection_validation_does_not_create_an_empty_collection(self):
+  ident=self.player.tracks[0]['id']
+  with self.assertRaises(ValueError):self.library.assign_many([ident,'missing'],'My series')
+  with self.assertRaises(ValueError):self.library.assign_many([ident],'x'*161)
+  self.assertEqual(self.player.saved['folders'],[])
 if __name__=='__main__':unittest.main(verbosity=2)

@@ -90,7 +90,7 @@ class Player:
         return raw
     def snapshot(self):
         raw=self.capture();ident=self.saved['currentId'];progress=self.saved['tracks'].get(ident,{})
-        if self.pending:raw={**raw,'position':self.pending['position'],'status':'loading'}
+        if self.pending:raw={**raw,'position':self.pending['position'],'duration':raw['duration'] or progress.get('duration',0),'status':'loading','playRequested':self.pending['autoplay']}
         if not self.active:raw={'position':progress.get('position',0),'duration':progress.get('duration',0),'status':'paused'}
         return {**raw,'currentId':ident,'speed':self.saved['speed'],'volume':self.saved['volume'],'autoNext':self.saved['autoNext'],'queue':self.saved['queue'],'error':self.error,'skipSeconds':self.saved['skipSeconds'],'folders':self.saved['folders'],'hotkeys':self.hotkey_status,'sleepMinutes':self.sleep_minutes,'sleepRemaining':max(0,int(self.sleep_deadline-time.monotonic()+.999)) if self.sleep_deadline else 0,'floatingAvailable':bool(self.floating_bar and self.floating_bar.hwnd),'floatingStatus':self.floating_bar.status if self.floating_bar else '', 'loaded':self.active is not None,'libraryCount':len(self.tracks),'folderName':self.root.name if self.root else '', 'hasFolder':self.root is not None,'libraryRevision':self.library_revision,'language':self.saved.get('language','en')}
     def library(self):return [{**t,**self.saved['tracks'].get(t['id'],{})} for t in self.tracks]
@@ -130,7 +130,8 @@ class Player:
                 op='pause' if (self.pending and self.pending['autoplay']) or (not self.pending and raw['status']=='playing') else 'play'
             if op=='skip':
                 if not self.active:raise ValueError('Select a recording first.')
-                raw=self.backend.state();value=max(0,min(raw['duration'],raw['position']+float(data.get('direction',1))*self.saved['skipSeconds']))
+                raw=self.snapshot();value=max(0,raw['position']+float(data.get('direction',1))*self.saved['skipSeconds'])
+                if raw['duration']:value=min(raw['duration'],value)
                 return self.command({'op':'seek','value':value})
             if op=='speed_step':
                 rates=[.75,1,1.25,1.5,1.75,2];index=rates.index(self.saved['speed']);index=max(0,min(len(rates)-1,index+int(data.get('direction',1))))

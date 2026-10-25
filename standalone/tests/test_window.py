@@ -46,6 +46,45 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_batch_collections_sorting_and_saved_window_size(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.geometry('1120x740');window.root.update()
+   ids=list(window.tree.get_children());window.select_all();window.root.update()
+   self.assertEqual(window.selection_info.cget('text'),'2 selected')
+   window.assign_collection('A series')
+   self.assertEqual(fixture.player.saved['folders'][0]['trackIds'],ids)
+   window.assign_collection('a SERIES');self.assertEqual(len(fixture.player.saved['folders']),1)
+   window.sort_by('name');window.sort_by('name');self.assertEqual(list(window.tree.get_children()),ids[::-1])
+   self.assertEqual(set(window.tree.selection()),set(ids))
+   view=fixture.player.saved['folders'][0]['id'];window.navigate(view);window.select_all();window.remove_selected()
+   self.assertEqual(window.tree.get_children(),());self.assertEqual(len(fixture.player.paths),2)
+   window.close();window=None
+   restored=Player(None,fixture.root/'data',test_player.Audio());library=LibraryController(restored)
+   self.assertEqual(restored.saved['windowSize'],[1120,740]);self.assertTrue(library.descending)
+   window=PlayerWindow(restored,library,lambda _:None);window.root.update()
+   self.assertEqual([window.root.winfo_width(),window.root.winfo_height()],[1120,740])
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+ def test_space_on_focused_button_does_not_toggle_twice(self):
+  import tkinter as tk
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   fixture.library.play();fixture.player.tick()
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.update()
+   window.play_button.focus_force();window.root.update()
+   window.play_button.event_generate('<KeyPress-space>');window.root.update()
+   window.play_button.event_generate('<KeyRelease-space>');window.root.update()
+   done=tk.BooleanVar(window.root);window.root.after(150,lambda:done.set(True));window.root.wait_variable(done)
+   self.assertEqual(fixture.backend.status,'paused')
+   window.play_button.event_generate('<KeyPress-space>');window.root.update()
+   window.play_button.event_generate('<KeyRelease-space>');window.root.update()
+   done=tk.BooleanVar(window.root);window.root.after(150,lambda:done.set(True));window.root.wait_variable(done)
+   self.assertEqual(fixture.backend.status,'playing')
+  finally:
+   if window:window.close()
+   fixture.tearDown()
  def test_multiple_resume_rows_and_reopen(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:

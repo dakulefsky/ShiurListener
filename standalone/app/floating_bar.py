@@ -6,7 +6,7 @@ def display(state,tracks):
  english=True
  title=track['name'] if track else 'Choose a recordings folder'
  n=state.get('skipSeconds',15)
- return title,('Pause' if state['status']=='playing' else 'Play'),f'−{n}',f'+{n}'
+ return title,('Pause' if state['status']=='playing' or state.get('playRequested') else 'Play'),f'−{n}',f'+{n}'
 
 def timing(state):
  def fmt(value):

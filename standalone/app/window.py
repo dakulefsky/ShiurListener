@@ -53,7 +53,13 @@ class ModernScale(tk.Canvas):
 class PlayerWindow:
  def __init__(self,player,library,shortcuts):
   self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False
-  self.root=tk.Tk();self.root.title(TITLE);self.root.geometry('1260x850');self.root.minsize(1080,700);self.root.configure(bg=BG)
+  self.root=tk.Tk();self.root.title(TITLE);self.root.configure(bg=BG)
+  screen_w,screen_h=self.root.winfo_screenwidth(),self.root.winfo_screenheight()
+  self.minimum_size=(min(980,screen_w-40),min(640,screen_h-80))
+  size=player.saved.get('windowSize',[1260,820])
+  if not isinstance(size,list) or len(size)!=2 or not all(isinstance(n,int) for n in size):size=[1260,820]
+  width=max(self.minimum_size[0],min(size[0],screen_w-40));height=max(self.minimum_size[1],min(size[1],screen_h-80))
+  self.root.geometry(f'{width}x{height}');self.root.minsize(*self.minimum_size)
   self.root.option_add('*Font',(FONT,10));self.root.option_add('*Foreground',INK)
   style=ttk.Style(self.root);style.theme_use('clam')
   style.configure('TCombobox',fieldbackground=PAPER,background=PAPER,bordercolor=LINE,lightcolor=PAPER,darkcolor=PAPER,arrowsize=12,padding=5)
@@ -68,7 +74,7 @@ class PlayerWindow:
   self.build();self.root.protocol('WM_DELETE_WINDOW',self.close)
   for key,fn in [('<space>',self.toggle),('<Left>',lambda:self.skip(-1)),('<Right>',lambda:self.skip(1)),('<Control-b>',self.bookmark),('<Control-f>',lambda:self.search.focus_set())]:
    self.root.bind(key,lambda event,f=fn:self.key(event,f))
-  self.root.bind('<Control-o>',lambda _:self.choose_folder());self.root.bind('<Escape>',lambda _:self.root.focus_set())
+  self.root.bind('<Control-o>',lambda _:self.safe(self.choose_folder));self.root.bind('<Escape>',lambda _:self.root.focus_set())
   self.root.bind('<Unmap>',lambda event:self.root.after(80,self.check_window_state) if event.widget is self.root and not self.closed else None)
   self.root.bind('<Map>',lambda event:self.root.after(80,self.check_window_state) if event.widget is self.root and not self.closed else None)
   self.refresh()
@@ -84,7 +90,7 @@ class PlayerWindow:
   self.button(self.sidebar,'+  New collection',self.new_collection).pack(fill='x',padx=12,pady=14)
   bottom=tk.Frame(self.sidebar,bg='#EDF1F8');bottom.pack(side='bottom',fill='x',padx=12,pady=20)
   self.folder_label=self.label(bottom,'No folder selected',9,MUTED,wraplength=180,anchor='w');self.folder_label.pack(fill='x',padx=12,pady=10)
-  self.button(bottom,'Open audio folder…',self.choose_folder).pack(fill='x')
+  self.button(bottom,'Open audio folder...',self.choose_folder).pack(fill='x')
   self.button(bottom,'Refresh recordings',lambda:self.command('rescan')).pack(fill='x')
   self.button(bottom,'Settings & shortcuts',self.settings).pack(fill='x')
   content=tk.Frame(self.root,bg=BG);content.pack(side='left',fill='both',expand=True,padx=28,pady=28)
@@ -97,14 +103,18 @@ class PlayerWindow:
   self.query.trace_add('write',lambda *_:self.search_changed())
   tk.Frame(left,bg=BG,height=16).pack()
   table=tk.Frame(left,bg=PAPER);table.pack(fill='both',expand=True)
-  self.tree=ttk.Treeview(table,columns=('name','resume','duration'),show='headings',selectmode='browse',height=5)
-  for name,title,width in [('name','RECORDING',260),('resume','RESUME AT',110),('duration','LENGTH',80)]:self.tree.heading(name,text=title);self.tree.column(name,width=width,minwidth=75,stretch=name=='name')
+  self.tree=ttk.Treeview(table,columns=('name','resume','duration'),show='headings',selectmode='extended',height=5)
+  for name,title,width in [('name','RECORDING',260),('resume','RESUME AT',110),('duration','LENGTH',80)]:
+   self.tree.heading(name,text=title,command=lambda column=name:self.safe(lambda:self.sort_by(column)));self.tree.column(name,width=width,minwidth=75,stretch=name=='name',anchor='w' if name=='name' else 'center')
+  self.tree.tag_configure('current',foreground=GREEN)
   scroll=SlimScrollbar(table,self.tree.yview);self.tree.configure(yscrollcommand=scroll.set);scroll.pack(side='right',fill='y');self.tree.pack(fill='both',expand=True)
-  self.tree.bind('<<TreeviewSelect>>',self.select);self.tree.bind('<Double-1>',lambda _:self.safe(self.resume));self.tree.bind('<Return>',lambda _:self.safe(self.resume))
+  self.tree.bind('<<TreeviewSelect>>',self.select);self.tree.bind('<Double-1>',self.double_click);self.tree.bind('<Return>',lambda _:self.safe(self.resume))
+  self.tree.bind('<Control-a>',self.select_all);self.tree.bind('<Button-3>',self.context_menu)
   actions=tk.Frame(left,bg=BG);actions.pack(fill='x',pady=(12,0))
-  self.button(actions,'Resume selected',self.resume,True).pack(side='left')
-  self.button(actions,'Organize selected…',self.add_collection).pack(side='left',padx=8)
+  self.resume_button=self.button(actions,'Play selected',self.resume,True);self.resume_button.pack(side='left')
+  self.organize_button=self.button(actions,'Add to collection',self.add_collection);self.organize_button.pack(side='left',padx=8)
   self.button(actions,'More',self.more).pack(side='right')
+  self.selection_info=self.label(left,'',9,MUTED,anchor='w');self.selection_info.pack(fill='x',pady=(8,0))
   right=tk.Frame(body,bg=PAPER,width=310);right.pack(side='right',fill='y');right.pack_propagate(False)
   card_scroll=SlimScrollbar(right,lambda *args:card_canvas.yview(*args));card_scroll.pack(side='right',fill='y')
   card_canvas=tk.Canvas(right,bg=PAPER,highlightthickness=0,yscrollcommand=card_scroll.set);card_canvas.pack(fill='both',expand=True);card_canvas.bind('<MouseWheel>',lambda event:card_canvas.yview_scroll(-int(event.delta/120),'units'))
@@ -138,11 +148,31 @@ class PlayerWindow:
  def command(self,op,**kw):return self.player.command({'op':op,**kw})
  def key(self,event,fn):
   if isinstance(event.widget,(tk.Entry,ttk.Entry,ttk.Combobox,tk.Text,tk.Scale,ttk.Scale,ModernScale)):return
+  if isinstance(event.widget,(tk.Button,ttk.Button,tk.Checkbutton)) and event.keysym in ('space','Return'):return
   self.safe(fn);return 'break'
  def search_changed(self):self.library.query=self.query.get();self.update_rows()
  def select(self,_=None):
   ids=self.tree.selection()
-  if ids:self.library.selected=ids[0]
+  if ids:self.library.selected=self.tree.focus() if self.tree.focus() in ids else ids[0]
+  if hasattr(self,'selection_info'):
+   self.selection_info.configure(text=f'{len(ids)} selected' if ids else '')
+   self.organize_button.configure(state='normal' if ids else 'disabled');self.resume_button.configure(state='normal' if ids else 'disabled')
+ def selected_ids(self):return list(self.tree.selection()) or ([self.library.selected] if self.library.selected in self.player.paths else [])
+ def select_all(self,_=None):self.tree.selection_set(self.tree.get_children());self.select();return 'break'
+ def double_click(self,event):
+  ident=self.tree.identify_row(event.y)
+  if ident:self.tree.selection_set(ident);self.tree.focus(ident);self.select();self.safe(self.resume)
+ def context_menu(self,event):
+  ident=self.tree.identify_row(event.y)
+  if not ident:return
+  if ident not in self.tree.selection():self.tree.selection_set(ident)
+  self.tree.focus(ident);self.select();menu=tk.Menu(self.root,tearoff=False)
+  menu.add_command(label='Play from saved position',command=lambda:self.safe(self.resume))
+  menu.add_command(label=f'Add {len(self.selected_ids())} to collection…',command=lambda:self.safe(self.add_collection))
+  if self.library.view not in ('all','continue'):menu.add_command(label='Remove selected from collection',command=lambda:self.safe(self.remove_selected))
+  try:menu.tk_popup(event.x_root,event.y_root)
+  finally:menu.grab_release()
+ def sort_by(self,column):self.library.set_sort(column);self.update_rows()
  def resume(self):self.library.play(force=True)
  def toggle(self):
   if self.player.saved['currentId']:self.command('toggle')
@@ -154,7 +184,8 @@ class PlayerWindow:
    if not self.player.active and self.player.saved['currentId']:self.player.load(self.player.saved['currentId'],position=value,autoplay=False)
    else:self.command('seek',value=value)
   self.safe(apply)
- def navigate(self,view):self.library.view=view;self.nav_signature=None;self.update_rows()
+ def navigate(self,view):
+  self.library.view=view;self.library.explicit_sort=False;self.nav_signature=None;self.tree.selection_remove(self.tree.selection());self.update_rows()
  def choose_folder(self):
   path=filedialog.askdirectory(title='Choose your shiur audio folder',parent=self.root)
   if path:self.player.scan(path);self.library.selected=None;self.update_rows()
@@ -162,29 +193,29 @@ class PlayerWindow:
   name=simpledialog.askstring('New collection','Collection name:',parent=self.root)
   if name:self.library.collection('folder_create',name);self.nav_signature=None;self.update_rows()
  def add_collection(self):
-  if not self.library.selected:raise ValueError('Select a recording first.')
-  selected=next(t for t in self.player.tracks if t['id']==self.library.selected)
+  ids=self.selected_ids()
+  if not ids:raise ValueError('Select a recording first.')
+  selected=next(t for t in self.player.tracks if t['id']==ids[0])
   pop=tk.Toplevel(self.root);pop.title('Add recording to collection');pop.geometry('460x340');pop.configure(bg=PAPER);pop.transient(self.root)
-  self.label(pop,selected['name'],12,wraplength=410,justify='left').pack(anchor='w',padx=24,pady=(22,16))
+  self.label(pop,selected['name'] if len(ids)==1 else f'{len(ids)} recordings selected',12,wraplength=410,justify='left').pack(anchor='w',padx=24,pady=(22,16))
   folders=list(self.player.saved['folders']);names=[f['name'] for f in folders]
   self.label(pop,'Choose a collection, or type a new name:',10,MUTED).pack(anchor='w',padx=24)
   target=ttk.Combobox(pop,values=names);target.pack(fill='x',padx=24,pady=12);target.focus_set()
   if names:target.current(0)
   self.label(pop,'Audio files stay in their original folder.',9,MUTED).pack(anchor='w',padx=24)
   def add():
-   self.assign_collection(target.get());pop.destroy()
-  self.button(pop,'Add recording',add,True).pack(anchor='e',padx=24,pady=22)
+   self.assign_collection(target.get(),ids);pop.destroy()
+  self.button(pop,'Add recording' if len(ids)==1 else 'Add recordings',add,True).pack(anchor='e',padx=24,pady=22)
   pop.bind('<Return>',lambda _:self.safe(add))
- def assign_collection(self,name):
-  name=name.strip()
-  if not name:raise ValueError('Enter a collection name.')
-  if not self.library.selected:raise ValueError('Select a recording first.')
-  with self.player.lock:
-   folder=next((f for f in self.player.saved['folders'] if f['name'].casefold()==name.casefold()),None)
-   if not folder:
-    self.command('folder_create',name=name);folder=self.player.saved['folders'][-1]
-   self.library.add_to(folder['id'])
+ def assign_collection(self,name,ids=None):
+  self.library.assign_many(self.selected_ids() if ids is None else ids,name)
   self.nav_signature=None;self.update_rows()
+ def remove_selected(self):
+  with self.player.lock:
+   folder=next((f for f in self.player.saved['folders'] if f['id']==self.library.view),None)
+   if not folder:raise ValueError('Open a collection first.')
+   ids=set(self.selected_ids());folder['trackIds']=[ident for ident in folder['trackIds'] if ident not in ids];self.player.persist()
+  self.update_rows()
  def check_window_state(self):
   if not self.closed:self.window_state_changed(self.root.state()=='iconic')
  def window_state_changed(self,minimized):
@@ -203,7 +234,7 @@ class PlayerWindow:
  def more(self):
   menu=tk.Menu(self.root,tearoff=False);menu.add_command(label='Reset selected recording to the beginning',command=lambda:self.safe(self.reset_selected))
   if self.library.view not in ('all','continue'):
-   menu.add_command(label='Remove selected from this collection',command=lambda:self.safe(lambda:self.command('folder_remove',id=self.library.view,trackId=self.library.selected)))
+   menu.add_command(label='Remove selected from this collection',command=lambda:self.safe(self.remove_selected))
    menu.add_command(label='Rename collection',command=lambda:self.safe(self.rename_collection));menu.add_command(label='Delete collection',command=lambda:self.safe(self.delete_collection))
   menu.tk_popup(self.root.winfo_pointerx(),self.root.winfo_pointery())
  def reset_selected(self):
@@ -247,8 +278,12 @@ class PlayerWindow:
    values=(track['name'],resume,clock(track['duration']) if track.get('duration') else '-')
    if not self.tree.exists(track['id']):self.tree.insert('',index,iid=track['id'],values=values)
    elif self.rows.get(track['id'])!=values:self.tree.item(track['id'],values=values)
-   self.tree.move(track['id'],'',index);self.rows[track['id']]=values
+   self.tree.move(track['id'],'',index);self.tree.item(track['id'],tags=('current',) if track['id']==self.player.saved['currentId'] else ());self.rows[track['id']]=values
   if self.library.selected in ids and not self.tree.selection():self.tree.selection_set(self.library.selected)
+  self.select()
+  for column,title in [('name','RECORDING'),('resume','RESUME AT'),('duration','LENGTH')]:
+   active=column==self.library.sort and (self.library.view!='continue' or self.library.explicit_sort)
+   self.tree.heading(column,text=title+(' v' if self.library.descending else ' ^') if active else title)
   folders=self.player.saved['folders'];name=next((f['name'] for f in folders if f['id']==self.library.view),'Continue listening' if self.library.view=='continue' else 'All recordings')
   self.heading.configure(text=name);self.subtitle.configure(text=f'{len(tracks)} recordings' if tracks else 'No recordings here yet. Choose a folder or try another search.')
   signature=(self.library.view,tuple((f['id'],f['name']) for f in folders))
@@ -268,7 +303,7 @@ class PlayerWindow:
     elif action=='folder':self.safe(self.choose_folder)
    with self.player.lock:state=self.player.snapshot();current=next((t for t in self.player.tracks if t['id']==state['currentId']),None)
    self.update_rows();self.folder_label.configure(text=str(self.player.root) if self.player.root else 'No folder selected')
-   self.track_title.configure(text=current['name'] if current else 'No recording selected');self.source.configure(text=current['source'] if current else 'Choose a recording to begin.')
+   self.track_title.configure(text=current['name'].rsplit('.',1)[0] if current else 'No recording selected');self.source.configure(text=current['source'] if current and current['source']!=current['name'] else '' if current else 'Choose a recording to begin.')
    playing=state['status']=='playing' or bool(self.player.pending and self.player.pending['autoplay']);self.play_button.configure(text='Pause' if playing else 'Play')
    self.state_label.configure(text='Loading…' if state['status']=='loading' else 'Playing' if playing else 'Paused' if current else '')
    if not self.dragging:self.seek.configure(to=max(1,state['duration']));self.seek.set(state['position'])
@@ -278,9 +313,12 @@ class PlayerWindow:
   self.root.after(500,self.refresh)
  def close(self):
   try:
-   with self.player.lock:self.player.capture();self.player.persist()
+   with self.player.lock:
+    self.player.capture()
+    if self.root.state()=='normal':self.player.saved['windowSize']=[self.root.winfo_width(),self.root.winfo_height()]
+    self.player.persist()
   except Exception as error:messagebox.showerror('Could not save your place',str(error),parent=self.root);return
   self.closed=True
-  for callback in self.root.tk.call('after','info'):self.root.after_cancel(callback)
+  for callback in self.root.tk.call('after','info'):self.root.tk.call('after','cancel',callback)
   self.root.destroy()
  def run(self):self.root.mainloop()
