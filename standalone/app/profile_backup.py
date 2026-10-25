@@ -57,8 +57,10 @@ def _validate(payload):
     _require(isinstance(tracks, dict) and len(tracks) <= 100000, 'recording positions are missing.')
     for ident, track in tracks.items():
         _require(_ident(ident) and isinstance(track, dict), 'invalid recording entry.')
-        _require(not (set(track) - {'position', 'duration', 'completed', 'lastListenedAt', 'favorite'}),
+        _require(not (set(track) - {'position', 'duration', 'completed', 'lastListenedAt', 'favorite', 'speed'}),
                  'invalid recording fields.')
+        if 'speed' in track:
+            _require(_number(track['speed']) and track['speed'] in RATES, 'invalid recording speed.')
         for key in ('position', 'duration'):
             if key in track:
                 _require(_number(track[key]), 'invalid recording ' + key + '.')

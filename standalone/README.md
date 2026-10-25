@@ -68,3 +68,7 @@ Favorites controls are removed from the interface; existing profile metadata is 
 ## Tiny floating player (development)
 
 Click the minus button in the floating mini player to collapse it into a 144 × 44 draggable pill. Play/pause remains available; click the expand arrow to restore the previous mini-player size. Drag the empty left edge to reposition the pill. Collapsing does not pause playback. The collapsed preference and position are saved, and the expanded size is kept separately. This source change has not yet been included in a Windows installer; native Windows visual testing remains required.
+
+### Hover controls and individual speeds (development)
+
+Hover over the tiny pill to reveal backward/forward skip buttons using the configured 10/15/60-second interval. Moving away hides them again; hovering does not issue playback commands. Each recording saves its playback speed independently, including changes from the mini player, and restores it after switching recordings or restarting. Recordings without a saved speed start at 1×. The speed cycle remains 1× → 1.5× → 2× → 0.5× → 1×. These changes are not yet packaged in an installer or visually verified on Windows.

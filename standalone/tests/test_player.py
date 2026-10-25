@@ -28,6 +28,18 @@ class Tests(unittest.TestCase):
   self.library.selected=ids[1];self.library.play(force=True);self.player.tick();self.backend.position=23.789;self.player.command({'op':'pause'})
   self.library.selected=ids[0];self.library.play();self.player.tick();self.assertEqual(self.backend.position,65.432)
   self.assertEqual(self.player.saved['tracks'][ids[1]]['position'],23.789)
+ def test_each_recording_restores_speed_after_switch_and_restart(self):
+  a,b=[t['id'] for t in self.player.tracks]
+  self.player.load(a,autoplay=True);self.player.tick()
+  self.player.command({'op':'speed','value':1.5})
+  self.player.load(b,autoplay=True);self.player.tick();self.assertEqual(self.backend.rate,1)
+  self.player.command({'op':'speed_cycle'});self.player.command({'op':'speed_cycle'})
+  self.assertEqual(self.backend.rate,2)
+  self.player.load(a,autoplay=True);self.player.tick();self.assertEqual(self.backend.rate,1.5)
+  restored=Player(None,self.root/'data',Audio())
+  restored.load(b,autoplay=True);restored.tick();self.assertEqual(restored.backend.rate,2)
+  restored.load(a,autoplay=False);restored.tick();self.assertEqual(restored.backend.rate,1.5)
+  self.assertEqual(restored.backend.status,'paused')
  def test_finished_tracks_and_near_end_are_distinguished(self):
   ids=[t['id'] for t in self.player.tracks]
   self.library.selected=ids[0];self.library.play();self.player.tick();self.backend.position=119.9;self.player.command({'op':'pause'})

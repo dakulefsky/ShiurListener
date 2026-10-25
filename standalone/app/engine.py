@@ -120,6 +120,8 @@ class Player:
         if not math.isfinite(start) or not 0<=start<1e8:raise ValueError('Invalid position.')
         if progress.get('duration'):start=min(start,progress['duration'])
         self.backend.load(self.paths[ident]);self.active=ident;self.saved['currentId']=ident;self.error='';self.sleep_paused=False;self.seek_target=None
+        rate=progress.get('speed',1)
+        self.saved['speed']=rate if rate in (.5,.75,1,1.25,1.5,1.75,2) else 1
         if self.loop_track!=ident:self.clear_loop()
         self.pending={'position':start,'autoplay':autoplay,'started':time.monotonic()};self.backend.volume(0);self.backend.play()
         self.capture()
@@ -247,6 +249,8 @@ class Player:
                 value=float(data['value'])
                 if value not in (.5,.75,1,1.25,1.5,1.75,2):raise ValueError('Invalid speed.')
                 self.backend.speed(value);self.saved['speed']=value;self.saved['miniSpeedCycleIndex']=None
+                ident=self.saved['currentId']
+                if ident:self.saved['tracks'].setdefault(ident,{})['speed']=value
             elif op=='volume':
                 value=float(data['value'])
                 if not 0<=value<=1:raise ValueError('Invalid volume.')

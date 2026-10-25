@@ -4,6 +4,7 @@ import ctypes,sys,threading,pathlib
 MIN_SIZE=(300,140)
 DEFAULT_SIZE=(360,150)
 COLLAPSED_SIZE=(144,44)
+HOVER_SIZE=(252,44)
 
 def display(state,tracks):
  track=next((t for t in tracks if t['id']==state['currentId']),None)
@@ -24,9 +25,12 @@ def color(value,fallback):
  except ValueError:return color(fallback,fallback)
  return r|(g<<8)|(b<<16)
 
-def layout(width,height,collapsed=False):
+def layout(width,height,collapsed=False,hovered=False):
  """Client coordinates; title, transport, timing and a clickable progress strip."""
- if collapsed:return {102:(16,6,76,32),108:(98,6,36,32)}
+ if collapsed:
+  bounds={102:(16,6,76,32),108:(98,6,36,32)}
+  if hovered:bounds.update({101:(140,6,48,32),103:(194,6,48,32)})
+  return bounds
  width=max(270,width);height=max(96,height);pad=10;gap=6
  available=width-2*pad-3*gap;back=int(available*.19);play=int(available*.32);speed=available-2*back-play
  row_height=max(26,min(44,height-74));bottom=height-34
@@ -83,10 +87,10 @@ class FloatingBar:
   controls={};labels={101:'−15',102:'Play',103:'+15',105:'Open',106:'1x',108:'−'};palette={};resources=[];font=None
   progress_ratio=0.;last_progress=None
   texts={};enabled={};visible=self.player.saved.get('floatingVisible',False)
-  collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE)
+  collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE);hovered=False
   def apply_mode():
    setstyle(self.hwnd,-16,ctypes.c_long(0x82000000 if collapsed else 0x02CC0000).value)
-   size=COLLAPSED_SIZE if collapsed else expanded_size
+   size=(HOVER_SIZE if hovered else COLLAPSED_SIZE) if collapsed else expanded_size
    rect=w.RECT();getrect(self.hwnd,ctypes.byref(rect))
    # Keep the restored window on screen, even after dragging the pill to an edge.
    left,top,width,height=(metrics(i) for i in [76,77,78,79])
@@ -97,7 +101,7 @@ class FloatingBar:
    nonlocal last_progress
    if not self.hwnd:return
    rect=w.RECT();clientrect(self.hwnd,ctypes.byref(rect))
-   bounds=layout(rect.right,rect.bottom,collapsed)
+   bounds=layout(rect.right,rect.bottom,collapsed,hovered)
    for ident,handle in controls.items():show(handle,5 if ident in bounds else 0)
    for ident,(x,y,width,height) in bounds.items():
     if ident in controls:move(controls[ident],x,y,width,height,True)
@@ -134,7 +138,7 @@ class FloatingBar:
      if ident in labels:labels[ident]=text
      settext(controls[ident],text)
   def proc(hwnd,msg,wp,lp):
-   nonlocal visible,collapsed,expanded_size
+   nonlocal visible,collapsed,expanded_size,hovered
    try:
     if msg==0x0024:
      info=ctypes.cast(lp,ctypes.POINTER(MINMAXINFO)).contents
@@ -157,11 +161,17 @@ class FloatingBar:
     if msg==0x8002:destroy(hwnd);return 0
     if msg==0x0002:killtimer(hwnd,1);quitmessage(0);return 0
     if msg==0x0021:return 3
-    if msg==0x0113:update();return 0
+    if msg==0x0113:
+     if collapsed and visible:
+      point=w.POINT();rect=w.RECT()
+      if getcursor(ctypes.byref(point)) and getrect(hwnd,ctypes.byref(rect)):
+       inside=rect.left<=point.x<rect.right and rect.top<=point.y<rect.bottom
+       if inside!=hovered:hovered=inside;apply_mode()
+     update();return 0
     if msg==0x0111:
      ident=wp&0xffff
      if (wp>>16)==0 and ident==108:
-      collapsed=not collapsed
+      collapsed=not collapsed;hovered=False
       with self.player.lock:self.player.saved['floatingCollapsed']=collapsed;self.player.persist()
       apply_mode();update();return 0
      if (wp>>16)==0 and ident==107:
@@ -232,7 +242,7 @@ class FloatingBar:
    for ident,text in labels.items():controls[ident]=create(0,'BUTTON',text,0x5001000B,0,0,1,1,self.hwnd,ident,instance,None)
    if not all(controls.values()):raise RuntimeError('Could not create floating controls.')
    for handle in controls.values():send(handle,0x0030,font,1)
-   resize();update();timer(self.hwnd,1,500,None);show(self.hwnd,4 if visible else 0);self.status='ready';self.ready.set()
+   resize();update();timer(self.hwnd,1,100,None);show(self.hwnd,4 if visible else 0);self.status='ready';self.ready.set()
    message=w.MSG()
    while getmessage(ctypes.byref(message),None,0,0)>0:translate(ctypes.byref(message));dispatch(ctypes.byref(message))
   except Exception as e:self.status=str(e);print('Floating bar unavailable: '+str(e),flush=True)
