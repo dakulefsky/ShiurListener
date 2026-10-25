@@ -134,3 +134,37 @@ class LibraryController:
    if delete:self.player.saved['bookmarks'][current]=[m for m in marks if m['id']!=ident];self.player.persist();self.revision+=1
    elif not self.player.active:self.player.load(current,position=mark['position'],autoplay=False)
    else:self.player.command({'op':'seek','value':mark['position']})
+
+ def rename(self,ident,name):
+  import hashlib,re
+  with self.player.lock:
+   if ident not in self.player.paths:raise ValueError('Select an available recording.')
+   source=self.player.paths[ident];name=str(name).strip()
+   if name.lower().endswith(source.suffix.lower()):name=name[:-len(source.suffix)]
+   if not name or len(name)>180 or re.search(r'[<>:"/\\|?*\x00-\x1f]',name) or name.endswith(('.', ' ')) or name.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*(f'COM{i}' for i in range(1,10)),*(f'LPT{i}' for i in range(1,10))}:raise ValueError('Choose a valid filename without slashes or special characters.')
+   target=source.with_name(name+source.suffix)
+   if target==source:return ident
+   if target.exists():raise ValueError('A recording with that filename already exists.')
+   if not source.resolve().is_relative_to(self.player.root):raise ValueError('The recording is outside the audio folder.')
+   state=self.player.snapshot();active=self.player.active==ident;position=self.player.saved['tracks'].get(ident,{}).get('position',0)
+   if active:
+    self.player.backend.stop();self.player.active=None;self.player.pending=None;self.player.seek_target=None
+   try:source.rename(target)
+   except OSError:
+    if active:self.player.load(ident,position=position,autoplay=False)
+    raise
+   relative=target.relative_to(self.player.root).as_posix();new_id=hashlib.sha256((str(self.player.root)+'/'+relative).encode()).hexdigest()[:24]
+   self.player.paths.pop(ident);self.player.paths[new_id]=target
+   for track in self.player.tracks:
+    if track['id']==ident:track.update(id=new_id,name=target.name,source=relative)
+   if ident in self.player.saved['tracks']:self.player.saved['tracks'][new_id]=self.player.saved['tracks'].pop(ident)
+   marks=self.player.saved['bookmarks']
+   if ident in marks:marks[new_id]=marks.pop(ident)
+   self.player.saved['queue']=[new_id if i==ident else i for i in self.player.saved['queue']]
+   for folder in self.player.saved['folders']:folder['trackIds']=[new_id if i==ident else i for i in folder['trackIds']]
+   if self.player.saved['currentId']==ident:self.player.saved['currentId']=new_id
+   if self.selected==ident:self.selected=new_id
+   if self.player.loop_track==ident:self.player.loop_track=new_id
+   self.player.library_revision+=1;self.revision+=1;self.player.persist()
+   if active:self.player.load(new_id,position=position,autoplay=state['status']=='playing' or state.get('playRequested',False))
+   return new_id

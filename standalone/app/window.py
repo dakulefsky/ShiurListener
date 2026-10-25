@@ -1,5 +1,5 @@
 """Local desktop library. UI work stays on the Tk thread; audio runs independently."""
-import queue,sys,threading
+import queue,sys,threading,pathlib
 from version import APP_VERSION
 import updater,profile_backup
 import tkinter as tk
@@ -9,7 +9,7 @@ from controller import clock
 TITLE='Shiur Player — Your listening library'
 FONT='Segoe UI' if sys.platform=='win32' else 'Helvetica'
 BG='#FAFBFD'; PAPER='#FFFFFF'; INK='#202A3B'; MUTED='#69758A'; GREEN='#4263EB'; LINE='#E8ECF3'; SIDEBAR='#F0F3F8'
-VIEWS={'all':'All shiurim','continue':'Continue listening','favorites':'Favorites','unplayed':'Unplayed','finished':'Finished'}
+VIEWS={'all':'All shiurim','continue':'Continue listening','unplayed':'Unplayed','finished':'Finished'}
 
 
 class SlimScrollbar(tk.Canvas):
@@ -162,7 +162,11 @@ class PlayerWindow:
   top=tk.Frame(self.root,bg=BG);top.pack(fill='both',expand=True)
   self.sidebar=tk.Frame(top,bg=SIDEBAR,width=224);self.sidebar.pack(side='left',fill='y');self.sidebar.pack_propagate(False)
   brand=tk.Frame(self.sidebar,bg=SIDEBAR);brand.pack(fill='x',padx=20,pady=(26,26))
-  self.label(brand,'Shiur Player',18,anchor='w').pack(fill='x')
+  self.brand_image=tk.PhotoImage(file=str(pathlib.Path(__file__).parent/'assets/brand-mark.png'))
+  self.brand_small=self.brand_image.subsample(2,2)
+  tk.Label(brand,image=self.brand_small,bg=SIDEBAR).pack(side='left',padx=(0,10))
+  self.root.iconphoto(True,self.brand_image)
+  self.label(brand,'Shiur Player',16,anchor='w').pack(side='left')
   bottom=tk.Frame(self.sidebar,bg=SIDEBAR);bottom.pack(side='bottom',fill='x',padx=10,pady=(6,12))
   self.folder_label=self.label(bottom,'No folder selected',9,MUTED,wraplength=170,anchor='w');self.folder_label.pack(fill='x',padx=12,pady=(6,8))
   self.button(bottom,'Open audio folder...',self.choose_folder,anchor='w').pack(fill='x')
@@ -204,7 +208,6 @@ class PlayerWindow:
   self.tree.bind('<ButtonPress-1>',self.list_press);self.tree.bind('<B1-Motion>',self.list_drag);self.tree.bind('<ButtonRelease-1>',self.list_release);self.tree.bind('<Motion>',self.list_motion)
   self.tree.bind('<Control-a>',self.select_all);self.tree.bind('<Button-3>',self.context_menu)
   self.tree.bind('<Control-q>',lambda _:self.safe(lambda:self.add_queue(False)))
-  self.tree.bind('<Control-d>',lambda _:self.safe(self.favorite_selected))
   info=tk.Frame(self.dock,bg=PAPER);info.pack(fill='x')
   track_info=tk.Frame(info,bg=PAPER);track_info.pack(side='left',fill='x',expand=True)
   eyebrow=tk.Frame(track_info,bg=PAPER);eyebrow.pack(fill='x')
@@ -212,7 +215,6 @@ class PlayerWindow:
   self.state_label=self.label(eyebrow,'',9,MUTED);self.state_label.pack(side='left',padx=14)
   self.track_title=self.label(track_info,'No recording selected',15,anchor='w');self.track_title.pack(fill='x',pady=(4,0))
   self.source=self.label(track_info,'Choose an audio folder to begin.',9,MUTED,anchor='w');self.source.pack(fill='x',pady=(2,0))
-  self.favorite_button=self.button(info,'Favorite',self.favorite_current);self.favorite_button.pack(side='right',padx=(6,0))
   self.queue_button=self.button(info,'Queue',self.show_queue);self.queue_button.pack(side='right')
   timeline=tk.Frame(self.dock,bg=PAPER);timeline.pack(fill='x',pady=(8,4))
   self.time=self.label(timeline,'0:00 / 0:00',10,MUTED,width=17,anchor='w');self.time.pack(side='left')
@@ -304,9 +306,9 @@ class PlayerWindow:
   if ident not in self.tree.selection():self.tree.selection_set(ident)
   self.tree.focus(ident);self.select();menu=tk.Menu(self.root,tearoff=False)
   menu.add_command(label='Play from saved position',command=lambda:self.safe(self.resume))
+  menu.add_command(label='Rename recording…',command=lambda:self.safe(self.rename_recording))
   menu.add_command(label='Play next',command=lambda:self.safe(lambda:self.add_queue(True)))
   menu.add_command(label='Add to queue',command=lambda:self.safe(lambda:self.add_queue(False)))
-  menu.add_command(label='Toggle favorite',command=lambda:self.safe(self.favorite_selected))
   menu.add_separator()
   menu.add_command(label=f'Add {len(self.selected_ids())} to collection…',command=lambda:self.safe(self.add_collection))
   if self.library.view not in VIEWS:menu.add_command(label='Remove selected from collection',command=lambda:self.safe(self.remove_selected))
@@ -373,9 +375,9 @@ class PlayerWindow:
    if minimized:self.root.deiconify()
  def more(self):
   menu=tk.Menu(self.root,tearoff=False)
+  menu.add_command(label='Rename recording…',command=lambda:self.safe(self.rename_recording))
   menu.add_command(label='Play next',command=lambda:self.safe(lambda:self.add_queue(True)))
   menu.add_command(label='Add to queue',command=lambda:self.safe(lambda:self.add_queue(False)))
-  menu.add_command(label='Toggle favorite',command=lambda:self.safe(self.favorite_selected))
   menu.add_separator();menu.add_command(label='Reset selected recording to the beginning',command=lambda:self.safe(self.reset_selected))
   if self.library.view not in VIEWS:
    menu.add_command(label='Remove selected from this collection',command=lambda:self.safe(self.remove_selected))
@@ -383,6 +385,13 @@ class PlayerWindow:
   menu.tk_popup(self.root.winfo_pointerx(),self.root.winfo_pointery())
  def reset_selected(self):
   if messagebox.askyesno('Reset position','Reset only the selected recording to 0:00?',parent=self.root):self.library.reset()
+ def rename_recording(self):
+  ids=self.selected_ids()
+  if len(ids)!=1:raise ValueError('Select one recording to rename.')
+  ident=ids[0];track=next(t for t in self.player.tracks if t['id']==ident)
+  name=simpledialog.askstring('Rename recording','New filename (audio extension stays the same):',initialvalue=track['name'].rsplit('.',1)[0],parent=self.root)
+  if name is None:return
+  self.library.rename(ident,name);self.rows.clear();self.update_rows()
  def rename_collection(self):
   name=simpledialog.askstring('Rename collection','New name:',parent=self.root)
   if name:self.library.collection('folder_rename',name);self.nav_signature=None
@@ -407,7 +416,7 @@ class PlayerWindow:
   tk.Checkbutton(pop,text='Show mini player when minimized',variable=mini,command=save_mini,bg=BG).pack(anchor='w',padx=24,pady=8)
   self.label(pop,'Speed button: 1× → 1.5× → 2× → 0.5× → 1×',10,MUTED).pack(anchor='w',padx=24,pady=8)
   global_keys=tk.BooleanVar(value=self.player.saved.get('globalShortcuts',False));tk.Checkbutton(pop,text='Enable shortcuts while using other apps',variable=global_keys,command=lambda:self.safe(lambda:self.shortcuts(global_keys.get())),bg=BG).pack(anchor='w',padx=24,pady=12)
-  self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+D: favorite  ·  Ctrl+Q: add to queue\n\nGlobal keys: Ctrl+Alt+Shift+P: play/pause\nCtrl+Alt+Shift+Left / Right: skip',10,MUTED,justify='left').pack(anchor='w',padx=24,pady=12)
+  self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+Q: add to queue\n\nGlobal keys: Ctrl+Alt+Shift+P: play/pause\nCtrl+Alt+Shift+Left / Right: skip',10,MUTED,justify='left').pack(anchor='w',padx=24,pady=12)
   self.label(pop,'LISTENING BACKUP',9,MUTED).pack(anchor='w',padx=24,pady=(18,8))
   row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24)
   self.button(row,'Export backup…',self.export_backup).pack(side='left');self.button(row,'Restore backup…',self.restore_backup).pack(side='left',padx=8)
@@ -525,7 +534,7 @@ class PlayerWindow:
    if ident not in ids:self.tree.delete(ident);self.rows.pop(ident,None)
   for index,track in enumerate(tracks):
    position=track.get('position',0);resume='Finished' if track.get('completed') else clock(position) if position else 'New'
-   values=(('★  ' if track.get('favorite') else '')+track['name'].rsplit('.',1)[0],resume,clock(track['duration']) if track.get('duration') else '-')
+   values=(track['name'].rsplit('.',1)[0],resume,clock(track['duration']) if track.get('duration') else '-')
    if not self.tree.exists(track['id']):self.tree.insert('',index,iid=track['id'],values=values)
    elif self.rows.get(track['id'])!=values:self.tree.item(track['id'],values=values)
    if reorder:self.tree.move(track['id'],'',index)
@@ -582,8 +591,6 @@ class PlayerWindow:
    if not self.dragging:self.seek.configure(to=max(1,state['duration']));self.seek.set(state['position'])
    self.set_options(self.time,text=f"{clock(state['position'])} / {clock(state['duration'])}");self.set_options(self.back,text=f"-{state['skipSeconds']}s");self.set_options(self.forward,text=f"+{state['skipSeconds']}s")
    self.set_options(self.remaining,text=f"{clock(max(0,state['duration']-state['position'])/state['speed'])} left at {state['speed']:g}×" if state['duration'] else '')
-   favorite=self.player.saved['tracks'].get(state['currentId'],{}).get('favorite',False)
-   self.set_options(self.favorite_button,text='★ Favorited' if favorite else 'Favorite',state='normal' if current else 'disabled')
    self.set_options(self.queue_button,text=f"Queue · {len(state['queue'])}")
    sleep=f"Pauses in {clock(state['sleepRemaining'])}" if state['sleepRemaining'] else 'Pauses after this recording' if state.get('sleepAtEnd') else ''
    loop=f"Repeat {clock(state['loopA'])}–{clock(state['loopB'])}" if state.get('loopB') is not None else ''

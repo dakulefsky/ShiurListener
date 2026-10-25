@@ -172,6 +172,12 @@ func makeLink(file, target, working string, ole *syscall.LazyDLL) error {
 			return fmt.Errorf("Could not configure Windows shortcut")
 		}
 	}
+	icon := wide(filepath.Join(working, "versions", releaseVersion, "assets", "shiur-player.ico"))
+	iconResult := comMethod(link, 17, uintptr(unsafe.Pointer(icon)), 0)
+	runtime.KeepAlive(icon)
+	if failed(iconResult) {
+		return fmt.Errorf("Could not set the player shortcut icon")
+	}
 	persistIID := guid{0x0000010B, 0, 0, [8]byte{0xC0, 0, 0, 0, 0, 0, 0, 0x46}}
 	var persist uintptr
 	if failed(comMethod(link, 0, uintptr(unsafe.Pointer(&persistIID)), uintptr(unsafe.Pointer(&persist)))) {

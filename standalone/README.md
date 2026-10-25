@@ -1,8 +1,8 @@
-# Shiur Player 0.8.1
+# Shiur Player 0.8.2
 
 An English-only local Windows x64 desktop player with a light interface, rounded controls, blue accents and a dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
 
-Close the old player and run **shiur-player-setup-0.8.1.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
+Close the old player and run **shiur-player-setup-0.8.2.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
 
 Click **Check for updates** in the app for subsequent releases. Checks run only when requested. The app fetches a small release JSON from this repository, validates its version/URL/size/SHA-256, downloads the installer in a worker thread, saves playback state and starts setup. Setup waits for the old player process to exit before selecting and starting the new version. Program files use separate version directories and an atomic `active.json` pointer, leaving the previous version selected if extraction/activation fails. User data and audio recordings are outside the installation tree. Previous program versions are retained; old portable copies are not removed.
 
@@ -16,11 +16,11 @@ Create and name collections yourself. Select a recording, click **Add to collect
 
 See [the instructions](READ%20ME%20FIRST.txt) for keyboard shortcuts. State stays at `%LOCALAPPDATA%\ShiurPlayerStandalone\state.json`; earlier Inside/Sidekick profiles remain separate.
 
-![Actual desktop-toolkit preview on Linux](../previews/shiur-player-0.8.0.png)
+![Actual desktop-toolkit preview on Linux](../previews/shiur-player-0.8.2.png)
 
 ## New in 0.8.0
 
-The library uses the full window width above a permanent playback dock. Favorites, Unplayed and Finished join Continue listening. Numbered recordings sort naturally, and search matches all entered words. Right-click or More offers Play next, Add to queue and Favorite; the Queue window supports reordering and removing upcoming recordings. Current audio keeps playing during queue changes.
+The library uses the full window width above a permanent playback dock. Unplayed and Finished join Continue listening. Numbered recordings sort naturally, and search matches all entered words. Right-click or More offers Play next, Add to queue and Favorite; the Queue window supports reordering and removing upcoming recordings. Current audio keeps playing during queue changes.
 
 Listening tools adds A–B section repeat, jump to time, 15/30/45/60-minute sleep presets, and pause at the end of the recording. Repeat and end-of-recording timers exclude one another. The dock displays time remaining adjusted for playback speed. The native mini player has a clickable progress strip and elapsed/remaining time.
 
@@ -58,5 +58,9 @@ The builder cross-compiles the stable installed launcher and self-contained setu
 
 Simpler branding, a light library and playback dock, rounded keyboard-operable controls, vector playback icons, a custom speed menu, fewer borders, unstriped rows and filename extensions hidden in the list. Mini speed defaults to 1 → 1.5 → 2 → 0.5 → 1×. Existing installations receive this corrected cycle once on upgrade; Both players use the same fixed order. Listening positions are preserved.
 
-## 0.8.1 speed cycle
+## 0.8.2 speed cycle
 Both main and mini speed buttons use 1 → 1.5 → 2 → 0.5 → 1×, regardless of older cycle preferences. Right-click the main speed button for individual rates.
+
+## 0.8.2 library and branding
+
+Favorites controls are removed from the interface; existing profile metadata is retained. Rename recording in More or the right-click menu renames the actual audio file and migrates its saved position, bookmarks, collections and queue entries. The audio extension stays unchanged; conflicting or invalid names are rejected. Renaming an active recording briefly reloads it at its saved place and preserves paused/playing state.

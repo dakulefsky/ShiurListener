@@ -1,6 +1,10 @@
 # Shiur Player downloads
 
-## Current standalone: 0.8.1
+## Current standalone: 0.8.2
+
+[Download setup](shiur-player-setup-0.8.2.exe) or Check for updates. Custom player branding, no Favorites section, and Rename recording with saved-place/bookmark/collection preservation. Both speed buttons cycle 1× → 1.5× → 2× → 0.5× → 1×.
+
+## Standalone: 0.8.1
 
 [Download setup](shiur-player-setup-0.8.1.exe) or Check for updates. Main and mini speed buttons cycle exactly 1× → 1.5× → 2× → 0.5× → 1×, overriding obsolete cycle preferences. Saved positions carry over.
 
