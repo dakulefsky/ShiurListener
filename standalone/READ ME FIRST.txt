@@ -1,0 +1,58 @@
+SHIUR PLAYER — STANDALONE WINDOWS APP 0.1.0
+
+FIRST SETUP
+1. Extract the ENTIRE ZIP into a folder on your computer.
+2. Open Shiur Player.exe from inside that folder.
+3. Choose the folder containing your MP3/M4A/WAV recordings.
+4. Select a recording and press Play, or double-click it.
+The interface is English only.
+
+NEXT TIME, INCLUDING AFTER RESTARTING THE COMPUTER
+Open Shiur Player.exe and press Play. The selected folder, last recording,
+separate listening positions, speed and volume are remembered. No pairing code
+or Otzaria connection is needed. No audio starts until you press Play.
+
+THE WHOLE PLAYER IS IN THIS APP
+The main window has the recordings list, search, collections, Play/Pause,
+previous/next, seek slider, speed, volume, 10/15/60-second skip intervals,
+sleep timer, auto-next, local bookmarks, and a floating-player button.
+No collections are pre-created. Use the Collection name field and New collection
+button to create your own. Select a recording and a target collection, then Add.
+Bookmark uses the current recording's listening position. Go jumps to a bookmark.
+Start over resets only the selected recording's saved position after confirmation.
+
+Ctrl+Space plays/pauses inside the app. Ctrl+Left/Right skips. Tab/Enter operate
+controls. Enable Shortcuts in other apps if you want Windows-wide controls:
+Ctrl+Alt+Shift+P plays/pauses; Left/Right skips; Up/Down changes speed;
+PageUp/PageDown changes recordings; 1/2/3 chooses skip length; F toggles floating.
+Conflicts are reported in the status line. Normal typing is not captured.
+
+Minimizing leaves audio playing. Closing the main window stops and saves the
+player. Reopening the EXE brings an already-running instance forward.
+The floating bar's Open player button restores the main window.
+
+The source folder is not rescanned continuously. Click Rescan after adding files.
+Recordings stay in their existing folder and are not copied, edited or deleted.
+Positions save about once per second and on normal pause/close; sudden power loss
+can lose the latest unsaved interval. Decoder seek precision depends on the file.
+
+FILES AND DATA
+Keep the full extracted folder together. Moving only the EXE will not work.
+No separate Python/VLC installation is needed; the required runtime is bundled.
+The app stores its own data in %LOCALAPPDATA%\ShiurPlayerStandalone\state.json.
+It does not overwrite or automatically import Inside/Sidekick data.
+Closing any old Sidekick instance avoids having two players running at once.
+There is no Windows-startup registration in this first portable build: open the
+app when you want to listen, or create a normal Windows desktop shortcut.
+
+TESTING STATUS
+This is the first experimental standalone Windows build. Saved-position,
+controller and simulated Win32-window tests pass. Real VLC WAV/MP3 playback,
+seeking and background advancement pass on Linux with a dummy audio sink.
+The x64 GUI executable and ZIP contents are structurally verified. Actual Windows
+window rendering, focus, output devices and physical sound remain unverified here.
+
+This app has no browser, web address field, network server, plugin or pairing step.
+The bundled Python interpreter is general purpose; the program is not an OS-level
+browser/Internet lockdown tool. Runtime licenses and source URLs are included in
+THIRD-PARTY-NOTICES.txt and the runtime folders.

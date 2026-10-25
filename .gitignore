@@ -6,3 +6,5 @@ sidekick/*.otzplugin
 sidekick/*.zip
 sidekick/*-preview.png
 sidekick/build/windows/*.exe
+standalone/*.zip
+standalone/build/*.exe
