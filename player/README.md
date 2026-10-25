@@ -9,6 +9,8 @@ A Hebrew Otzaria player for local shiurim, with a simpler layout, separate saved
 
 See the [complete Hebrew handoff](../docs/INSIDE_DEVELOPER_HANDOFF.he.md) or [download its PDF](../docs/INSIDE_DEVELOPER_HANDOFF.he.pdf) for implementation status, security limits, test evidence, and the host changes required for background playback and floating controls.
 
+See also the [supplemental Inside review in Hebrew](../docs/INSIDE_REVIEW_2026-10-25.he.md) for the latest reproduced bugs, source fixes and verification. No new plugin archive was published.
+
 ## Store upload requirements
 
 See [the publishing review](STORE_UPLOAD.md) for the official sources, field requirements, validation results and first-upload requirements. Published packages were built and checked with the official Otzaria validator; the current development source has been validated without publishing a new archive; the repository now checks manifest metadata and runs the official validator in CI with store publishing explicitly disabled.

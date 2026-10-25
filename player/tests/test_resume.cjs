@@ -107,3 +107,11 @@ test('continue listening retains near-end progress and sorts recent shiurim firs
 test('file picker advertises only implemented formats without deleting older library entries',()=>{
  const f=fixture(),C=f.context.ShiurCore;assert.deepEqual(Array.from(C.extensions),['mp3','wav']);const state=C.normalize({version:1,tracks:[{id:'legacy',name:'saved.flac',position:65.432,duration:600}]});assert.equal(state.tracks[0].position,65.432);assert.equal(state.tracks[0].name,'saved.flac');
 });
+
+
+test('invalid saved numeric progress cannot produce infinite timelines or false completion',()=>{
+ const f=fixture(),core=f.context.ShiurCore;
+ const normalized=core.normalize({version:1,tracks:[{id:'bad',name:'Bad',position:'Infinity',duration:'Infinity'},{id:'ok',name:'Good',position:65.432,duration:600}]});
+ assert.equal(normalized.tracks[0].position,0);assert.equal(normalized.tracks[0].duration,0);assert.equal(normalized.tracks[0].completed,false);
+ assert.equal(normalized.tracks[1].position,65.432);assert.equal(core.format(Infinity),'0:00');
+});

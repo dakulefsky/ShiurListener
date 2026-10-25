@@ -54,7 +54,8 @@ function renderTracks(){
     actions.append(button(view!=='all'&&view!=='continue'?'הסרה מהתיקייה':'הסרה',async()=>{
       if(view!=='all'&&view!=='continue'){const p=state.playlists.find(p=>p.id===view);p.trackIds=p.trackIds.filter(id=>id!==t.id);}
       else {if(!await confirmDelete(`להסיר את „${t.name}” מהספרייה?`))return;
-        if(state.currentId===t.id){++loadRevision;loadedId=null;await engine.clear();}
+        if(state.currentId===t.id){++loadRevision;loadedId=null;engine.cancel();}
+        await engine.send('remove_track',{id:t.id});
         C.removeTrack(state,t.id);queue=queue.filter(id=>id!==t.id);
       }
       await save();render();

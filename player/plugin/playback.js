@@ -21,7 +21,7 @@ class VisiblePlayback {
  }
  async refresh(){return this.apply(this.local.snapshot());}
  send(op,args={}){
-  if(['stop','clear'].includes(op)&&this.local.loadController)this.cancel();
+  if(['stop','clear','pause'].includes(op)&&this.local.loadController)this.cancel();
   return this.local.serial(async()=>{try{await this.local.execute({op,...args});await this.local.publish();return this.apply(this.local.snapshot());}catch(error){this.error=error.message;this.emit('error');throw error;}});
  }
  load(track,position){
@@ -35,7 +35,7 @@ class VisiblePlayback {
   const action=this.local.play();
   return action.then(()=>this.local.serial(async()=>{await this.local.publish();return this.apply(this.local.snapshot());})).catch(error=>{this.error=error.message;this.emit('error');throw error;});
  }
- pause(){this.local.audio.pause();this.local.capture();return this.local.serial(async()=>{await this.local.publish();return this.apply(this.local.snapshot());});}
+ pause(){if(this.local.loadController)this.cancel();this.local.audio.pause();this.local.capture();return this.local.serial(async()=>{await this.local.publish();return this.apply(this.local.snapshot());});}
  suspend(){this.visible=false;return this.local.suspend();}
  async resume(){this.visible=true;await this.local.resume();return this.apply(this.local.snapshot());}
  seek(value){return this.send('seek',{positionMs:Math.round(Math.max(0,value)*1000)});}

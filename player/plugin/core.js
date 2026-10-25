@@ -3,10 +3,11 @@
   'use strict';
   const extensions = ['mp3','wav'];
   const fresh = () => ({version:1,tracks:[],playlists:[],currentId:null,speed:1,volume:1,autoNext:false,skipSeconds:15});
+  function nonnegative(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,n):0;}
   function normalize(value) {
     const state = fresh();
     if (!value || value.version !== 1) return state;
-    state.tracks = Array.isArray(value.tracks) ? value.tracks.filter(t => t && typeof t.id==='string' && typeof t.name==='string').map(t => ({...t,position:Math.max(0,Number(t.position)||0),duration:Math.max(0,Number(t.duration)||0),completed:t.completed===true||(t.completed==null&&Number(t.duration)>0&&Number(t.position)>=Number(t.duration)),lastListenedAt:Number.isFinite(t.lastListenedAt)?t.lastListenedAt:0,bookmarks:Array.isArray(t.bookmarks)?t.bookmarks:[]})) : [];
+    state.tracks = Array.isArray(value.tracks) ? value.tracks.filter(t => t && typeof t.id==='string' && typeof t.name==='string').map(t => {const position=nonnegative(t.position),duration=nonnegative(t.duration);return {...t,position,duration,completed:t.completed===true||(t.completed==null&&duration>0&&position>=duration),lastListenedAt:Number.isFinite(t.lastListenedAt)?t.lastListenedAt:0,bookmarks:Array.isArray(t.bookmarks)?t.bookmarks:[]};}) : [];
     const ids = new Set(state.tracks.map(t=>t.id));
     state.playlists = Array.isArray(value.playlists) ? value.playlists.filter(p=>p && typeof p.name==='string' && typeof p.id==='string').map(p=>({...p,trackIds:[...new Set((Array.isArray(p.trackIds)?p.trackIds:[]).filter(id=>ids.has(id)))]})) : [];
     state.currentId = ids.has(value.currentId) ? value.currentId : null;
@@ -29,7 +30,7 @@
     if(state.currentId===id) state.currentId=null;
   }
   function format(seconds) {
-    seconds=Math.max(0,Math.floor(Number(seconds)||0));
+    seconds=Math.floor(nonnegative(seconds));
     const h=Math.floor(seconds/3600),m=Math.floor(seconds%3600/60),s=seconds%60;
     return h?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`;
   }

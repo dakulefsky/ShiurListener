@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: player
+      - name: Playback, persistence and offline-analysis regression tests
+        run: node --test player/tests/test_load_reliability.cjs player/tests/test_offline_analysis.cjs player/tests/test_minimum_duration.cjs player/tests/test_resume.cjs player/experiments/browser-two-check/test_guards.cjs player/experiments/browser-two-check/test_deadline.cjs
       - name: Check store manifest metadata
         run: node player/build/check_store_manifest.cjs
       - name: Validate and build with the official Otzaria validator

@@ -89,3 +89,26 @@ test('an elapsed load deadline cannot approve before the timer callback is deliv
  let now=0;const f=fixture({performance:{now(){return now}}});await f.player.init();f.hooks.analyze=async()=>{now=6000;return {decision:'provisional_speech'}};
  await assert.rejects(f.player.load(track),e=>e.name==='TimeoutError');assert.equal(f.player.loaded,false);assert.equal(f.audio.muted,true);
 });
+test('file-token revocation invalidates cached approval and blocks buffered replay',async()=>{
+ const f=fixture();await f.player.init();await f.player.load(track);await f.player.execute({op:'seek',positionMs:65432});await f.player.play();
+ f.player.lastAccess=0;f.hooks.resolve=async()=>{throw Error('Token revoked')};await f.player.tick();
+ assert.equal(f.player.loaded,false);assert.equal(f.audio.muted,true);assert.equal(f.player.positions.a.positionMs,65432);await assert.rejects(f.player.play());
+});
+test('removing a queued recording prevents automatic advancement to it',async()=>{
+ const f=fixture();await f.player.init();await f.player.load(track);const other={id:'b',title:'b.mp3',token:'b'};f.player.queue=[track,other];
+ await f.player.execute({op:'remove_track',id:'b'});await f.player.advance(1);assert.equal(f.player.current.id,'a');assert.equal(f.player.queue.length,1);
+ assert.equal(f.store.get('shiur-audio-v1:queue').some(t=>t.id==='b'),false);
+});
+test('pause cancels an in-progress load before it can later start sound',async()=>{
+ const f=fixture(),gate=deferred();await f.player.init();f.hooks.analyze=()=>gate.promise;
+ const pending=f.visible.load(track,0),outcome=pending.catch(e=>e);await settle();const pause=f.visible.pause();await settle();
+ assert.equal(f.player.loadController,null);gate.resolve({decision:'provisional_speech'});await outcome;await pause;
+ assert.equal(f.player.loaded,false);assert.equal(f.audio.muted,true);assert.equal(f.audio.paused,true);
+});
+test('removing the active recording stops it and preserves other queue entries and saved places',async()=>{
+ const f=fixture();await f.player.init();await f.player.load(track);await f.player.execute({op:'seek',positionMs:65432});await f.player.play();
+ f.player.positions.b={positionMs:23789,durationMs:600000};f.player.queue=[track,{id:'b',title:'b.mp3',token:'b'}];
+ await f.player.execute({op:'remove_track',id:'a'});await f.player.publish();
+ assert.equal(f.player.current,null);assert.equal(f.audio.paused,true);assert.equal(f.audio.muted,true);assert.equal(f.player.queue[0].id,'b');
+ assert.equal(f.player.positions.a.positionMs,65432);assert.equal(f.player.positions.b.positionMs,23789);
+});

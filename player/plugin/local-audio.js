@@ -192,6 +192,12 @@ class LocalAudioEngine {
    case 'pause':this.audio.pause();this.capture();break;
    case 'stop':this.audio.pause();this.capture();this.sleepUntil=0;break;
    case 'clear':this.audio.pause();this.capture();this.current=null;this.loaded=false;this.queue=[];this.sleepUntil=0;this.audio.removeAttribute('src');this.audio.load();await P.rpc('storage.set',{key:K.queue,value:[]});break;
+   case 'remove_track':{
+    if(typeof args.id!=='string'||!args.id)throw Error('מזהה שיעור לא תקין');
+    if(this.current?.id===args.id){this.cancelLoad();this.current=null;this.sleepUntil=0;}
+    this.queue=this.queue.filter(track=>track.id!==args.id);
+    await P.rpc('storage.set',{key:K.queue,value:this.queue});break;
+   }
    case 'reset_progress':{
     if(typeof args.id!=='string'||!Object.hasOwn(this.positions,args.id))throw Error('לא נמצא מיקום שמור לשיעור');
     if(this.current?.id===args.id){this.audio.pause();if(this.loaded)this.seekTo(0);}
@@ -223,7 +229,7 @@ class LocalAudioEngine {
     this.lastPermissionCheck=Date.now();const {permissions=[]}=await P.rpc('app.getGrantedPermissions');
     if(!permissions.includes('fs.user_files.read')){this.cancelLoad();this.ready=false;clearInterval(this.timer);this.timer=null;this.error='הרשאת קריאת הקבצים בוטלה';await this.publish();return;}
    }
-   if(this.current&&this.loaded&&Date.now()-this.lastAccess>5000){this.lastAccess=Date.now();try{await this.resolve(this.current);}catch(error){this.audio.pause();this.error='הגישה לקובץ בוטלה: '+error.message;}}
+   if(this.current&&this.loaded&&Date.now()-this.lastAccess>5000){this.lastAccess=Date.now();try{await this.resolve(this.current);}catch(error){this.cancelLoad();this.error='הגישה לקובץ בוטלה: '+error.message;}}
    if(Date.now()-(this.lastPublished||0)>=(this.audio.paused?2000:500)){await this.publish();this.lastPublished=Date.now();}
   });}catch(error){this.audio.pause();this.error=error.message;console.error(error.message);}
   finally{this.running=false;}

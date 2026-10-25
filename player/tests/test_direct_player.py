@@ -16,7 +16,7 @@ window.Otzaria={on(topic,fn){(handlers[topic]||=[]).push(fn);if(topic==='plugin.
  else if(method==='fs.pickUserFolder')data={cancelled:false,folderToken:'series',name:'Series'};
  else if(method==='fs.listUserFolder')data={entries:[{type:'file',name:'First.wav',path:'First.wav'},{type:'file',name:'Second.wav',path:'Second.wav'}]};
  else if(method==='fs.resolveFileUrl'||method==='fs.openFolderFile'){
-  if(window.fileRevoked||window.fileMissing)return {success:false,error:{message:'File unavailable'}};
+  if(window.fileRevoked||window.tokenRevoked||window.fileMissing)return {success:false,error:{message:'File unavailable'}};
   data={url:location.origin+(window.shortFile?'/short.wav':window.musicFile?'/music.wav':'/sample.wav')};
  }else return {success:false,error:{message:'Unexpected method: '+method}};
  return {success:true,data};
@@ -115,9 +115,13 @@ def main():
     context.add_init_script('window.fileMissing=true');page.reload();expect(page.locator('#add-file')).to_be_enabled();expect(page.locator('#status')).to_contain_text('השיעור האחרון אינו זמין')
     page.evaluate('window.fileMissing=false');page.locator('#retry-setup').click();expect(page.locator('#status')).to_contain_text('השיעור מוכן')
     page.locator('#play').click();page.wait_for_function('!document.querySelector("#audio").paused')
-    page.evaluate('window.fileRevoked=true');expect(page.locator('#status')).to_contain_text('בוטלה')
+    page.evaluate('window.tokenRevoked=true');expect(page.locator('#status')).to_contain_text('הגישה לקובץ בוטלה',timeout=12000)
+    assert page.locator('#audio').evaluate('(a)=>a.paused && a.muted && !a.getAttribute("src")')
+    page.evaluate('window.tokenRevoked=false');page.locator('#retry-setup').click();expect(page.locator('#status')).to_contain_text('השיעור מוכן')
+    page.locator('#play').click();page.wait_for_function('!document.querySelector("#audio").paused')
+    page.evaluate('window.fileRevoked=true');expect(page.locator('#status')).to_contain_text('הרשאת קריאת הקבצים בוטלה',timeout=12000)
     assert page.locator('#audio').evaluate('(a)=>a.paused')
-    page.evaluate('window.fileRevoked=false');page.locator('#retry-setup').click();expect(page.locator('#play')).to_be_enabled()
+    page.evaluate('window.fileRevoked=false');page.locator('#retry-setup').click();page.wait_for_function('!document.querySelector("#play").disabled && !document.querySelector("#audio").muted && document.querySelector("#audio").readyState>=1',timeout=30000)
     page.locator('#play').click();page.wait_for_function('!document.querySelector("#audio").paused')
     page.locator('#reader-controls').click();page.locator('#sound-check').click()
     page.wait_for_function('!document.querySelector("#sound-check-audio").paused')
@@ -129,6 +133,10 @@ def main():
     page.evaluate('window.shortFile=false;window.musicFile=true')
     page.locator('#add-file').click();expect(page.locator('#status')).to_contain_text('מוזיקה')
     assert page.locator('#audio').evaluate('(a)=>a.paused && a.muted && !a.getAttribute("src")')
+    first=page.locator('.track',has=page.locator('.track-title',has_text='First.wav'))
+    first.locator('summary').click();first.locator('button.remove').click();page.locator('#confirm-dialog button[value=yes]').click()
+    expect(first).to_have_count(0)
+    assert all(track['id']!='folder:series:First.wav' for track in page.evaluate("JSON.parse(localStorage.getItem('shiur-audio-v1:queue'))"))
     blocked=page.evaluate("""()=>new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(false);image.onerror=()=>resolve(true);image.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';})""")
     assert blocked,'GIF image load was not blocked by plugin CSP'
     assert not outside,outside
@@ -138,6 +146,6 @@ def main():
     assert not any(x in manifest['permissions'] for x in ['app.run_on_startup','app.background_keep_alive','network.access','app.open_url'])
     assert page.locator('iframe,a[href]').count()==0
     browser.close()
-   print('PASS: visible-page audio starts from a real click under strict autoplay; no hidden player; per-track resume/reload; compact mode; suspend/pause; speeds/skips; keyboard; reset; folder management; missing-file recovery. Actual Otzaria still requires a local check.')
+   print('PASS: visible-page audio starts from a real click under strict autoplay; no hidden player; per-track resume/reload; compact mode; suspend/pause; speeds/skips; keyboard; reset; folder management; missing-file and token/permission recovery; queue removal; GIF blocking. Actual Otzaria still requires a local check.')
   finally:server.shutdown();server.server_close()
 if __name__=='__main__':main()
