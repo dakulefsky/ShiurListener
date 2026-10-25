@@ -84,12 +84,12 @@ class Tests(unittest.TestCase):
   rates=[]
   for _ in range(4):
    self.player.command({'op':'speed_cycle'});rates.append(self.backend.rate)
-  self.assertEqual(rates,[.5,2,.5,1]);self.assertEqual(self.backend.position,42.875)
+  self.assertEqual(rates,[1.5,2,.5,1]);self.assertEqual(self.backend.position,42.875)
   self.assertEqual(self.player.saved['tracks'][ident]['position'],42.875)
   self.player.command({'op':'speed_cycle'});self.player.command({'op':'speed_cycle'})
   restored=Player(None,self.root/'data',Audio());restored.command({'op':'speed_cycle'});self.assertEqual(restored.saved['speed'],.5)
   restored.saved['miniSpeedMiddle']=.5;restored.command({'op':'speed','value':1})
-  rates=[restored.command({'op':'speed_cycle'})['speed'] for _ in range(4)];self.assertEqual(rates,[.5,2,.5,1])
+  rates=[restored.command({'op':'speed_cycle'})['speed'] for _ in range(4)];self.assertEqual(rates,[1.5,2,.5,1])
  def test_upgrade_corrects_existing_mini_speed_cycle(self):
   import json
   saved=dict(self.player.saved);saved.pop('halfSpeedCycleMigration',None)

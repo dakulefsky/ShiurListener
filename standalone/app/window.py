@@ -228,7 +228,7 @@ class PlayerWindow:
   self.volume=ModernScale(controls,from_=0,to=1,value=self.player.saved['volume'],command=lambda value:self.safe(lambda:self.command('volume',value=float(value))),dark=False);self.volume.configure(width=90);self.volume.pack(side='right',padx=8)
   self.mute_button=self.button(controls,'Volume',self.mute);self.mute_button.pack(side='right')
   self.speed=tk.StringVar(value=f"{self.player.saved['speed']:g}")
-  self.speed_button=self.button(controls,f"{self.speed.get()}×",self.speed_menu);self.speed_button.pack(side='right',padx=8)
+  self.speed_button=self.button(controls,f"{self.speed.get()}×",lambda:self.command('speed_cycle'));self.speed_button.pack(side='right',padx=8);self.speed_button.bind('<Button-3>',lambda _:self.speed_menu())
   self.speed.trace_add('write',lambda *_:self.set_options(self.speed_button,text=f"{self.speed.get()}×"))
   self.label(controls,'Speed',9,MUTED).pack(side='right')
   self.interval=None
@@ -405,13 +405,7 @@ class PlayerWindow:
   def save_mini():
    with self.player.lock:self.player.saved['miniOnMinimize']=mini.get();self.player.persist()
   tk.Checkbutton(pop,text='Show mini player when minimized',variable=mini,command=save_mini,bg=BG).pack(anchor='w',padx=24,pady=8)
-  speed_row=tk.Frame(pop,bg=BG);speed_row.pack(fill='x',padx=24,pady=6)
-  self.label(speed_row,'Mini-player speed steps',10).pack(side='left')
-  middle=ttk.Combobox(speed_row,values=['1 / 1.5 / 2 / 1.5','1 / 0.5 / 2 / 0.5'],state='readonly',width=20)
-  middle.current(1 if self.player.saved.get('miniSpeedMiddle',.5)==.5 else 0);middle.pack(side='right')
-  def save_cycle(_):
-   with self.player.lock:self.player.saved['miniSpeedMiddle']=.5 if middle.current()==1 else 1.5;self.player.saved['miniSpeedCycleIndex']=None;self.player.persist()
-  middle.bind('<<ComboboxSelected>>',save_cycle)
+  self.label(pop,'Speed button: 1× → 1.5× → 2× → 0.5× → 1×',10,MUTED).pack(anchor='w',padx=24,pady=8)
   global_keys=tk.BooleanVar(value=self.player.saved.get('globalShortcuts',False));tk.Checkbutton(pop,text='Enable shortcuts while using other apps',variable=global_keys,command=lambda:self.safe(lambda:self.shortcuts(global_keys.get())),bg=BG).pack(anchor='w',padx=24,pady=12)
   self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+D: favorite  ·  Ctrl+Q: add to queue\n\nGlobal keys: Ctrl+Alt+Shift+P: play/pause\nCtrl+Alt+Shift+Left / Right: skip',10,MUTED,justify='left').pack(anchor='w',padx=24,pady=12)
   self.label(pop,'LISTENING BACKUP',9,MUTED).pack(anchor='w',padx=24,pady=(18,8))

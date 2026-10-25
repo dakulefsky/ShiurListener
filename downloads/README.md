@@ -1,6 +1,10 @@
 # Shiur Player downloads
 
-## Current standalone: 0.8.0
+## Current standalone: 0.8.1
+
+[Download setup](shiur-player-setup-0.8.1.exe) or Check for updates. Main and mini speed buttons cycle exactly 1× → 1.5× → 2× → 0.5× → 1×, overriding obsolete cycle preferences. Saved positions carry over.
+
+## Standalone: 0.8.0
 
 [Download setup](shiur-player-setup-0.8.0.exe) or use Check for updates. Light styling with rounded controls and corrected half-speed mini-player cycle, including migration of existing settings. Saved places carry over. [Screenshot](../previews/shiur-player-0.8.0.png).
 
