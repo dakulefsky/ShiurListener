@@ -5,6 +5,11 @@ on:
       - 'standalone/**'
       - '.github/workflows/validate-standalone.yml'
   workflow_dispatch:
+    inputs:
+      installer_version:
+        description: 'Candidate installer version to verify before activating the update channel'
+        required: false
+        default: ''
 permissions:
   contents: read
 jobs:
@@ -38,6 +43,11 @@ jobs:
       - name: Actual Windows desktop controls with real VLC (dummy audio output)
         if: runner.os == 'Windows'
         run: python standalone/tests/test_desktop_vlc.py
+      - name: Native packaged installer, shortcut identity and repair
+        if: runner.os == 'Windows' && github.event_name == 'workflow_dispatch' && inputs.installer_version != ''
+        env:
+          SHIUR_INSTALLER_VERSION: ${{ inputs.installer_version }}
+        run: python standalone/tests/test_windows_installation.py
       - uses: actions/setup-go@v5
         if: runner.os == 'Linux'
         with:
