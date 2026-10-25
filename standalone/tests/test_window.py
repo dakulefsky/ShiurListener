@@ -7,6 +7,45 @@ from controller import LibraryController
 import test_player
 @unittest.skipUnless(os.environ.get('DISPLAY') or sys.platform=='win32','Needs a desktop display')
 class Tests(unittest.TestCase):
+ def test_minimize_opens_bar_and_restore_hides_only_automatic_bar(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  class Bar:
+   def __init__(self):self.calls=[];self.hwnd=123;self.status='ready'
+   def set_visible(self,visible):self.calls.append(visible);fixture.player.saved['floatingVisible']=visible
+  try:
+   bar=Bar();fixture.player.floating_bar=bar;fixture.player.saved['floatingVisible']=False
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   window.window_state_changed(True);window.window_state_changed(True)
+   window.window_state_changed(False);self.assertEqual(bar.calls,[True,False])
+   fixture.player.saved['floatingVisible']=True;window.window_state_changed(True);window.window_state_changed(False)
+   self.assertEqual(bar.calls,[True,False,True])
+   fixture.player.saved['miniOnMinimize']=False;window.window_state_changed(True);self.assertEqual(len(bar.calls),3)
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+ def test_new_collection_assignment_is_one_operation(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   fixture.library.selected=fixture.player.tracks[0]['id'];window.assign_collection('My recordings')
+   folders=fixture.player.saved['folders'];self.assertEqual(len(folders),1);self.assertEqual(folders[0]['trackIds'],[fixture.library.selected])
+   window.assign_collection('my recordings');self.assertEqual(len(folders),1);self.assertEqual(len(folders[0]['trackIds']),1)
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+ def test_custom_seek_and_volume_controls(self):
+  from types import SimpleNamespace
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   fixture.library.play();fixture.player.tick()
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.update()
+   window.seek.pointer(SimpleNamespace(x=window.seek.winfo_width()/2));window.seek_release(None)
+   self.assertAlmostEqual(fixture.backend.position,60,delta=1)
+   window.seek.step(1);self.assertGreater(fixture.backend.position,60)
+   self.assertAlmostEqual(fixture.player.saved['tracks'][fixture.player.active]['position'],fixture.backend.position)
+  finally:
+   if window:window.close()
+   fixture.tearDown()
  def test_multiple_resume_rows_and_reopen(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:

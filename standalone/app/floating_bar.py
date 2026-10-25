@@ -30,6 +30,9 @@ class FloatingBar:
  def toggle(self):
   if not self.hwnd:raise RuntimeError(self.status or 'Floating bar is not ready.')
   self.post(self.hwnd,0x8001,0,0)
+ def set_visible(self,visible):
+  if not self.hwnd:raise RuntimeError(self.status or 'Floating bar is not ready.')
+  self.post(self.hwnd,0x8003,int(bool(visible)),0)
  def close(self):
   if self.hwnd:self.post(self.hwnd,0x8002,0,0)
   if self.thread:self.thread.join(timeout=3)
@@ -56,7 +59,7 @@ class FloatingBar:
   addfont=bind(gdi,'AddFontResourceExW',ctypes.c_int,[w.LPCWSTR,w.DWORD,w.LPVOID]);removefont=bind(gdi,'RemoveFontResourceExW',w.BOOL,[w.LPCWSTR,w.DWORD,w.LPVOID])
   fontpath=pathlib.Path(__file__).resolve().parent/'assets/Rubik.ttf';fontloaded=bool(fontpath.exists() and addfont(str(fontpath),0x10,None))
   current_family='Rubik' if fontloaded else 'Segoe UI'
-  controls={};labels={101:'−15',102:'Play',103:'+15'};palette={};resources=[];font=None;last=None;visible=self.player.saved.get('floatingVisible',True)
+  controls={};labels={101:'−15',102:'Play',103:'+15',105:'Open player'};palette={};resources=[];font=None;last=None;visible=self.player.saved.get('floatingVisible',True)
   def update():
    nonlocal last,palette,font,current_family
    with self.player.lock:state=self.player.snapshot();tracks=self.player.tracks;palette=dict(self.player.saved.get('floatingTheme',{}))
@@ -90,8 +93,8 @@ class FloatingBar:
      if getrect(hwnd,ctypes.byref(rect)):
       with self.player.lock:self.player.saved['floatingPosition']=[rect.left,rect.top];self.player.persist()
      return 0
-    if msg==0x0010 or msg==0x8001:
-     visible=False if msg==0x0010 else not visible;show(hwnd,4 if visible else 0)
+    if msg in (0x0010,0x8001,0x8003):
+     visible=bool(wp) if msg==0x8003 else False if msg==0x0010 else not visible;show(hwnd,4 if visible else 0)
      with self.player.lock:self.player.saved['floatingVisible']=visible;self.player.persist()
      return 0
     if msg==0x8002:destroy(hwnd);return 0
@@ -139,7 +142,7 @@ class FloatingBar:
    controls[100]=create(0,'STATIC','Choose a recording',0x50004002,14,12,366,26,self.hwnd,100,instance,None)
    controls[104]=create(0,'STATIC','0:00 / 0:00',0x50000001,14,108,366,22,self.hwnd,104,instance,None)
    for ident,x,width in [(101,14,98),(102,124,132),(103,268,98)]:controls[ident]=create(0,'BUTTON',labels[ident],0x5000000B,x,48,width,46,self.hwnd,ident,instance,None)
-   controls[105]=create(0,'BUTTON','Open player',0x50010000,14,140,352,30,self.hwnd,105,instance,None)
+   controls[105]=create(0,'BUTTON','Open player',0x5001000B,14,140,352,30,self.hwnd,105,instance,None)
    if not all(controls.values()):raise RuntimeError('Could not create floating controls.')
    for handle in controls.values():send(handle,0x0030,font,1)
    update();timer(self.hwnd,1,500,None);show(self.hwnd,4 if visible else 0);self.status='ready';self.ready.set()

@@ -33,3 +33,7 @@ Download **shiur-player-windows-x64-0.2.0.zip**. Extract everything and run **Sh
 ## נגן שיעורים 1.4.2 — plugin display name
 
 Use **shiur-player-1.4.2.otzplugin** to replace the former Inside name with **נגן שיעורים** in the plugin list, tab, heading and error details. Install as an update and restart Otzaria. Same plugin ID and saved-data keys; no playback-engine changes.
+
+## Standalone Windows app 0.3.0 — flat controls and automatic mini player
+
+Download **shiur-player-windows-x64-0.3.0.zip**. This update removes decorative slogans, replaces old scrollbars and sliders, simplifies collection assignment into one dialog, and shows the floating mini player automatically when minimized. Existing standalone listening positions carry over. Extract the entire ZIP. Windows desktop execution remains unverified here.

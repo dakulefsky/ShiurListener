@@ -1,4 +1,4 @@
-SHIUR PLAYER 0.2.0 — ENGLISH STANDALONE WINDOWS APP
+SHIUR PLAYER 0.3.0 — ENGLISH STANDALONE WINDOWS APP
 
 Extract the ENTIRE ZIP. Open Shiur Player.exe. No separate installation needed.
 Choose your audio folder once, select a recording and click Resume selected.
@@ -12,12 +12,14 @@ most recently listened to first. Positions survive closing and restarting.
 Keep your recordings at the same path so their saved identities stay the same.
 The app saves about once per second, on pause, on switching and on normal close.
 Sudden power loss can lose the newest interval. Seek accuracy depends on the file.
-Upgrading from standalone 0.1.0 reuses the same saved positions automatically.
+Upgrading from standalone 0.1.0 or 0.2.0 reuses the same saved positions automatically.
 
 YOUR LIBRARY
-Search above the list. Choose audio folder or Rescan folder at the bottom left.
-New collection creates a collection you name. Add to collection assigns the
-selected recording. More offers rename/delete and reset for only that recording.
+Open audio folder selects the folder containing your recordings. Refresh recordings
+finds files added there. Search filters the list. No Save button is needed.
+Select a recording and click Organize selected. Choose an existing collection
+or type a new name, then click Add recording. New names create the collection
+and add the recording in that same action. More offers rename/delete and reset.
 Deleting a collection never deletes recordings. No collections are pre-created.
 
 NOW PLAYING
@@ -25,8 +27,12 @@ Play/Pause controls the current recording, even with another row selected.
 Resume selected switches to the selected shiur. Speed, volume and 10/15/60-second
 skip options are beside the playback controls. Add bookmarks and revisit them.
 Settings includes automatic next recording, sleep timer and global shortcuts.
-Open floating controls shows the always-on-top bar with play/pause and skips.
-Minimize to keep listening. Closing the main window saves and stops playback.
+MINI PLAYER
+Minimizing automatically shows a floating, always-on-top mini player with
+play/pause, skips and Open player. Restoring the main window hides a mini player
+that was opened automatically. A manually opened mini player stays visible.
+Show / hide mini player opens it manually. Settings can disable automatic showing.
+Closing the main window saves and stops playback; minimizing keeps playing.
 
 KEYBOARD
 Space: play/pause. Left/Right: skip. Ctrl+F: search. Ctrl+O: choose folder.
@@ -43,7 +49,8 @@ It is a local player, not an operating-system browser lockdown mechanism.
 
 TESTING
 Three independent resume positions after restart, real desktop-toolkit controls,
-search and recent ordering were tested on Linux. Real VLC WAV/MP3 decoding,
+search, collection assignment and sliders were tested on Linux. Minimize/restore
+logic and native floating-window messages were checked with simulated Windows APIs. Real VLC WAV/MP3 decoding,
 seeking, pause/resume and automatic next-track tests passed with dummy output.
 The Windows x64 launcher, archive contents and bundled runtime were checked.
 Actual Windows rendering, global keys and physical sound remain untested here.

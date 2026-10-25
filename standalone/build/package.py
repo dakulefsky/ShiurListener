@@ -3,7 +3,7 @@ import argparse,hashlib,json,pathlib,struct,zipfile
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--base',type=pathlib.Path,required=True);parser.add_argument('--tk',type=pathlib.Path,required=True,help='Extracted official Python 3.13.17 amd64 tcltk.msi');args=parser.parse_args()
- output=ROOT/'shiur-player-windows-x64-0.2.0.zip';prefix='Shiur Player/'
+ output=ROOT/'shiur-player-windows-x64-0.3.0.zip';prefix='Shiur Player/'
  with zipfile.ZipFile(args.base) as base,zipfile.ZipFile(output,'w',zipfile.ZIP_DEFLATED) as bundle:
   for name in base.namelist():
    relative=name.split('/',1)[1]
@@ -25,7 +25,7 @@ def main():
   bundle.write(ROOT/'build/Shiur Player.exe',prefix+'Shiur Player.exe')
   bundle.write(ROOT/'READ ME FIRST.txt',prefix+'READ ME FIRST.txt')
   info=json.loads(base.read('Sidekick/BUILD-INFO.json'))
-  info.update(version='0.2.0',variant='Standalone desktop player with redesigned library',tkSource='https://www.python.org/ftp/python/3.13.17/amd64/tcltk.msi',tkMsiSha256='ae3e5f9dd998b36d14655cd3444d0af906c1849c60aee40994eeb1e460a3cabf',baseBundleSha256=hashlib.sha256(args.base.read_bytes()).hexdigest(),validation='Persistence/controller and real Tk window interaction pass on Linux including three independent resume positions after restart; real VLC WAV/MP3 decoding passes with dummy output. Windows GUI execution remains unverified.')
+  info.update(version='0.3.0',variant='Standalone desktop player with flat controls and automatic mini player',tkSource='https://www.python.org/ftp/python/3.13.17/amd64/tcltk.msi',tkMsiSha256='ae3e5f9dd998b36d14655cd3444d0af906c1849c60aee40994eeb1e460a3cabf',baseBundleSha256=hashlib.sha256(args.base.read_bytes()).hexdigest(),validation='Persistence/controller, actual Tk interactions, one-step collection assignment and sliders pass on Linux; minimize/restore and native show/hide pass with mocks; real VLC WAV/MP3 decoding passes with dummy output. Windows GUI execution remains unverified.')
   for key in ['pluginId','pluginName','pluginVersion']:info.pop(key,None)
   bundle.writestr(prefix+'BUILD-INFO.json',json.dumps(info,ensure_ascii=False,indent=2)+'\n')
  with zipfile.ZipFile(output) as bundle,zipfile.ZipFile(args.base) as base:

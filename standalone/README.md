@@ -1,20 +1,20 @@
-# Shiur Player 0.2.0
+# Shiur Player 0.3.0
 
 An English-only local Windows x64 desktop player with a redesigned library, collection sidebar and dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
 
 Extract the entire ZIP and open **Shiur Player.exe**. Choose an audio folder once. Double-click a recording or click **Resume selected**. On another day, open the app and press Play.
 
-Every recording has its own saved position, shown in the list. **Continue listening** shows unfinished recordings in recent listening order. Switching recordings, pausing and normal closing save progress, alongside periodic checkpoints. Sudden termination can lose the newest interval; seek precision depends on the file. Keep file paths unchanged. Existing standalone 0.1.0 positions are reused automatically.
+Every recording has its own saved position, shown in the list. **Continue listening** shows unfinished recordings in recent listening order. Switching recordings, pausing and normal closing save progress, alongside periodic checkpoints. Sudden termination can lose the newest interval; seek precision depends on the file. Keep file paths unchanged. Existing standalone 0.1.0/0.2.0 positions are reused automatically.
 
-Create and name collections yourself. Use Add to collection, or More to rename/delete a collection, remove a member or reset only one recording. Collections do not copy or delete audio. Bookmarks, 0.75–2× speeds, 10/15/60-second skips, sleep timer, automatic next-track playback, optional global keyboard shortcuts and floating controls are included. Minimize to keep playing; close to save and stop.
+Create and name collections yourself. Select a recording, click **Organize selected**, choose an existing collection or type a new name, then **Add recording**. Creating and assigning a new collection happens in one action. Use More to rename/delete a collection, remove a member or reset only one recording. Collections do not copy or delete audio. Bookmarks, 0.75–2× speeds, 10/15/60-second skips, sleep timer, automatic next-track playback, optional global keyboard shortcuts and floating controls are included. Minimizing automatically shows the always-on-top mini player. Restore the main window to hide an automatically opened mini player; a manually opened one stays visible. Disable this in Settings if preferred. Close to save and stop.
 
 See [the instructions](READ%20ME%20FIRST.txt) for keyboard shortcuts. State stays at `%LOCALAPPDATA%\ShiurPlayerStandalone\state.json`; earlier Inside/Sidekick profiles remain separate.
 
-![Actual desktop-toolkit preview on Linux](../previews/shiur-player-0.2.0.png)
+![Actual desktop-toolkit preview on Linux](../previews/shiur-player-0.3.0.png)
 
 ## Validation
 
-Controller and actual Tk window tests verify three separate positions, switching, reopening, near-end progress, recent ordering, filtering, collections and bookmarks. Real libVLC WAV/MP3 decode, seek, pause/resume and next-track tests pass on Linux using dummy output. Packaging verifies source bytes, preserved existing runtime, Tk library layout, x64 PE headers and the GUI subsystem. Actual Windows rendering, global shortcuts and physical speaker output have not been tested here. This is an unsigned portable Windows build; Mac/Linux packages are not included.
+Controller and actual Tk window tests verify three separate positions, switching, reopening, near-end progress, recent ordering, filtering, one-step collection assignment, custom sliders, collections and bookmarks. Minimize/restore logic and Win32 floating-window show/hide messages are tested with mocks. Real libVLC WAV/MP3 decode, seek, pause/resume and next-track tests pass on Linux using dummy output. Packaging verifies source bytes, preserved existing runtime, Tk library layout, x64 PE headers and the GUI subsystem. Actual Windows rendering, global shortcuts and physical speaker output have not been tested here. This is an unsigned portable Windows build; Mac/Linux packages are not included.
 
 The app has no browser control or URL-opening action. Its bundled interpreter is general purpose; this is not an OS-level browser lockdown.
 

@@ -19,7 +19,9 @@ def main():
  try:
   player=Player(args.folder,data,backend);controller=LibraryController(player);player.saved['language']='en'
   player.saved.setdefault('floatingVisible',False)
-  player.saved.setdefault('floatingTheme',{'primary':'#245C49','onPrimary':'#FFFFFF','surface':'#F5F3ED','onSurface':'#20352F','surfaceContainer':'#E7EEE7','fontFamily':'Rubik'})
+  player.saved.setdefault('floatingTheme',{'primary':'#4169E1','onPrimary':'#FFFFFF','surface':'#FFFFFF','onSurface':'#182235','surfaceContainer':'#EDF1F8','fontFamily':'Rubik'})
+  if player.saved['floatingTheme'].get('primary')=='#245C49':
+   player.saved['floatingTheme'].update(primary='#4169E1',surface='#FFFFFF',onSurface='#182235',surfaceContainer='#EDF1F8')
   bar=FloatingBar(player);player.floating_bar=bar
   def shortcuts(enabled):
    nonlocal keys
