@@ -1,8 +1,12 @@
-# Shiur Player 0.5.1
+# Shiur Player 0.6.0
 
 An English-only local Windows x64 desktop player with a high-contrast navy sidebar, bold typography, blue controls and a dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
 
-Close the older player first, then extract the entire ZIP and open **Shiur Player.exe**. Choose an audio folder once. Double-click a recording or click **Play selected**. On another day, open the app and press Play.
+Close the old player and run **shiur-player-setup-0.6.0.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
+
+Click **Check for updates** in the app for subsequent releases. Checks run only when requested. The app fetches a small release JSON from this repository, validates its version/URL/size/SHA-256, downloads the installer in a worker thread, saves playback state and starts setup. Setup waits for the old player process to exit before selecting and starting the new version. Program files use separate version directories and an atomic `active.json` pointer, leaving the previous version selected if extraction/activation fails. User data and audio recordings are outside the installation tree. Previous program versions are retained; old portable copies are not removed.
+
+Update downloads are restricted to this repository's versioned raw GitHub installer URLs. TLS and SHA-256 detect transport/content mismatch; this is not code signing. A portable ZIP remains available, with the same in-app update button. Updating a portable copy installs the stable shortcut-based version with the existing standalone profile.
 
 Every recording has its own saved position, shown in the list. **Continue listening** shows unfinished recordings in recent listening order. Switching recordings, pausing and normal closing save progress, alongside periodic checkpoints. Sudden termination can lose the newest interval; seek precision depends on the file. Keep file paths unchanged. Existing standalone 0.1.0/0.2.0/0.3.0/0.4.0 positions are reused automatically.
 
@@ -12,7 +16,7 @@ Create and name collections yourself. Select a recording, click **Add to collect
 
 See [the instructions](READ%20ME%20FIRST.txt) for keyboard shortcuts. State stays at `%LOCALAPPDATA%\ShiurPlayerStandalone\state.json`; earlier Inside/Sidekick profiles remain separate.
 
-![Actual desktop-toolkit preview on Linux](../previews/shiur-player-0.5.0.png)
+![Actual desktop-toolkit preview on Linux](../previews/shiur-player-0.6.0.png)
 
 ## Validation
 
@@ -30,3 +34,14 @@ python standalone/build/package.py --base downloads/sidekick-windows-x64-1.1.0.z
 ```
 
 Window tests need a desktop display; real decoder tests need VLC and ffmpeg. Tk payload comes from the official Python 3.13.17 amd64 `tcltk.msi`, SHA256 `ae3e5f9dd998b36d14655cd3444d0af906c1849c60aee40994eeb1e460a3cabf`, extracted with msiextract. Ship `_tkinter.pyd` and its DLL dependencies, the tkinter package and Tcl/Tk script libraries, excluding IDLE, demos and tests. Source URLs and license notices are bundled.
+
+## Installer build
+
+Set the release in `app/version.py`, build the portable payload with `build/package.py`, then run:
+
+```sh
+python standalone/build/build_installer.py --go /path/to/go
+GO111MODULE=off go test ./standalone/build/installer
+```
+
+The builder cross-compiles the stable installed launcher and self-contained setup as Windows GUI x64 binaries, embeds the full ZIP, and writes `downloads/standalone-latest.json` with size and SHA-256. Publish the new setup and channel JSON together. No store credentials or automatic publishing are involved. The installer core tests actual extraction, sequential version activation, path rejection and preservation of the separate state file. Network tests reject changed checksums, foreign origins and downgrade offers. Actual Windows COM shortcuts, native setup and update restart have not been executed here.

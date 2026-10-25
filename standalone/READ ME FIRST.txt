@@ -1,74 +1,57 @@
-SHIUR PLAYER 0.5.1 — ENGLISH STANDALONE WINDOWS APP
+SHIUR PLAYER 0.6.0 — WINDOWS INSTALLER AND IN-APP UPDATES
 
-Close any older Shiur Player window first so its saved positions are written.
-Extract the ENTIRE ZIP. Open Shiur Player.exe. No separate installation needed.
-Choose your audio folder once, select a recording and click Play selected.
-On future days open the app and press Play to continue the last recording.
+ONE-TIME SETUP
+Close the older player. Run shiur-player-setup-0.6.0.exe and click OK.
+There is no ZIP to extract. Setup creates desktop and Start menu shortcuts.
+No administrator access, Python installation or VLC installation is needed.
+Use the Shiur Player shortcut to open the app on future days.
 
-EVERY SHIUR KEEPS ITS OWN PLACE
-Switch between recordings freely. Each row shows that shiur's resume time.
-Double-click a recording, or select it and click Play selected, to return to
-its own saved position. Continue listening lists unfinished recordings with the
-most recently listened to first. Positions survive closing and restarting.
-Keep your recordings at the same path so their saved identities stay the same.
-The app saves about once per second, on pause, on switching and on normal close.
+FUTURE UPDATES
+Click Check for updates at the top of the app. If a newer version is available,
+choose Install. The installer downloads in the background, verifies its size and
+SHA-256 checksum, saves your place, closes the player and restarts the new version.
+If the download fails, the current app continues working. Update checks are manual;
+ordinary listening does not contact the update server. No browser is opened.
+
+YOUR DATA
+Existing standalone recordings, collections, bookmarks and positions carry over.
+Data remains in %LOCALAPPDATA%\ShiurPlayerStandalone\state.json.
+Program files go in %LOCALAPPDATA%\Programs\ShiurPlayer, separately from that data.
+Recordings stay in the folder you selected. Keep their paths unchanged.
+Setup and updates do not copy, edit or delete your audio recordings.
+Earlier portable copies are left in place; use the installed shortcut afterwards.
+
+LISTENING
+Open audio folder once, then select a recording and click Play selected.
+Every recording has its own position. Continue listening shows unfinished shiurim.
+Positions save on pause, switching and normal close, plus periodic checkpoints.
 Sudden power loss can lose the newest interval. Seek accuracy depends on the file.
-Upgrading from standalone 0.1.0, 0.2.0, 0.3.0 or 0.4.0 reuses the same saved positions automatically.
+Ctrl/Shift selects multiple recordings; Add to collection assigns them together.
+Click a column heading to sort. The dividers cannot be dragged.
 
-YOUR LIBRARY
-Open audio folder selects the folder containing your recordings. Refresh recordings
-finds files added there. Search filters the list. No Save button is needed.
-Select a recording and click Add to collection. Choose an existing collection
-or type a new name, then click Add recording. New names create the collection
-and add the recording in that same action. Hold Ctrl to select several recordings,
-or Shift to select a range, then add them together. Ctrl+A selects the visible list.
-Right-click a recording for Play and collection actions. In a collection, More
-or right-click can remove all selected members without affecting their positions.
-Click a column heading to sort by name, resume position or duration.
-Column dividers are locked so dragging a heading cannot change column widths.
-Continue listening opens with the most recently listened-to recording first.
-The window size and library sort preference are remembered.
-More also offers collection rename/delete and an individual position reset.
-Deleting a collection never deletes recordings. No collections are pre-created.
-
-NOW PLAYING
-Play/Pause controls the current recording, even with another row selected.
-Play selected switches to the selected shiur. Speed, volume and 10/15/60-second
-skip options are beside the playback controls. Add bookmarks and revisit them.
-Settings includes automatic next recording, sleep timer and global shortcuts.
 MINI PLAYER
-Minimizing automatically shows a floating, always-on-top mini player with
-play/pause, skips and Open player. Restoring the main window hides a mini player
-that was opened automatically. A manually opened mini player stays visible.
-Click Mini player at the top right to show or hide the floating player manually.
-It starts smaller than before. Drag any edge or corner to resize it; your chosen
-size and position are remembered. Click Open to return to the full app.
-Click its speed button to cycle 1x -> 1.5x -> 2x -> 1.5x -> 1x.
-Settings also offers a 1x -> 0.5x -> 2x -> 0.5x -> 1x cycle.
-The main speed selector stays in sync. Settings can disable automatic showing.
-Closing the main window saves and stops playback; minimizing keeps playing.
+Click Mini player, or minimize the main window. The smaller floating player has
+Play/Pause, skips, speed and Open. Drag its edges to resize it; size and position
+are remembered. Speed cycles 1x -> 1.5x -> 2x -> 1.5x -> 1x by default.
+Settings offers the 0.5x alternative and optional shortcuts for use in other apps.
+Closing the main window saves and stops playback. Minimizing keeps playing.
 
 KEYBOARD
-Space: play/pause. Left/Right: skip. Ctrl+F: search. Ctrl+O: choose folder.
-Ctrl+B: bookmark. Tab and Enter operate controls. Text fields keep normal typing.
-Optional global shortcuts (enable in Settings): Ctrl+Alt+Shift+P plays/pauses;
-Left/Right skips; Up/Down changes speed; PageUp/PageDown changes recordings;
-1/2/3 changes skip length; F toggles the floating bar. Other apps may reserve keys.
+Space: play/pause. Left/Right: skip. Ctrl+F: search. Ctrl+O: audio folder.
+Ctrl+B: bookmark. Ctrl+A selects the visible recordings when the list has focus.
+Tab/Enter operate controls. Text fields keep their usual typing behavior.
+Global shortcuts, when enabled: Ctrl+Alt+Shift+P: play/pause; Left/Right: skip;
+Up/Down: speed; PageUp/PageDown: recordings; 1/2/3: skip length; F: mini player.
 
-KEEP ALL EXTRACTED FILES TOGETHER — do not move only the EXE.
-Saved data: %LOCALAPPDATA%\ShiurPlayerStandalone\state.json
-This update reuses standalone data, leaving earlier Inside/Sidekick data alone.
-No Otzaria, pairing code, browser, account, network service or command window.
-It is a local player, not an operating-system browser lockdown mechanism.
+PORTABLE OPTION
+A separate portable ZIP is available for those who prefer it. Extract its entire
+contents and run Shiur Player.exe. Its Check for updates can move you to the
+installed version using the same saved data.
 
-TESTING
-Three independent resume positions after restart, real desktop-toolkit controls,
-search, batch collection assignment, sorting, focused-button keyboard handling,
-window-size restore, locked column dividers and stable idle redraws were tested
-on Linux. Minimize/restore
-logic, resize persistence, speed clicks and native repaint messages were checked
-with simulated Windows APIs. Real VLC WAV/MP3 decoding,
-seeking, pause/resume and automatic next-track tests passed with dummy output.
-The Windows x64 launcher, archive contents and bundled runtime were checked.
-Actual Windows rendering, global keys and physical sound remain untested here.
-Runtime licenses and source links are included. This is an unsigned portable app.
+VALIDATION
+Installer extraction, failed-update preservation and saved-data isolation were
+tested using the shared Go installer code on Linux. Download integrity, metadata,
+version checks and existing player controls were tested. Windows GUI executables
+and embedded package contents were verified structurally. The actual Windows
+setup UI, shortcuts, restart flow and speaker output remain untested here.
+This is an unsigned per-user installer. Licenses are included with the app.

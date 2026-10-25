@@ -1,5 +1,7 @@
 """Local desktop library. UI work stays on the Tk thread; audio runs independently."""
-import queue,sys
+import queue,sys,threading
+from version import APP_VERSION
+import updater
 import tkinter as tk
 from tkinter import ttk, filedialog, simpledialog, messagebox
 from controller import clock
@@ -59,7 +61,7 @@ class ModernScale(tk.Canvas):
 
 class PlayerWindow:
  def __init__(self,player,library,shortcuts):
-  self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False
+  self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False;self.update_busy=False
   self.root=tk.Tk();self.root.title(TITLE);self.root.configure(bg=BG)
   screen_w,screen_h=self.root.winfo_screenwidth(),self.root.winfo_screenheight()
   self.minimum_size=(min(980,screen_w-40),min(640,screen_h-80))
@@ -110,6 +112,7 @@ class PlayerWindow:
   content=tk.Frame(self.root,bg=BG);content.pack(side='left',fill='both',expand=True,padx=28,pady=28)
   header=tk.Frame(content,bg=BG);header.pack(fill='x')
   self.heading=self.label(header,'All recordings',28,anchor='w');self.heading.pack(side='left',fill='x',expand=True,pady=(6,4))
+  self.update_button=self.button(header,'Check for updates',self.check_updates);self.update_button.pack(side='right',padx=(12,0))
   self.mini_button=self.button(header,'Mini player',lambda:self.command('floating_toggle'),True);self.mini_button.pack(side='right',padx=(12,0))
   self.subtitle=self.label(content,'0 recordings',10,MUTED,anchor='w');self.subtitle.pack(fill='x',pady=(0,22))
   body=tk.Frame(content,bg=BG);body.pack(fill='both',expand=True)
@@ -159,6 +162,35 @@ class PlayerWindow:
   self.button(self.card,'Add bookmark',self.bookmark).pack(fill='x')
   self.button(self.card,'View bookmarks',self.bookmarks).pack(fill='x')
   self.status=self.label(content,'',9,MUTED,anchor='w',wraplength=850);self.status.pack(fill='x',pady=(18,0))
+ def check_updates(self):
+  if self.update_busy:return
+  self.update_busy=True;self.set_options(self.update_button,text='Checking...',state='disabled')
+  def work():
+   try:self.requests.put(('update_checked',updater.check()))
+   except Exception as error:self.requests.put(('update_error',str(error)))
+  threading.Thread(target=work,daemon=True).start()
+ def update_event(self,event):
+  action,value=event
+  if action=='update_error':
+   self.update_busy=False;self.set_options(self.update_button,text='Check for updates',state='normal')
+   messagebox.showerror('Update unavailable',value+'\nYou can keep using the player and try again later.',parent=self.root)
+  elif action=='update_checked':
+   if value is None:
+    self.update_busy=False;self.set_options(self.update_button,text='Check for updates',state='normal');messagebox.showinfo('Shiur Player',f'You have the latest version ({APP_VERSION}).',parent=self.root);return
+   if not messagebox.askyesno('Update available',f"Install Shiur Player {value['version']}? Your listening positions will be saved and the player will restart.",parent=self.root):
+    self.update_busy=False;self.set_options(self.update_button,text='Check for updates',state='normal');return
+   self.set_options(self.update_button,text='Downloading...')
+   def work():
+    try:self.requests.put(('update_downloaded',updater.download(value)))
+    except Exception as error:self.requests.put(('update_error',str(error)))
+   threading.Thread(target=work,daemon=True).start()
+  elif action=='update_downloaded':
+   try:
+    with self.player.lock:self.player.capture();self.player.persist()
+    process=updater.install(value)
+    if not self.close():
+     process.terminate();self.update_event(('update_error','The update was postponed because your listening position could not be saved.'))
+   except Exception as error:self.update_event(('update_error',str(error)))
  def safe(self,fn):
   try:return fn()
   except Exception as error:messagebox.showerror('Shiur Player',str(error),parent=self.root)
@@ -283,7 +315,7 @@ class PlayerWindow:
   self.button(pop,'Jump to bookmark',lambda:action()).pack(side='left',padx=16,pady=12);self.button(pop,'Delete',lambda:action(True)).pack(side='right',padx=16)
  def settings(self):
   pop=tk.Toplevel(self.root);pop.title('Settings & shortcuts');pop.geometry('530x570');pop.configure(bg=BG)
-  self.label(pop,'Settings',20).pack(anchor='w',padx=24,pady=20)
+  self.label(pop,f'Settings · {APP_VERSION}',20).pack(anchor='w',padx=24,pady=20)
   auto=tk.BooleanVar(value=self.player.saved['autoNext']);tk.Checkbutton(pop,text='Automatically play the next recording',variable=auto,command=lambda:self.safe(lambda:self.command('autonext',value=auto.get())),bg=BG).pack(anchor='w',padx=24)
   mini=tk.BooleanVar(value=self.player.saved.get('miniOnMinimize',True))
   def save_mini():
@@ -337,6 +369,10 @@ class PlayerWindow:
    self.check_window_state()
    while not self.requests.empty():
     action=self.requests.get_nowait()
+    if isinstance(action,tuple):
+     self.update_event(action)
+     if self.closed:return
+     continue
     if action=='show':self.root.deiconify();self.root.lift();self.root.focus_force()
     elif action=='hide':self.root.iconify()
     elif action=='folder':self.safe(self.choose_folder)
@@ -359,8 +395,8 @@ class PlayerWindow:
     self.player.capture()
     if self.root.state()=='normal':self.player.saved['windowSize']=[self.root.winfo_width(),self.root.winfo_height()]
     self.player.persist()
-  except Exception as error:messagebox.showerror('Could not save your place',str(error),parent=self.root);return
+  except Exception as error:messagebox.showerror('Could not save your place',str(error),parent=self.root);return False
   self.closed=True
   for callback in self.root.tk.call('after','info'):self.root.tk.call('after','cancel',callback)
-  self.root.destroy()
+  self.root.destroy();return True
  def run(self):self.root.mainloop()

@@ -4,13 +4,13 @@ An English-only local shiur player for Windows x64. The recording library and pl
 
 ## Download
 
-**[Download the standalone Windows app — 0.5.1](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-windows-x64-0.5.1.zip)**
+**[Download the standalone Windows app — 0.6.0](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-0.6.0.exe)**
 
-Extract the **entire ZIP**, run **Shiur Player.exe**, choose the folder containing your recordings, and press Play. Keep the runtime folders beside the executable. Python and the audio runtime are included; no separate runtime installation is needed.
+Close the older player and run the **setup EXE once**. It creates desktop and Start menu shortcuts. Use **Check for updates** inside the app for future releases—no repeated manual extraction. Python and VLC are bundled. Existing standalone listening data stays in the same profile.
 
-After restarting the computer, open the same EXE and press Play. The chosen folder, last recording and individual listening positions are remembered. Nothing starts playing automatically. The first standalone profile is separate from the previous Inside/Sidekick profiles; those are left untouched.
+After restarting the computer, open the Shiur Player shortcut and press Play. The chosen folder, last recording and individual listening positions are remembered. Nothing starts playing automatically. The first standalone profile is separate from the previous Inside/Sidekick profiles; those are left untouched.
 
-![Redesigned player, rendered on Linux](previews/shiur-player-0.5.0.png)
+![Redesigned player, rendered on Linux](previews/shiur-player-0.6.0.png)
 
 ## Features
 
@@ -28,13 +28,13 @@ After restarting the computer, open the same EXE and press Play. The chosen fold
 
 Minimizing keeps playback running. Closing the main window stops the app and saves progress. Run the EXE again to restore an already-running main window. Use **Rescan** after adding audio files. Recordings stay in their existing folders and are not modified, copied or deleted.
 
-[Installation and source guide](standalone/README.md) · [Source ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-standalone-source-0.5.1.zip) · [Checksums](downloads/SHA256SUMS.txt)
+[Installation and source guide](standalone/README.md) · [Source ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-standalone-source-0.6.0.zip) · [Checksums](downloads/SHA256SUMS.txt)
 
 ## Verification and limits
 
 Controller tests cover separate positions, collections, bookmarks and playback actions. Actual Tk window tests verify three independent resume times, recent ordering, searching, switching and reopening. Real VLC WAV/MP3 decoding passes on Linux with dummy output.
 
-Packaging verifies runtime/license preservation, source correspondence, x64 PE structure, the GUI subsystem and bundled Tk dependencies. Actual Windows rendering, global shortcuts and physical speaker output remain untested here. This is an unsigned portable build.
+Packaging verifies runtime/license preservation, source correspondence, x64 PE structure, the GUI subsystem and bundled Tk dependencies. Actual Windows rendering, global shortcuts and physical speaker output remain untested here. This is an unsigned per-user installer. Installer extraction and version activation have been tested on Linux; actual Windows setup, shortcuts and restart remain unverified here.
 
 The app exposes no browser control or URL-opening command. Its bundled Python interpreter is general purpose; it is not a device-level browser/Internet lockdown tool.
 

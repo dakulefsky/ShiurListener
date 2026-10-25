@@ -8,3 +8,6 @@ sidekick/*-preview.png
 sidekick/build/windows/*.exe
 standalone/*.zip
 standalone/build/*.exe
+
+standalone/build/installer/payload.zip
+standalone/build/installer/*.exe

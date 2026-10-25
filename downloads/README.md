@@ -61,3 +61,7 @@ Download **shiur-player-windows-x64-0.5.0.zip**. Bold navy/blue styling, a clear
 ## Standalone Windows app 0.5.1 — preferred speed cycle
 
 Download **shiur-player-windows-x64-0.5.1.zip**. The mini-player speed button now defaults to **1× → 1.5× → 2× → 1.5× → 1×**. The half-speed cycle remains an option in Settings. All 0.5.0 visual, resizing and redraw improvements are retained.
+
+## Standalone Windows app 0.6.0 — installer and updates
+
+Run **shiur-player-setup-0.6.0.exe** once. It creates desktop/Start menu shortcuts and preserves the existing standalone profile. Future updates use **Check for updates** inside the app. The portable ZIP remains optional. Updates contact only the fixed GitHub release channel when requested; no browser opens. Actual Windows setup and restart remain unverified here.

@@ -103,6 +103,21 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_update_handoff_saves_positions_and_cancels_if_close_fails(self):
+  import json
+  from unittest.mock import Mock,patch
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   fixture.library.play();fixture.player.tick();fixture.backend.position=65.432
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.root.update();helper=Mock()
+   def start(_):
+    saved=json.loads(fixture.player.file.read_text());self.assertEqual(saved['tracks'][fixture.player.active]['position'],65.432);return helper
+   with patch('window.updater.install',side_effect=start),patch.object(window,'close',return_value=False),patch('window.messagebox.showerror'):
+    window.update_busy=True;window.update_event(('update_downloaded',fixture.root/'Setup.exe'))
+    helper.terminate.assert_called_once();self.assertFalse(window.update_busy);self.assertTrue(window.root.winfo_exists())
+  finally:
+   if window:window.close()
+   fixture.tearDown()
  def test_column_dividers_are_locked_but_headings_still_sort(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
