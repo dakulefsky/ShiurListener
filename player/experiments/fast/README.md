@@ -64,3 +64,7 @@ ffmpeg -stream_loop -1 -i data/music_wav/opera.wav -t 3600 -ac 1 -ar 16000 -c:a 
 ## Next integration constraint
 
 The current plugin uses OfflineAudioContext, which decodes a whole recording. This native seek/decode prototype does not remove that browser limitation. Bringing these timings and large-file handling into Inside needs a suitable browser incremental decoder/demuxer or a host-owned bounded seek/decode API. No companion installation has been added. Host-side validation remains the correct place for restrictions that modified plugin code must not bypass.
+
+## Broader two-check file test
+
+[136-file evaluation results](FILE_TEST_RESULTS.md): no music-only example passed, nine speech examples were uncertain, and three mixed music/speech examples passed. Rules were unchanged during the run; fixtures and limitations are documented.
