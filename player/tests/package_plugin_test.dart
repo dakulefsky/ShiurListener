@@ -11,6 +11,9 @@ void main() {
     final manifest = jsonDecode(
       File('$root/plugin/manifest.json').readAsStringSync(),
     ) as Map;
+    expect(manifest['name'], 'נגן שיעורים');
+    expect(manifest['id'], 'org.shiurplayer.local');
+    expect((manifest['contributes'] as Map)['toolTab']['title'], 'נגן שיעורים');
     final permissions = (manifest['permissions'] as List).cast<String>();
     expect(
       permissions.any(
@@ -29,9 +32,9 @@ void main() {
       '$root/plugin',
       '--force',
       '--output',
-      '$root/inside-1.4.1.otzplugin',
+      '$root/shiur-player-1.4.2.otzplugin',
     ]);
     expect(code, PluginPackagerCliExitCode.success);
-    expect(File('$root/inside-1.4.1.otzplugin').existsSync(), isTrue);
+    expect(File('$root/shiur-player-1.4.2.otzplugin').existsSync(), isTrue);
   });
 }

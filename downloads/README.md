@@ -29,3 +29,7 @@ Download **shiur-player-windows-x64-0.1.0.zip** for the English-only standalone 
 ## Standalone Windows app 0.2.0 — redesigned player
 
 Download **shiur-player-windows-x64-0.2.0.zip**. Extract everything and run **Shiur Player.exe**. The new library shows a separate resume time for every shiur, with recent-first Continue listening and a dedicated Now Playing panel. It reuses standalone 0.1.0 positions. No separate runtime installation. [Instructions](../standalone/README.md). Windows desktop execution remains unverified.
+
+## נגן שיעורים 1.4.2 — plugin display name
+
+Use **shiur-player-1.4.2.otzplugin** to replace the former Inside name with **נגן שיעורים** in the plugin list, tab, heading and error details. Install as an update and restart Otzaria. Same plugin ID and saved-data keys; no playback-engine changes.

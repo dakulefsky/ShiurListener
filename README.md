@@ -38,6 +38,6 @@ The app exposes no browser control or URL-opening command. Its bundled Python in
 
 These remain available as earlier projects, but are not required by the standalone app:
 
-- [Inside 1.4.1 plugin](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/inside-1.4.1.otzplugin) · [Inside guide](player/README.md)
+- [נגן שיעורים 1.4.2 plugin](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-1.4.2.otzplugin) · [Plugin guide](player/README.md)
 - [Sidekick 1.1.0 companion ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/sidekick-windows-x64-1.1.0.zip) · [Companion guide](sidekick/README.md)
 - [Hebrew Otzaria developer handoff](docs/OTZARIA_AUDIO_HANDOFF.he.md)
