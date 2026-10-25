@@ -1,0 +1,265 @@
+{
+  "model_sha256": "e193da5676a2fdb7a3702c10fba62aa27d76f64e4534467443811c1a2ff1667d",
+  "experimental": true,
+  "files": [
+    {
+      "file": "jazz_insert_2sec.wav",
+      "sha256": "629c5519757ebd6b6455f3bc41c7fc136e222450ea99102edacc2aa64abd7585",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "uncertain",
+      "reason": "Short music/singing candidates need review",
+      "seconds": 32.000000000000014,
+      "speech_fraction": 0.90859375,
+      "music_fraction": 0.06093749999999997,
+      "segments": [
+        {
+          "start": 14.625,
+          "end": 16.575,
+          "peak": 0.9391167759895325
+        }
+      ],
+      "duration_policy": "below_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.17051898199133575
+    },
+    {
+      "file": "jazz_insert_5sec.wav",
+      "sha256": "2ac8ffd772193f8cebd863557aea3f626da0f0c04c920a949ce29c7608468f00",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "block",
+      "reason": "Sustained or substantial music/singing detected",
+      "seconds": 35.00000000000002,
+      "speech_fraction": 0.8328571428571427,
+      "music_fraction": 0.1392857142857142,
+      "segments": [
+        {
+          "start": 14.625,
+          "end": 19.5,
+          "peak": 0.9869138598442078
+        }
+      ],
+      "duration_policy": "below_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.13669260599999689
+    },
+    {
+      "file": "jazz_under_speech_minus20dB.wav",
+      "sha256": "dd16743d5d87e296e7f40da98aabbaa9a0027ddd880fb3da33cfe478869bc207",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "block",
+      "reason": "Sustained or substantial music/singing detected",
+      "seconds": 30.000000000000014,
+      "speech_fraction": 0.9349999999999999,
+      "music_fraction": 0.2924999999999998,
+      "segments": [
+        {
+          "start": 1.95,
+          "end": 2.925,
+          "peak": 0.8289799690246582
+        },
+        {
+          "start": 4.875,
+          "end": 7.8,
+          "peak": 0.6411149501800537
+        },
+        {
+          "start": 9.75,
+          "end": 10.725,
+          "peak": 0.7568017840385437
+        },
+        {
+          "start": 12.675,
+          "end": 13.65,
+          "peak": 0.783640444278717
+        },
+        {
+          "start": 19.5,
+          "end": 21.450000000000003,
+          "peak": 0.6775885820388794
+        },
+        {
+          "start": 27.3,
+          "end": 28.275000000000002,
+          "peak": 0.5092613697052002
+        }
+      ],
+      "duration_policy": "below_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.13240546200540848
+    },
+    {
+      "file": "opera_insert_2sec.wav",
+      "sha256": "47544fd9e08f2181914904e56b9db6e6a30c898bb849123c5ea55091e8bbc8bd",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "uncertain",
+      "reason": "Short music/singing candidates need review",
+      "seconds": 32.000000000000014,
+      "speech_fraction": 0.90859375,
+      "music_fraction": 0.030468749999999985,
+      "segments": [
+        {
+          "start": 15.6,
+          "end": 16.575,
+          "peak": 0.9003576636314392
+        }
+      ],
+      "duration_policy": "below_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.12514324000221677
+    },
+    {
+      "file": "opera_insert_5sec.wav",
+      "sha256": "1a69fb6bc0971ef7198627247f537abe93fbd8ea1ce11d022f1f7e494e07cc01",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "uncertain",
+      "reason": "Short music/singing candidates need review",
+      "seconds": 35.00000000000002,
+      "speech_fraction": 0.8607142857142855,
+      "music_fraction": 0.05571428571428568,
+      "segments": [
+        {
+          "start": 15.6,
+          "end": 17.55,
+          "peak": 0.9003576636314392
+        }
+      ],
+      "duration_policy": "below_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.13537751699914224
+    },
+    {
+      "file": "opera_under_speech_minus20dB.wav",
+      "sha256": "0f9873d4d7e0d2acf868a11efff025f2b05194b91ba7c9bee585a1f3762007df",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "uncertain",
+      "reason": "Short music/singing candidates need review",
+      "seconds": 30.000000000000014,
+      "speech_fraction": 0.9349999999999999,
+      "music_fraction": 0.03249999999999999,
+      "segments": [
+        {
+          "start": 1.95,
+          "end": 2.925,
+          "peak": 0.6685552000999451
+        }
+      ],
+      "duration_policy": "below_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.12692958998377435
+    },
+    {
+      "file": "rock_insert_2sec.wav",
+      "sha256": "fbf287c5a0a6176635882b6052bba2912757a77ad4dae5c493cab2675fed50b2",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "uncertain",
+      "reason": "Short music/singing candidates need review",
+      "seconds": 32.000000000000014,
+      "speech_fraction": 0.90859375,
+      "music_fraction": 0.030468749999999985,
+      "segments": [
+        {
+          "start": 15.6,
+          "end": 16.575,
+          "peak": 0.9523489475250244
+        }
+      ],
+      "duration_policy": "below_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.12748360002296977
+    },
+    {
+      "file": "rock_insert_5sec.wav",
+      "sha256": "156686a0bc641194776113f78a3c88dd2ec19159ab221853594b8b6e46e7893c",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "block",
+      "reason": "Sustained or substantial music/singing detected",
+      "seconds": 35.00000000000002,
+      "speech_fraction": 0.8328571428571427,
+      "music_fraction": 0.11142857142857136,
+      "segments": [
+        {
+          "start": 15.6,
+          "end": 19.5,
+          "peak": 0.9735627174377441
+        }
+      ],
+      "duration_policy": "below_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.12910490299691446
+    },
+    {
+      "file": "rock_under_speech_minus20dB.wav",
+      "sha256": "42cbef7ee2f5b4b3dc890bf3cf2958549db3d1141d362f50c283d7787c5b1875",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "block",
+      "reason": "Sustained or substantial music/singing detected",
+      "seconds": 30.000000000000014,
+      "speech_fraction": 0.9674999999999999,
+      "music_fraction": 0.48749999999999966,
+      "segments": [
+        {
+          "start": 1.95,
+          "end": 3.9,
+          "peak": 0.7060698866844177
+        },
+        {
+          "start": 4.875,
+          "end": 8.775,
+          "peak": 0.8667512536048889
+        },
+        {
+          "start": 9.75,
+          "end": 10.725,
+          "peak": 0.7718157768249512
+        },
+        {
+          "start": 11.7,
+          "end": 13.65,
+          "peak": 0.645148754119873
+        },
+        {
+          "start": 16.575,
+          "end": 18.525000000000002,
+          "peak": 0.6721090078353882
+        },
+        {
+          "start": 20.475,
+          "end": 23.400000000000002,
+          "peak": 0.843926191329956
+        },
+        {
+          "start": 25.35,
+          "end": 26.325000000000003,
+          "peak": 0.8292304873466492
+        }
+      ],
+      "duration_policy": "below_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.12034010500065051
+    },
+    {
+      "file": "speech_only_geography.wav",
+      "sha256": "f9b311fdacfb9b978ca00f36b0cf4f9b94fddcd183cca00dd409dafd41900a50",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "allow",
+      "reason": "Predominantly speech under this experimental rule",
+      "seconds": 30.000000000000014,
+      "speech_fraction": 1.0,
+      "music_fraction": 0.0,
+      "segments": [],
+      "duration_policy": "below_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.12096979600028135
+    }
+  ]
+}

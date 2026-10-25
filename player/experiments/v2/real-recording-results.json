@@ -1,0 +1,103 @@
+{
+  "model_sha256": "e193da5676a2fdb7a3702c10fba62aa27d76f64e4534467443811c1a2ff1667d",
+  "experimental": true,
+  "files": [
+    {
+      "file": "shiur_freifeld.mp3",
+      "sha256": "1b97eef25f4e9f967fe0527dc5f3ffbe587d09ce65b2ae166f85c204aa600458",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "uncertain",
+      "reason": "Short music/singing candidates need review",
+      "seconds": 460.0946875000037,
+      "speech_fraction": 0.8434133463016761,
+      "music_fraction": 0.016953032086465758,
+      "segments": [
+        {
+          "start": 9.75,
+          "end": 10.725,
+          "peak": 0.7451404333114624
+        },
+        {
+          "start": 60.45,
+          "end": 61.425000000000004,
+          "peak": 0.6509822607040405
+        },
+        {
+          "start": 154.05,
+          "end": 155.025,
+          "peak": 0.555396318435669
+        },
+        {
+          "start": 333.45,
+          "end": 334.425,
+          "peak": 0.5296992063522339
+        },
+        {
+          "start": 350.025,
+          "end": 351.0,
+          "peak": 0.5915994048118591
+        },
+        {
+          "start": 365.625,
+          "end": 367.57500000000005,
+          "peak": 0.7067527770996094
+        },
+        {
+          "start": 372.45,
+          "end": 373.425,
+          "peak": 0.521198034286499
+        }
+      ],
+      "duration_policy": "meets_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 1.4510010139783844
+    },
+    {
+      "file": "six_minutes_speech_then_15sec_music.wav",
+      "sha256": "25357637f27d4d0bfa076b6d01e229bc2d94f270fc63594692ae44643452742d",
+      "policy": "2.0-experimental",
+      "profile": "conservative",
+      "decision": "block",
+      "reason": "Sustained or substantial music/singing detected",
+      "seconds": 375.00000000000176,
+      "speech_fraction": 0.8345999999999969,
+      "music_fraction": 0.05359999999999975,
+      "segments": [
+        {
+          "start": 9.75,
+          "end": 10.725,
+          "peak": 0.741254448890686
+        },
+        {
+          "start": 60.45,
+          "end": 61.425000000000004,
+          "peak": 0.6420562267303467
+        },
+        {
+          "start": 154.05,
+          "end": 155.025,
+          "peak": 0.5565744638442993
+        },
+        {
+          "start": 333.45,
+          "end": 334.425,
+          "peak": 0.5344182252883911
+        },
+        {
+          "start": 350.025,
+          "end": 351.0,
+          "peak": 0.5887691974639893
+        },
+        {
+          "start": 359.775,
+          "end": 375.0,
+          "peak": 0.9995176196098328
+        }
+      ],
+      "duration_policy": "meets_five_minutes",
+      "playback_eligible": false,
+      "wall_seconds": 0.9085555569909047
+    }
+  ]
+}
