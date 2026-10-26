@@ -90,6 +90,9 @@ class FloatingBar:
   if self.thread:self.thread.join(timeout=3)
  def run(self):
   from ctypes import wintypes as w
+  from native_rendering import SmoothDrawing
+  from rendering import rounded_png,icon_png
+  smooth=SmoothDrawing()
   user=ctypes.WinDLL('user32',use_last_error=True);gdi=ctypes.WinDLL('gdi32',use_last_error=True);kernel=ctypes.WinDLL('kernel32',use_last_error=True)
   LRESULT=ctypes.c_ssize_t;PROC=ctypes.WINFUNCTYPE(LRESULT,w.HWND,w.UINT,w.WPARAM,w.LPARAM)
   class WNDCLASS(ctypes.Structure):
@@ -314,14 +317,21 @@ class FloatingBar:
      active=item.id==hot_control or bool(item.state&1)
      shade=color(palette.get('primary') if primary else palette.get('surfaceContainer' if active else 'surface'),'#6558D3' if primary else '#E9EAF0' if active else '#F7F7FA')
      if resources:fill(item.dc,ctypes.byref(item.rect),resources[0])
-     b=brush(shade);pen=penfn(0,1,shade);oldbrush=select(item.dc,b);oldpen=select(item.dc,pen)
-     roundrect(item.dc,item.rect.left+1,item.rect.top+1,item.rect.right-1,item.rect.bottom-1,24,24)
-     select(item.dc,oldpen);select(item.dc,oldbrush);delete(pen);delete(b)
+     fill_hex=f'#{shade&255:02x}{(shade>>8)&255:02x}{(shade>>16)&255:02x}'
+     width=item.rect.right-item.rect.left;height=item.rect.bottom-item.rect.top
+     painted=smooth.draw(item.dc,item.rect.left+1,item.rect.top+1,max(1,width-2),max(1,height-2),rounded_png(max(1,width-2),max(1,height-2),12,fill_hex))
+     if not painted:
+      b=brush(shade);pen=penfn(0,1,shade);oldbrush=select(item.dc,b);oldpen=select(item.dc,pen)
+      roundrect(item.dc,item.rect.left+1,item.rect.top+1,item.rect.right-1,item.rect.bottom-1,24,24)
+      select(item.dc,oldpen);select(item.dc,oldbrush);delete(pen);delete(b)
      ink=color(palette.get('onPrimary') if primary else palette.get('onSurface'),'#FFFFFF' if primary else '#242332')
      if item.state&4:ink=color('#A7A5B5','#A7A5B5')
      setcolor(item.dc,ink);setbg(item.dc,1)
      if item.id in (102,105,108,109):
       cx=(item.rect.left+item.rect.right)//2;cy=(item.rect.top+item.rect.bottom)//2
+      name=('Pause' if labels[102]=='Pause' else 'Play') if item.id==102 else 'Close' if item.id==109 else 'Collapse' if item.id==108 and not collapsed else 'Expand'
+      ink_hex=f'#{ink&255:02x}{(ink>>8)&255:02x}{(ink>>16)&255:02x}'
+      if smooth.draw(item.dc,cx-11,cy-11,22,22,icon_png(name,ink_hex)):return 1
       iconbrush=brush(ink);iconpen=penfn(0,2,ink);oldb=select(item.dc,iconbrush);oldp=select(item.dc,iconpen)
       if item.id==102:
        if labels[102]=='Pause':
@@ -373,7 +383,7 @@ class FloatingBar:
    while getmessage(ctypes.byref(message),None,0,0)>0:translate(ctypes.byref(message));dispatch(ctypes.byref(message))
   except Exception as e:self.status=str(e);print('Floating bar unavailable: '+str(e),flush=True)
   finally:
-   self.ready.set()
+   self.ready.set();smooth.close()
    if self.hwnd:destroy(self.hwnd)
    self.hwnd=None
    if font:delete(font)

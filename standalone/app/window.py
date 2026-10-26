@@ -1,7 +1,8 @@
 """Local desktop library. UI work stays on the Tk thread; audio runs independently."""
 import queue,sys,threading,pathlib
+from rendering import rounded_png,icon_png
 from version import APP_VERSION
-import updater,profile_backup
+import updater,profile_backup,hotkeys
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from controller import clock
@@ -54,8 +55,8 @@ class RoundedCard(tk.Canvas):
  def __init__(self,parent,inset=14,stretch=False,**kw):
   super().__init__(parent,bg=parent.cget('bg'),bd=0,highlightthickness=0,**kw)
   self.inset=inset;self.stretch=stretch
-  self.shadow=self.create_polygon(0,0,1,1,smooth=True,fill='#E4E1ED',outline='')
-  self.surface=self.create_polygon(0,0,1,1,smooth=True,fill=PAPER,outline=LINE,width=1)
+  self.shadow=self.create_image(1,3,anchor='nw')
+  self.surface=self.create_image(1,1,anchor='nw');self.surface_key=None
   self.body=tk.Frame(self,bg=PAPER)
   self.window=self.create_window(inset,inset,anchor='nw',window=self.body)
   self.bind('<Configure>',self.resize)
@@ -66,8 +67,12 @@ class RoundedCard(tk.Canvas):
    if self.winfo_reqheight()!=wanted:self.configure(height=wanted)
  def resize(self,event=None):
   width=self.winfo_width();height=self.winfo_height()
-  self.coords(self.shadow,*rounded_points(1,3,max(0,width-2),max(0,height-3)))
-  self.coords(self.surface,*rounded_points(1,1,max(0,width-2),max(0,height-5)))
+  key=(max(1,width-2),max(1,height-5))
+  if key!=self.surface_key:
+   self.surface_key=key
+   self.shadow_image=tk.PhotoImage(master=self,data=rounded_png(*key,18,'#E4E1ED'))
+   self.surface_image=tk.PhotoImage(master=self,data=rounded_png(*key,18,PAPER,LINE))
+   self.itemconfigure(self.shadow,image=self.shadow_image);self.itemconfigure(self.surface,image=self.surface_image)
   options={'width':max(1,width-2*self.inset)}
   if self.stretch:options['height']=max(1,height-2*self.inset-3)
   self.itemconfigure(self.window,**options)
@@ -77,8 +82,9 @@ class SoftToggle(tk.Canvas):
  def __init__(self,parent,text,variable,command):
   super().__init__(parent,height=40,bg=parent.cget('bg'),highlightthickness=0,bd=0,takefocus=1,cursor='hand2')
   self.variable=variable;self.command=command;self.focused=False
-  self.track=self.create_polygon(0,0,1,1,smooth=True,outline='')
-  self.thumb=self.create_oval(0,0,1,1,fill=PAPER,outline='')
+  self.track=self.create_image(1,7,anchor='nw');self.track_key=None
+  self.thumb_image=tk.PhotoImage(master=self,data=rounded_png(16,16,8,PAPER))
+  self.thumb=self.create_image(5,11,anchor='nw',image=self.thumb_image)
   self.caption=self.create_text(56,19,text=text,anchor='w',fill=INK,font=(FONT,10))
   self.bind('<ButtonRelease-1>',self.toggle);self.bind('<KeyRelease-space>',self.toggle);self.bind('<Return>',self.toggle)
   self.bind('<FocusIn>',lambda _:self.focus(True));self.bind('<FocusOut>',lambda _:self.focus(False))
@@ -88,9 +94,10 @@ class SoftToggle(tk.Canvas):
   if event.widget is self:self.variable.trace_remove('write',self.trace)
  def focus(self,value):self.focused=value;self.paint()
  def paint(self):
-  self.coords(self.track,*rounded_points(1,7,40,24,12));on=self.variable.get()
-  self.itemconfigure(self.track,fill=GREEN if on else '#D8D5E2',outline=GREEN if self.focused else '',width=2)
-  x=23 if on else 5;self.coords(self.thumb,x,11,x+16,27)
+  on=self.variable.get();key=(on,self.focused)
+  if key!=self.track_key:
+   self.track_key=key;self.track_image=tk.PhotoImage(master=self,data=rounded_png(40,24,12,GREEN if on else '#D8D5E2',GREEN if self.focused else ''));self.itemconfigure(self.track,image=self.track_image)
+  x=23 if on else 5;self.coords(self.thumb,x,11)
  def toggle(self,event=None):
   self.focus_set();self.variable.set(not self.variable.get());self.command();return 'break'
 
@@ -116,17 +123,21 @@ class ModernScale(tk.Canvas):
  """Flat seek/volume track; updates from playback do not send seek commands."""
  def __init__(self,parent,from_=0,to=1,value=0,command=None,dark=False):
   super().__init__(parent,height=26,bg=SIDEBAR if dark else PAPER,highlightthickness=0,bd=0,takefocus=1,cursor='hand2')
-  self.maximum=to;self.minimum=from_;self.value=value;self.command=command;self.last_paint=None
+  self.maximum=to;self.minimum=from_;self.value=value;self.command=command;self.last_paint=None;self.focused=False
   self.track=self.create_line(8,13,9,13,fill=LINE,width=4,capstyle='round')
   self.fill=self.create_line(8,13,9,13,fill=GREEN,width=4,capstyle='round')
-  self.dot=self.create_oval(2,7,14,19,fill=GREEN,outline='')
+  self.dot_image=tk.PhotoImage(master=self,data=rounded_png(12,12,6,GREEN))
+  self.dot=self.create_image(8,13,image=self.dot_image)
   self.bind('<Configure>',lambda _:self.paint());self.bind('<Button-1>',self.pointer);self.bind('<B1-Motion>',self.pointer)
   self.bind('<Left>',lambda _:self.step(-1));self.bind('<Right>',lambda _:self.step(1))
-  self.bind('<FocusIn>',lambda _:self.itemconfigure(self.dot,outline=TINT,width=3));self.bind('<FocusOut>',lambda _:self.itemconfigure(self.dot,outline='',width=0))
+  self.bind('<FocusIn>',lambda _:self.focus(True));self.bind('<FocusOut>',lambda _:self.focus(False))
  def configure(self,**kw):
   if 'to' in kw:self.maximum=kw.pop('to')
   if kw:super().configure(**kw)
   self.paint()
+ def focus(self,value):
+  self.focused=value;size=18 if value else 12
+  self.dot_image=tk.PhotoImage(master=self,data=rounded_png(size,size,size/2,GREEN,TINT if value else ''));self.itemconfigure(self.dot,image=self.dot_image)
  def get(self):return self.value
  def set(self,value):self.value=max(self.minimum,min(self.maximum,float(value)));self.paint()
  def paint(self):
@@ -134,7 +145,7 @@ class ModernScale(tk.Canvas):
   if key==self.last_paint:return
   self.last_paint=key;ratio=(self.value-self.minimum)/max(.001,self.maximum-self.minimum);x=8+ratio*(width-16)
   self.coords(self.track,8,13,width-8,13);self.coords(self.fill,8,13,x,13)
-  self.itemconfigure(self.fill,state='normal' if x>8 else 'hidden');self.coords(self.dot,x-6,7,x+6,19)
+  self.itemconfigure(self.fill,state='normal' if x>8 else 'hidden');self.coords(self.dot,x,13)
  def pointer(self,event):
   self.focus_set();self.set(self.minimum+(event.x-8)/max(1,self.winfo_width()-16)*(self.maximum-self.minimum))
   if self.command:self.command(self.value)
@@ -153,7 +164,8 @@ class SoftButton(tk.Canvas):
   self.typeface=tkfont.Font(family=FONT,size=10,weight='bold' if primary else 'normal')
   width=46 if text in ('Play','Pause','Prev','Next') else max(self.typeface.measure(text)+28,self.typeface.measure('0')*characters+24)
   super().__init__(parent,width=width,height=40,bg=parent.cget('bg'),highlightthickness=0,bd=0,takefocus=1,cursor='hand2')
-  self.shape=self.create_polygon(0,0,1,1,smooth=True,fill=self.fill_color,outline='')
+  self.shape=self.create_image(1,1,anchor='nw');self.shape_key=None
+  self.icon_image_item=self.create_image(0,0);self.icon_key=None
   self.word=self.create_text(14,19,text=text,font=self.typeface,fill=self.text_color,anchor='w')
   self.glyph=self.create_polygon(0,0,1,1,fill=self.text_color,outline='')
   self.bar1=self.create_line(0,0,0,1,fill=self.text_color,width=3)
@@ -178,23 +190,25 @@ class SoftButton(tk.Canvas):
   if kw:super().configure(**kw)
   self.paint()
  def paint(self):
-  width=max(1,self.winfo_width());height=max(1,self.winfo_height());r=16
-  points=[r,1,width-r,1,width-1,1,width-1,r,width-1,height-r,width-1,height-1,width-r,height-1,r,height-1,1,height-1,1,height-r,1,r,1,1]
-  self.coords(self.shape,*points)
+  width=max(1,self.winfo_width());height=max(1,self.winfo_height())
+
   fill=('#7568DF' if self.primary else HOVER) if self.hover and not self.disabled else self.fill_color
-  self.itemconfigure(self.shape,fill=fill,outline=GREEN if self.focused else '',width=1)
+  key=(max(1,width-2),max(1,height-2),fill,self.focused)
+  if key!=self.shape_key:
+   self.shape_key=key;self.shape_image=tk.PhotoImage(master=self,data=rounded_png(key[0],key[1],16,fill,GREEN if self.focused else ''))
+   self.itemconfigure(self.shape,image=self.shape_image)
   self.coords(self.word,14 if self.align=='w' else width/2,height/2)
   self.itemconfigure(self.word,text=self.caption,anchor='w' if self.align=='w' else 'center',fill='#A6A1B1' if self.disabled else self.text_color)
   icon=self.caption in ('Play','Pause','Prev','Next');cx,cy=width/2,height/2
   self.itemconfigure(self.word,state='hidden' if icon else 'normal')
   for item in (self.glyph,self.bar1,self.bar2):self.itemconfigure(item,state='hidden')
+  self.itemconfigure(self.icon_image_item,state='normal' if icon else 'hidden')
   if icon:
-   if self.caption=='Pause':
-    for item,x in [(self.bar1,cx-4),(self.bar2,cx+4)]:self.coords(item,x,cy-7,x,cy+7);self.itemconfigure(item,state='normal')
-   else:
-    direction=-1 if self.caption=='Prev' else 1
-    self.coords(self.glyph,cx-5*direction,cy-8,cx+7*direction,cy,cx-5*direction,cy+8);self.itemconfigure(self.glyph,state='normal')
-    if self.caption!='Play':self.coords(self.bar1,cx+9*direction,cy-8,cx+9*direction,cy+8);self.itemconfigure(self.bar1,state='normal')
+   color='#A6A1B1' if self.disabled else self.text_color;key=(self.caption,color)
+   if key!=self.icon_key:
+    self.icon_key=key;self.icon_image=tk.PhotoImage(master=self,data=icon_png(*key));self.itemconfigure(self.icon_image_item,image=self.icon_image)
+   self.coords(self.icon_image_item,cx,cy)
+
 
 
 class PlayerWindow:
@@ -218,7 +232,7 @@ class PlayerWindow:
   style.map('TCombobox',fieldbackground=[('readonly',PAPER)],background=[('readonly',PAPER)],foreground=[('readonly',INK)],selectbackground=[('readonly',PAPER)],selectforeground=[('readonly',INK)])
   style.configure('TScale',sliderlength=14,sliderthickness=14,borderwidth=0,background=PAPER,troughcolor=LINE)
   style.layout('Treeview',[('Treeview.treearea',{'sticky':'nswe'})])
-  style.configure('Treeview',background=PAPER,fieldbackground=PAPER,foreground=INK,rowheight=54,borderwidth=0,font=(FONT,11))
+  style.configure('Treeview',background=PAPER,fieldbackground=PAPER,foreground=INK,rowheight=44,borderwidth=0,font=(FONT,11))
   style.configure('Treeview.Heading',background=PAPER,foreground=MUTED,font=(FONT,9),padding=(8,14),relief='flat',borderwidth=0,lightcolor=BG,darkcolor=BG)
   style.map('Treeview',background=[('selected',TINT)],foreground=[('selected',INK)])
   style.configure('TScale',background=PAPER,troughcolor=LINE)
@@ -265,7 +279,7 @@ class PlayerWindow:
   if changed:widget.configure(**changed)
 
  def build(self):
-  self.dock_card=RoundedCard(self.root,inset=20);self.dock_card.pack(side='bottom',fill='x',padx=18,pady=(0,18))
+  self.dock_card=RoundedCard(self.root,inset=12);self.dock_card.pack(side='bottom',fill='x',padx=18,pady=(0,12))
   self.dock=self.dock_card.body
   top=tk.Frame(self.root,bg=BG);top.pack(fill='both',expand=True)
   self.sidebar=tk.Frame(top,bg=SIDEBAR,width=232);self.sidebar.pack(side='left',fill='y');self.sidebar.pack_propagate(False)
@@ -286,16 +300,14 @@ class PlayerWindow:
   nav_canvas.bind('<Configure>',lambda e:nav_canvas.itemconfigure(nav_id,width=e.width))
   nav_canvas.bind('<MouseWheel>',lambda e:nav_canvas.yview_scroll(-int(e.delta/120),'units'))
   self.nav_canvas=nav_canvas
-  content=tk.Frame(top,bg=BG);content.pack(side='left',fill='both',expand=True,padx=(8,24),pady=(24,20))
-  header=tk.Frame(content,bg=BG);header.pack(fill='x')
-  self.label(header,'YOUR LIBRARY',9,MUTED,anchor='w').pack(side='left')
-  self.update_button=self.button(header,'Check for updates',self.check_updates);self.update_button.pack(side='right')
-  title_row=tk.Frame(content,bg=BG);title_row.pack(fill='x',pady=(2,0))
-  self.heading=self.label(title_row,'All shiurim',24,anchor='w',width=1);self.heading.pack(side='left',fill='x',expand=True)
+  content=tk.Frame(top,bg=BG);content.pack(side='left',fill='both',expand=True,padx=(8,24),pady=(12,8))
+  title_row=tk.Frame(content,bg=BG);title_row.pack(fill='x')
+  self.heading=self.label(title_row,'All shiurim',20,anchor='w',width=1);self.heading.pack(side='left',fill='x',expand=True)
   self.mini_button=self.button(title_row,'Mini player',lambda:self.command('floating_toggle'));self.mini_button.pack(side='right')
+  self.update_button=self.button(title_row,'Check for updates',self.check_updates);self.update_button.pack(side='right',padx=(0,6))
   self.heading_tip=HoverTip(self.heading)
-  self.subtitle=self.label(content,'0 recordings',10,MUTED,anchor='w');self.subtitle.pack(fill='x',pady=(4,18))
-  self.search_card=RoundedCard(content,inset=8);self.search_card.pack(fill='x',pady=(0,16))
+  self.subtitle=self.label(content,'0 recordings',10,MUTED,anchor='w');self.subtitle.pack(fill='x',pady=(0,8))
+  self.search_card=RoundedCard(content,inset=8);self.search_card.pack(fill='x',pady=(0,8))
   search_row=self.search_card.body
   self.label(search_row,'Search',10,MUTED).pack(side='left',padx=(0,12))
   self.query=tk.StringVar();self.search=tk.Entry(search_row,textvariable=self.query,relief='flat',bg=PAPER,fg=INK,insertbackground=INK,font=(FONT,11),highlightthickness=0,bd=0);self.search.pack(side='left',fill='x',expand=True,ipady=6)
@@ -307,7 +319,7 @@ class PlayerWindow:
   self.organize_button=self.button(actions,'Add to collection',self.add_collection);self.organize_button.pack(side='left',padx=5)
   self.button(actions,'More ···',self.more).pack(side='right')
   self.selection_info=self.label(actions,'',9,MUTED,anchor='w');self.selection_info.pack(side='left',padx=6)
-  self.library_card=RoundedCard(content,inset=12,stretch=True);self.library_card.pack(fill='both',expand=True)
+  self.library_card=RoundedCard(content,inset=8,stretch=True);self.library_card.pack(fill='both',expand=True)
   table=self.library_card.body
   self.tree=ttk.Treeview(table,columns=('name','resume','duration'),show='headings',selectmode='extended',height=4)
   for name,title,width in [('name','Recording',400),('resume','Saved place',112),('duration','Length',90)]:
@@ -325,7 +337,7 @@ class PlayerWindow:
   eyebrow=tk.Frame(track_info,bg=PAPER);self.dock_eyebrow=eyebrow;eyebrow.pack(fill='x')
   self.label(eyebrow,'Now playing',9,MUTED).pack(side='left')
   self.state_label=self.label(eyebrow,'',9,MUTED);self.state_label.pack(side='left',padx=14)
-  self.track_title=self.label(track_info,'No recording selected',15,anchor='w',width=1);self.track_title.pack(fill='x',pady=(4,0))
+  self.track_title=self.label(track_info,'No recording selected',13,anchor='w',width=1);self.track_title.pack(fill='x',pady=(4,0))
   self.source=self.label(track_info,'Choose an audio folder to begin.',9,MUTED,anchor='w',width=1);self.source.pack(fill='x',pady=(2,0))
   self.title_tip=HoverTip(self.track_title);self.source_tip=HoverTip(self.source)
   self.dock_toggle=self.button(info,'Collapse player',self.toggle_dock);self.dock_toggle.pack(side='right',padx=(8,0))
@@ -359,8 +371,8 @@ class PlayerWindow:
  def apply_dock_layout(self):
   for widget in (self.dock_eyebrow,self.source,self.queue_button,self.dock_timeline,self.dock_controls,self.status,self.compact_play,self.compact_speed):widget.pack_forget()
   self.set_options(self.dock_toggle,text='Expand player' if self.dock_collapsed else 'Collapse player')
-  self.track_title.configure(font=(FONT,11,'bold') if self.dock_collapsed else (FONT,15,'bold'))
-  self.dock_card.inset=12 if self.dock_collapsed else 20
+  self.track_title.configure(font=(FONT,11,'bold') if self.dock_collapsed else (FONT,13,'bold'))
+  self.dock_card.inset=10 if self.dock_collapsed else 12
   self.dock_card.coords(self.dock_card.window,self.dock_card.inset,self.dock_card.inset)
   if self.dock_collapsed:
    self.compact_speed.pack(side='right',padx=6);self.compact_play.pack(side='right',padx=6)
@@ -368,7 +380,8 @@ class PlayerWindow:
   else:
    self.dock_eyebrow.pack(fill='x',before=self.track_title);self.source.pack(fill='x',pady=(2,0))
    self.queue_button.pack(side='right')
-   self.dock_timeline.pack(fill='x',pady=(8,4));self.dock_controls.pack(fill='x');self.status.pack(fill='x',pady=(6,0))
+   self.dock_timeline.pack(fill='x',pady=(4,2));self.dock_controls.pack(fill='x')
+   if self.status.cget('text'):self.status.pack(fill='x',pady=(6,0))
   self.dock_card.content_changed();self.dock_card.resize()
  def speed_menu(self):
   menu=tk.Menu(self.root,tearoff=False,bg=PAPER,fg=INK,activebackground=TINT,activeforeground=GREEN,font=(FONT,11),bd=0)
@@ -555,11 +568,66 @@ class PlayerWindow:
   SoftToggle(pop,text='Show mini player when minimized',variable=mini,command=save_mini).pack(anchor='w',fill='x',padx=24,pady=8)
   self.label(pop,'Speed button: 1× → 1.5× → 2× → 0.5× → 1×',10,MUTED).pack(anchor='w',fill='x',padx=24,pady=8)
   global_keys=tk.BooleanVar(value=self.player.saved.get('globalShortcuts',False));SoftToggle(pop,text='Enable shortcuts while using other apps',variable=global_keys,command=lambda:self.safe(lambda:self.shortcuts(global_keys.get()))).pack(anchor='w',fill='x',padx=24,pady=12)
-  self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+Q: add to queue\n\nGlobal keys: Ctrl+Alt+Shift+P: play/pause\nCtrl+Alt+Shift+Left / Right: skip',10,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
+  self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+Q: add to queue\nCustomize global keys below; they also work in other apps.',10,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
+  self.button(pop,'Customize keyboard shortcuts…',lambda:(pop.destroy(),self.edit_shortcuts())).pack(anchor='w',padx=24,pady=(0,4))
   self.label(pop,'LISTENING BACKUP',9,MUTED).pack(anchor='w',padx=24,pady=(18,8))
   row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24)
   self.button(row,'Export backup…',self.export_backup).pack(side='left');self.button(row,'Restore backup…',self.restore_backup).pack(side='left',padx=8)
   self.label(pop,'Includes positions, collections and bookmarks. Audio stays in its folder.',9,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
+ def edit_shortcuts(self):
+  path=self.player.data_dir/'hotkeys.json'
+  draft=hotkeys.load_config(path)
+  pop=tk.Toplevel(self.root);pop.title('Keyboard shortcuts');pop.geometry('720x650');pop.minsize(660,600);pop.configure(bg=BG);pop.transient(self.root)
+  self.label(pop,'Keyboard shortcuts',20).pack(anchor='w',padx=20,pady=(16,4))
+  self.label(pop,'Choose an action, then a key and modifiers. Ctrl, Alt or Win is required.',10,MUTED).pack(anchor='w',padx=20,pady=(0,8))
+  enabled=tk.BooleanVar(pop,value=self.player.saved.get('globalShortcuts',False))
+  SoftToggle(pop,text='Enable shortcuts while using other apps',variable=enabled,command=lambda:None).pack(fill='x',padx=20)
+  frame=tk.Frame(pop,bg=BG);frame.pack(fill='both',expand=True,padx=20,pady=8)
+  tree=ttk.Treeview(frame,columns=('action','shortcut'),show='headings',selectmode='browse',height=7)
+  tree.heading('action',text='Action');tree.heading('shortcut',text='Shortcut');tree.column('action',width=250);tree.column('shortcut',width=300)
+  scrollbar=SlimScrollbar(frame,tree.yview);tree.configure(yscrollcommand=scrollbar.set);scrollbar.pack(side='right',fill='y');tree.pack(fill='both',expand=True)
+  labels={'toggle':'Play / pause','back':'Skip backward','forward':'Skip forward','slower':'Slower','faster':'Faster','previous':'Previous recording','next':'Next recording','skip10':'Use 10-second skips','skip15':'Use 15-second skips','skip60':'Use 60-second skips','stop':'Stop','floating':'Show / hide mini player'}
+  selected=[None];variables={name:tk.BooleanVar(pop) for name in hotkeys.MODS};key=tk.StringVar(pop);disabled=tk.BooleanVar(pop)
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=20,pady=6)
+  for name,var in variables.items():tk.Checkbutton(row,text=name.title(),variable=var,bg=BG,activebackground=BG).pack(side='left',padx=(0,8))
+  combo=ttk.Combobox(row,textvariable=key,values=sorted(hotkeys.KEYS),state='readonly',width=12);combo.pack(side='left',padx=8)
+  tk.Checkbutton(row,text='Disabled',variable=disabled,bg=BG,activebackground=BG).pack(side='left')
+  error=self.label(pop,'',10,ERROR,wraplength=650,justify='left');error.pack(fill='x',padx=20,pady=4)
+  def populate():
+   for name in hotkeys.DEFAULTS:
+    value=draft[name];label='Disabled' if value is None else '+'.join(value['modifiers']+[value['key']])
+    if tree.exists(name):tree.item(name,values=(labels[name],label))
+    else:tree.insert('', 'end',iid=name,values=(labels[name],label))
+  def show(event=None):
+   if not tree.selection():return
+   selected[0]=tree.selection()[0];value=draft[selected[0]];disabled.set(value is None)
+   for name,var in variables.items():var.set(bool(value and name in value['modifiers']))
+   key.set(value['key'] if value else hotkeys.DEFAULTS[selected[0]]['key'])
+  def assign():
+   name=selected[0]
+   if not name:return False
+   value=None if disabled.get() else {'modifiers':[name for name,var in variables.items() if var.get()],'key':key.get()}
+   candidate={**draft,name:value}
+   try:hotkeys.bindings(candidate)
+   except ValueError as issue:error.configure(text=str(issue));return False
+   draft.update(candidate);populate();error.configure(text='');return True
+  def reset():
+   draft.clear();draft.update(hotkeys.default_config());populate();show();error.configure(text='')
+  def save():
+   if not assign():return
+   try:
+    hotkeys.save_config(path,draft);self.shortcuts(enabled.get())
+    conflicts=[status.get('label',status['name'])+': '+status['error'] for status in self.player.hotkey_status if not status['registered']]
+    if enabled.get() and conflicts:error.configure(text='Saved, but unavailable: '+'; '.join(conflicts));return
+    pop.destroy()
+   except (OSError,ValueError) as issue:error.configure(text=str(issue))
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=20,pady=(4,16))
+  self.button(row,'Set shortcut',assign).pack(side='left')
+  self.button(row,'Reset defaults',reset).pack(side='left',padx=8)
+  self.button(row,'Cancel',pop.destroy).pack(side='right')
+  self.button(row,'Save',save,True).pack(side='right',padx=8)
+  tree.bind('<<TreeviewSelect>>',show);populate();tree.selection_set('toggle');show()
+  self.shortcut_controls={'popup':pop,'tree':tree,'key':key,'modifiers':variables,'disabled':disabled,'enabled':enabled,'assign':assign,'save':save,'reset':reset}
  def timer(self):
   minutes=self.ask_value('Sleep timer','Minutes until pause (0 turns it off):',minvalue=0,maxvalue=180)
   if minutes is not None:self.command('sleep_timer',minutes=minutes)
@@ -736,13 +804,12 @@ class PlayerWindow:
    sleep=f"Pauses in {clock(state['sleepRemaining'])}" if state['sleepRemaining'] else 'Pauses after this recording' if state.get('sleepAtEnd') else ''
    loop=f"Repeat {clock(state['loopA'])}–{clock(state['loopB'])}" if state.get('loopB') is not None else ''
    self.set_options(self.status,text=state['error'] or '   ·   '.join(t for t in (sleep,loop) if t),fg=ERROR if state['error'] else MUTED)
-   if self.dock_collapsed:
-    if self.status.cget('text') and not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
-    elif not self.status.cget('text') and self.status.winfo_manager():self.status.pack_forget()
+   if self.status.cget('text') and not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
+   elif not self.status.cget('text') and self.status.winfo_manager():self.status.pack_forget()
    self.refresh_tools(state);self.refresh_queue()
   except Exception as error:
    self.set_options(self.status,text=str(error),fg=ERROR)
-   if self.dock_collapsed and not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
+   if not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
   self.root.after(500,self.refresh)
  def close(self):
   try:

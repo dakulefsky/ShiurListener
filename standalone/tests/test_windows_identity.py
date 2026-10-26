@@ -28,6 +28,23 @@ class Tests(unittest.TestCase):
             windows_identity.configure_taskbar()
         load.assert_not_called()
 
+    def test_dpi_awareness_prevents_bitmap_scaling(self):
+        user=Mock();user.SetProcessDpiAwarenessContext.return_value=1
+        with patch.object(windows_identity.sys,'platform','win32'),patch.object(ctypes,'WinDLL',return_value=user,create=True):
+            windows_identity.configure_dpi()
+        self.assertEqual(user.SetProcessDpiAwarenessContext.call_args.args[0].value,ctypes.c_void_p(-2).value)
+        user.SetProcessDPIAware.assert_not_called()
+
+    def test_dpi_awareness_preserves_manifest_and_supports_older_windows(self):
+        user=Mock();user.SetProcessDpiAwarenessContext.return_value=0
+        with patch.object(windows_identity.sys,'platform','win32'),patch.object(ctypes,'WinDLL',return_value=user,create=True),patch.object(ctypes,'get_last_error',return_value=5,create=True):
+            windows_identity.configure_dpi()
+        user.SetProcessDPIAware.assert_not_called()
+        del user.SetProcessDpiAwarenessContext
+        with patch.object(windows_identity.sys,'platform','win32'),patch.object(ctypes,'WinDLL',return_value=user,create=True):
+            windows_identity.configure_dpi()
+        user.SetProcessDPIAware.assert_called_once_with()
+
     def test_new_instance_holds_handle_and_closes_it_once(self):
         kernel = Mock();kernel.CreateMutexW.return_value=123
         with patch.object(ctypes,'WinDLL',return_value=kernel,create=True),patch.object(ctypes,'set_last_error',create=True),patch.object(ctypes,'get_last_error',return_value=0,create=True):
@@ -46,6 +63,7 @@ class Tests(unittest.TestCase):
     def test_failed_audio_startup_releases_instance_handle(self):
         import main
         instance=Mock()
-        with patch.object(main.sys,'platform','win32'),patch.object(main.sys,'argv',['Shiur Player']),patch.object(main,'configure_taskbar'),patch.object(main,'acquire_instance',return_value=instance),patch.object(main,'VLC',side_effect=RuntimeError('Audio missing')):
+        with patch.object(main.sys,'platform','win32'),patch.object(main.sys,'argv',['Shiur Player']),patch.object(main,'configure_dpi'),patch.object(main,'configure_taskbar'),patch.object(main,'acquire_instance',return_value=instance),patch.object(main,'VLC',side_effect=RuntimeError('Audio missing')):
             with self.assertRaisesRegex(RuntimeError,'Audio missing'):main.main()
         instance.close.assert_called_once()
+

@@ -15,6 +15,19 @@ class Tests(unittest.TestCase):
   with self.assertRaises(ValueError):hotkeys.bindings({'toggle':{'modifiers':['CTRL','ALT','SHIFT'],'key':'LEFT'}})
   self.assertEqual(len(hotkeys.bindings({'toggle':None})),len(items)-1)
 
+ def test_custom_shortcuts_save_reload_and_invalid_changes_preserve_file(self):
+  fixture=test_player.Tests();fixture.setUp()
+  try:
+   path=fixture.player.data_dir/'hotkeys.json'
+   config=hotkeys.default_config();config['toggle']={'modifiers':['CTRL'],'key':'F8'};config['stop']=None
+   hotkeys.save_config(path,config)
+   self.assertEqual(hotkeys.load_config(path),config)
+   before=path.read_bytes();config['forward']=config['toggle']
+   with self.assertRaisesRegex(ValueError,'Duplicate'):hotkeys.save_config(path,config)
+   self.assertEqual(path.read_bytes(),before)
+   with self.assertRaises(ValueError):hotkeys.bindings({'toggle':{'modifiers':[{}],'key':'P'}})
+  finally:fixture.tearDown()
+
  def test_registration_conflict_and_dispatch_without_console(self):
   fixture=test_player.Tests();fixture.setUp()
   try:
@@ -32,3 +45,4 @@ class Tests(unittest.TestCase):
    self.assertEqual(user.UnregisterHotKey.call_count,len(hotkeys.DEFAULTS)-1)
    self.assertTrue(fixture.player.pending['autoplay'])
   finally:fixture.tearDown()
+

@@ -77,7 +77,8 @@ def publish():
  (REPO/'downloads/standalone-latest.json').write_text(json.dumps(metadata,indent=2)+'\n')
  readme=REPO/'downloads/README.md'
  text=readme.read_text(encoding='utf-8')
- text=re.sub(r'## Current standalone:.*?(?=\n## )',f'## Current standalone: {VERSION}\n\n[Download setup](shiur-player-setup-{VERSION}.exe) or choose **Check for updates** in the app. Adds an × close button to both mini player views, keeps long titles from crowding the shiurim list, protects the Mini player button beside long collection names, and adds full-title hover previews. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.\n',text,count=1,flags=re.S)
+ notes=(ROOT/'RELEASE-NOTES.md').read_text(encoding='utf-8').strip()
+ text=re.sub(r'## Current standalone:.*?(?=\n## )',f'## Current standalone: {VERSION}\n\n[Download setup](shiur-player-setup-{VERSION}.exe) or choose **Check for updates** in the app. {notes} Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.\n',text,count=1,flags=re.S)
  readme.write_text(text,encoding='utf-8')
  paths=[f'downloads/{path.name}' for path in (setup,portable,source)]+['downloads/SHA256SUMS.txt','downloads/standalone-latest.json','downloads/README.md']
  git('add','--sparse','-f',*paths)

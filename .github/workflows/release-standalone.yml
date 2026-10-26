@@ -57,4 +57,4 @@ jobs:
         run: |
           $version = python -c "import runpy; print(runpy.run_path('standalone/app/version.py')['APP_VERSION'])"
           $head = git rev-parse HEAD
-          gh release create "standalone-v$version" --target $head --title "Shiur Player $version" --notes "Adds a close button to the mini player, keeps the shiurim list visible with long titles, protects library controls, and adds full-title hover previews. Windows/Linux desktop checks and actual Windows installation/repair tests pass. Existing listening positions are preserved." "downloads/shiur-player-setup-$version.exe" "downloads/shiur-player-windows-x64-$version.zip" "downloads/shiur-player-standalone-source-$version.zip"
+          gh release create "standalone-v$version" --target $head --title "Shiur Player $version" --notes-file standalone/RELEASE-NOTES.md "downloads/shiur-player-setup-$version.exe" "downloads/shiur-player-windows-x64-$version.zip" "downloads/shiur-player-standalone-source-$version.zip"

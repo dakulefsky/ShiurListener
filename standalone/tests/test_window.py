@@ -25,8 +25,8 @@ class Tests(unittest.TestCase):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
    window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.toggle_dock();window.root.update()
-   with patch.object(fixture.player,'snapshot',side_effect=RuntimeError('Audio output missing')):window.refresh()
-   window.root.update()
+   with patch.object(fixture.player,'snapshot',side_effect=RuntimeError('Audio output missing')):
+    window.refresh();window.root.update()
    self.assertEqual(window.status.cget('text'),'Audio output missing');self.assertTrue(window.status.winfo_ismapped())
   finally:
    if window:window.close()
@@ -94,6 +94,46 @@ class Tests(unittest.TestCase):
    tip.hide();self.assertIsNone(tip.popup)
    tip.schedule();self.assertIsNotNone(tip.pending)
    tip.hide();self.assertIsNone(tip.pending)
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+ def test_expanded_player_leaves_room_for_recordings_at_minimum_size(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   window.root.geometry(f'{window.minimum_size[0]}x{window.minimum_size[1]}');window.root.update()
+   self.assertFalse(window.dock_collapsed)
+   self.assertTrue(window.seek.winfo_ismapped())
+   self.assertLessEqual(window.tree.winfo_rooty()-window.root.winfo_rooty(),170)
+   self.assertGreaterEqual(window.tree.winfo_height(),190)
+   self.assertLessEqual(window.dock_card.winfo_height(),210)
+   self.assertLessEqual(window.tree.winfo_rooty()+window.tree.winfo_height(),window.dock_card.winfo_rooty())
+   for button in (window.mini_button,window.update_button,window.dock_toggle,window.play_button):
+    self.assertTrue(button.winfo_ismapped());self.assertGreater(button.winfo_width(),1)
+   self.assertFalse(window.status.winfo_ismapped())
+   fixture.player.error='Audio output missing';window.refresh();window.root.update()
+   self.assertTrue(window.status.winfo_ismapped())
+   fixture.player.error='';window.refresh();window.root.update()
+   self.assertFalse(window.status.winfo_ismapped())
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+ def test_custom_shortcut_editor_saves_and_reloads_global_keys(self):
+  import hotkeys
+  fixture=test_player.Tests();fixture.setUp();window=None;calls=[]
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,calls.append);window.edit_shortcuts();window.root.update()
+   ui=window.shortcut_controls;ui['key'].set('F8')
+   for name,var in ui['modifiers'].items():var.set(name=='CTRL')
+   ui['enabled'].set(True);ui['save']();window.root.update()
+   self.assertEqual(calls,[True])
+   saved=hotkeys.load_config(fixture.player.data_dir/'hotkeys.json')
+   self.assertEqual(saved['toggle'],{'modifiers':['CTRL'],'key':'F8'})
+   window.edit_shortcuts();window.root.update()
+   self.assertEqual(window.shortcut_controls['key'].get(),'F8')
+   window.shortcut_controls['reset']()
+   self.assertEqual(hotkeys.load_config(fixture.player.data_dir/'hotkeys.json'),saved)
+   window.shortcut_controls['popup'].destroy()
   finally:
    if window:window.close()
    fixture.tearDown()
