@@ -18,6 +18,31 @@ def configure_taskbar():
         raise OSError(f'Could not set Shiur Player taskbar identity (0x{result & 0xffffffff:08x}).')
 
 
+def configure_dpi():
+    """Render at system DPI before Tk/native windows exist (Tk 8.6 compatible)."""
+    if sys.platform != 'win32':
+        return
+    user = ctypes.WinDLL('user32', use_last_error=True)
+    try:
+        set_context = user.SetProcessDpiAwarenessContext
+        set_context.argtypes = [ctypes.c_void_p]
+        set_context.restype = ctypes.c_int
+        # SYSTEM_AWARE: Tk owns scaling; avoid Windows bitmap virtualization.
+        if set_context(ctypes.c_void_p(-2)):
+            return
+        if ctypes.get_last_error() == 5:  # Already set by the executable manifest.
+            return
+    except AttributeError:
+        pass
+    try:
+        fallback = user.SetProcessDPIAware
+        fallback.argtypes = []
+        fallback.restype = ctypes.c_int
+        fallback()
+    except AttributeError:
+        pass
+
+
 class InstanceHandle:
     def __init__(self, kernel, handle):
         self.kernel = kernel
@@ -55,3 +80,4 @@ def acquire_instance():
             user.SetForegroundWindow(window)
         return None
     return InstanceHandle(kernel, handle)
+

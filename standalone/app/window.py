@@ -1,5 +1,6 @@
 """Local desktop library. UI work stays on the Tk thread; audio runs independently."""
 import queue,sys,threading,pathlib
+from rendering import rounded_png,icon_png
 from version import APP_VERSION
 import updater,profile_backup
 import tkinter as tk
@@ -54,8 +55,8 @@ class RoundedCard(tk.Canvas):
  def __init__(self,parent,inset=14,stretch=False,**kw):
   super().__init__(parent,bg=parent.cget('bg'),bd=0,highlightthickness=0,**kw)
   self.inset=inset;self.stretch=stretch
-  self.shadow=self.create_polygon(0,0,1,1,smooth=True,fill='#E4E1ED',outline='')
-  self.surface=self.create_polygon(0,0,1,1,smooth=True,fill=PAPER,outline=LINE,width=1)
+  self.shadow=self.create_image(1,3,anchor='nw')
+  self.surface=self.create_image(1,1,anchor='nw');self.surface_key=None
   self.body=tk.Frame(self,bg=PAPER)
   self.window=self.create_window(inset,inset,anchor='nw',window=self.body)
   self.bind('<Configure>',self.resize)
@@ -66,8 +67,12 @@ class RoundedCard(tk.Canvas):
    if self.winfo_reqheight()!=wanted:self.configure(height=wanted)
  def resize(self,event=None):
   width=self.winfo_width();height=self.winfo_height()
-  self.coords(self.shadow,*rounded_points(1,3,max(0,width-2),max(0,height-3)))
-  self.coords(self.surface,*rounded_points(1,1,max(0,width-2),max(0,height-5)))
+  key=(max(1,width-2),max(1,height-5))
+  if key!=self.surface_key:
+   self.surface_key=key
+   self.shadow_image=tk.PhotoImage(master=self,data=rounded_png(*key,18,'#E4E1ED'))
+   self.surface_image=tk.PhotoImage(master=self,data=rounded_png(*key,18,PAPER,LINE))
+   self.itemconfigure(self.shadow,image=self.shadow_image);self.itemconfigure(self.surface,image=self.surface_image)
   options={'width':max(1,width-2*self.inset)}
   if self.stretch:options['height']=max(1,height-2*self.inset-3)
   self.itemconfigure(self.window,**options)
@@ -77,8 +82,9 @@ class SoftToggle(tk.Canvas):
  def __init__(self,parent,text,variable,command):
   super().__init__(parent,height=40,bg=parent.cget('bg'),highlightthickness=0,bd=0,takefocus=1,cursor='hand2')
   self.variable=variable;self.command=command;self.focused=False
-  self.track=self.create_polygon(0,0,1,1,smooth=True,outline='')
-  self.thumb=self.create_oval(0,0,1,1,fill=PAPER,outline='')
+  self.track=self.create_image(1,7,anchor='nw');self.track_key=None
+  self.thumb_image=tk.PhotoImage(master=self,data=rounded_png(16,16,8,PAPER))
+  self.thumb=self.create_image(5,11,anchor='nw',image=self.thumb_image)
   self.caption=self.create_text(56,19,text=text,anchor='w',fill=INK,font=(FONT,10))
   self.bind('<ButtonRelease-1>',self.toggle);self.bind('<KeyRelease-space>',self.toggle);self.bind('<Return>',self.toggle)
   self.bind('<FocusIn>',lambda _:self.focus(True));self.bind('<FocusOut>',lambda _:self.focus(False))
@@ -88,9 +94,10 @@ class SoftToggle(tk.Canvas):
   if event.widget is self:self.variable.trace_remove('write',self.trace)
  def focus(self,value):self.focused=value;self.paint()
  def paint(self):
-  self.coords(self.track,*rounded_points(1,7,40,24,12));on=self.variable.get()
-  self.itemconfigure(self.track,fill=GREEN if on else '#D8D5E2',outline=GREEN if self.focused else '',width=2)
-  x=23 if on else 5;self.coords(self.thumb,x,11,x+16,27)
+  on=self.variable.get();key=(on,self.focused)
+  if key!=self.track_key:
+   self.track_key=key;self.track_image=tk.PhotoImage(master=self,data=rounded_png(40,24,12,GREEN if on else '#D8D5E2',GREEN if self.focused else ''));self.itemconfigure(self.track,image=self.track_image)
+  x=23 if on else 5;self.coords(self.thumb,x,11)
  def toggle(self,event=None):
   self.focus_set();self.variable.set(not self.variable.get());self.command();return 'break'
 
@@ -116,17 +123,21 @@ class ModernScale(tk.Canvas):
  """Flat seek/volume track; updates from playback do not send seek commands."""
  def __init__(self,parent,from_=0,to=1,value=0,command=None,dark=False):
   super().__init__(parent,height=26,bg=SIDEBAR if dark else PAPER,highlightthickness=0,bd=0,takefocus=1,cursor='hand2')
-  self.maximum=to;self.minimum=from_;self.value=value;self.command=command;self.last_paint=None
+  self.maximum=to;self.minimum=from_;self.value=value;self.command=command;self.last_paint=None;self.focused=False
   self.track=self.create_line(8,13,9,13,fill=LINE,width=4,capstyle='round')
   self.fill=self.create_line(8,13,9,13,fill=GREEN,width=4,capstyle='round')
-  self.dot=self.create_oval(2,7,14,19,fill=GREEN,outline='')
+  self.dot_image=tk.PhotoImage(master=self,data=rounded_png(12,12,6,GREEN))
+  self.dot=self.create_image(8,13,image=self.dot_image)
   self.bind('<Configure>',lambda _:self.paint());self.bind('<Button-1>',self.pointer);self.bind('<B1-Motion>',self.pointer)
   self.bind('<Left>',lambda _:self.step(-1));self.bind('<Right>',lambda _:self.step(1))
-  self.bind('<FocusIn>',lambda _:self.itemconfigure(self.dot,outline=TINT,width=3));self.bind('<FocusOut>',lambda _:self.itemconfigure(self.dot,outline='',width=0))
+  self.bind('<FocusIn>',lambda _:self.focus(True));self.bind('<FocusOut>',lambda _:self.focus(False))
  def configure(self,**kw):
   if 'to' in kw:self.maximum=kw.pop('to')
   if kw:super().configure(**kw)
   self.paint()
+ def focus(self,value):
+  self.focused=value;size=18 if value else 12
+  self.dot_image=tk.PhotoImage(master=self,data=rounded_png(size,size,size/2,GREEN,TINT if value else ''));self.itemconfigure(self.dot,image=self.dot_image)
  def get(self):return self.value
  def set(self,value):self.value=max(self.minimum,min(self.maximum,float(value)));self.paint()
  def paint(self):
@@ -134,7 +145,7 @@ class ModernScale(tk.Canvas):
   if key==self.last_paint:return
   self.last_paint=key;ratio=(self.value-self.minimum)/max(.001,self.maximum-self.minimum);x=8+ratio*(width-16)
   self.coords(self.track,8,13,width-8,13);self.coords(self.fill,8,13,x,13)
-  self.itemconfigure(self.fill,state='normal' if x>8 else 'hidden');self.coords(self.dot,x-6,7,x+6,19)
+  self.itemconfigure(self.fill,state='normal' if x>8 else 'hidden');self.coords(self.dot,x,13)
  def pointer(self,event):
   self.focus_set();self.set(self.minimum+(event.x-8)/max(1,self.winfo_width()-16)*(self.maximum-self.minimum))
   if self.command:self.command(self.value)
@@ -153,7 +164,8 @@ class SoftButton(tk.Canvas):
   self.typeface=tkfont.Font(family=FONT,size=10,weight='bold' if primary else 'normal')
   width=46 if text in ('Play','Pause','Prev','Next') else max(self.typeface.measure(text)+28,self.typeface.measure('0')*characters+24)
   super().__init__(parent,width=width,height=40,bg=parent.cget('bg'),highlightthickness=0,bd=0,takefocus=1,cursor='hand2')
-  self.shape=self.create_polygon(0,0,1,1,smooth=True,fill=self.fill_color,outline='')
+  self.shape=self.create_image(1,1,anchor='nw');self.shape_key=None
+  self.icon_image_item=self.create_image(0,0);self.icon_key=None
   self.word=self.create_text(14,19,text=text,font=self.typeface,fill=self.text_color,anchor='w')
   self.glyph=self.create_polygon(0,0,1,1,fill=self.text_color,outline='')
   self.bar1=self.create_line(0,0,0,1,fill=self.text_color,width=3)
@@ -178,23 +190,25 @@ class SoftButton(tk.Canvas):
   if kw:super().configure(**kw)
   self.paint()
  def paint(self):
-  width=max(1,self.winfo_width());height=max(1,self.winfo_height());r=16
-  points=[r,1,width-r,1,width-1,1,width-1,r,width-1,height-r,width-1,height-1,width-r,height-1,r,height-1,1,height-1,1,height-r,1,r,1,1]
-  self.coords(self.shape,*points)
+  width=max(1,self.winfo_width());height=max(1,self.winfo_height())
+
   fill=('#7568DF' if self.primary else HOVER) if self.hover and not self.disabled else self.fill_color
-  self.itemconfigure(self.shape,fill=fill,outline=GREEN if self.focused else '',width=1)
+  key=(max(1,width-2),max(1,height-2),fill,self.focused)
+  if key!=self.shape_key:
+   self.shape_key=key;self.shape_image=tk.PhotoImage(master=self,data=rounded_png(key[0],key[1],16,fill,GREEN if self.focused else ''))
+   self.itemconfigure(self.shape,image=self.shape_image)
   self.coords(self.word,14 if self.align=='w' else width/2,height/2)
   self.itemconfigure(self.word,text=self.caption,anchor='w' if self.align=='w' else 'center',fill='#A6A1B1' if self.disabled else self.text_color)
   icon=self.caption in ('Play','Pause','Prev','Next');cx,cy=width/2,height/2
   self.itemconfigure(self.word,state='hidden' if icon else 'normal')
   for item in (self.glyph,self.bar1,self.bar2):self.itemconfigure(item,state='hidden')
+  self.itemconfigure(self.icon_image_item,state='normal' if icon else 'hidden')
   if icon:
-   if self.caption=='Pause':
-    for item,x in [(self.bar1,cx-4),(self.bar2,cx+4)]:self.coords(item,x,cy-7,x,cy+7);self.itemconfigure(item,state='normal')
-   else:
-    direction=-1 if self.caption=='Prev' else 1
-    self.coords(self.glyph,cx-5*direction,cy-8,cx+7*direction,cy,cx-5*direction,cy+8);self.itemconfigure(self.glyph,state='normal')
-    if self.caption!='Play':self.coords(self.bar1,cx+9*direction,cy-8,cx+9*direction,cy+8);self.itemconfigure(self.bar1,state='normal')
+   color='#A6A1B1' if self.disabled else self.text_color;key=(self.caption,color)
+   if key!=self.icon_key:
+    self.icon_key=key;self.icon_image=tk.PhotoImage(master=self,data=icon_png(*key));self.itemconfigure(self.icon_image_item,image=self.icon_image)
+   self.coords(self.icon_image_item,cx,cy)
+
 
 
 class PlayerWindow:
