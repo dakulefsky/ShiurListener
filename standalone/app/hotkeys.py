@@ -1,5 +1,5 @@
 """Windows RegisterHotKey integration, independent of browser focus. No keyboard hook or typing capture."""
-import ctypes,json,pathlib,sys,threading
+import ctypes,json,pathlib,sys,threading,os
 DEFAULTS={
  'toggle':{'key':'P','action':{'op':'toggle'}},
  'back':{'key':'LEFT','action':{'op':'skip','direction':-1}},
@@ -15,6 +15,7 @@ DEFAULTS={
  'floating':{'key':'F','action':{'op':'floating_toggle'}},
 }
 KEYS={'LEFT':0x25,'UP':0x26,'RIGHT':0x27,'DOWN':0x28,'PAGEUP':0x21,'PAGEDOWN':0x22,'SPACE':0x20,**{chr(i):i for i in range(65,91)},**{str(i):48+i for i in range(10)}}
+KEYS.update({f'F{i}':0x6f+i for i in range(1,25)})
 MODS={'ALT':1,'CTRL':2,'SHIFT':4,'WIN':8}
 def bindings(config):
  result=[];used=set()
@@ -24,13 +25,28 @@ def bindings(config):
   if value is None:continue
   if not isinstance(value,dict):raise ValueError('Invalid shortcut: '+name)
   modifiers=value.get('modifiers',[]);key=str(value.get('key','')).upper()
-  if not isinstance(modifiers,list) or len(set(modifiers))<2 or any(m not in MODS for m in modifiers) or key not in KEYS:raise ValueError('Use at least two modifiers and a supported key for '+name)
+  if not isinstance(modifiers,list) or any(not isinstance(m,str) or m not in MODS for m in modifiers) or not any(m in ('CTRL','ALT','WIN') for m in modifiers) or key not in KEYS:raise ValueError('Use Ctrl, Alt or Win and a supported key for '+name)
   flags=0
   for modifier in modifiers:flags|=MODS[modifier]
   chord=(flags,KEYS[key])
   if chord in used:raise ValueError('Duplicate shortcut: '+name)
   used.add(chord);result.append((name,flags,KEYS[key],'+'.join(modifiers+[key]),spec['action']))
  return result
+def default_config():
+ return {name:{'modifiers':['CTRL','ALT','SHIFT'],'key':item['key']} for name,item in DEFAULTS.items()}
+def load_config(path):
+ config=json.loads(path.read_text('utf-8')) if path.exists() else {}
+ bindings(config)
+ return {**default_config(),**{name:value for name,value in config.items() if name in DEFAULTS}}
+def save_config(path,config):
+ bindings(config)
+ path.parent.mkdir(parents=True,exist_ok=True)
+ temporary=path.with_name(path.name+'.tmp')
+ try:
+  temporary.write_text(json.dumps(config,indent=2)+'\n',encoding='utf-8')
+  os.replace(temporary,path)
+ finally:
+  if temporary.exists():temporary.unlink()
 class GlobalHotkeys:
  def __init__(self,player):self.player=player;self.thread=None;self.thread_id=None;self.ready=threading.Event()
  def start(self):
@@ -49,8 +65,8 @@ class GlobalHotkeys:
   active={};statuses=[]
   try:
    path=self.player.data_dir/'hotkeys.json'
-   if not path.exists():path.write_text(json.dumps({name:{'modifiers':['CTRL','ALT','SHIFT'],'key':item['key']} for name,item in DEFAULTS.items()},indent=2),'utf-8')
-   config=json.loads(path.read_text('utf-8'));items=bindings(config)
+   if not path.exists():save_config(path,default_config())
+   items=bindings(load_config(path))
    for index,(name,mods,key,label,action) in enumerate(items,1):
     ok=bool(user.RegisterHotKey(None,index,mods|0x4000,key));statuses.append({'name':name,'label':label,'registered':ok,'error':'' if ok else f'Shortcut unavailable (Windows error {ctypes.get_last_error()}).'})
     if ok:active[index]=action
@@ -76,3 +92,4 @@ class GlobalHotkeys:
    user=ctypes.WinDLL('user32',use_last_error=True);user.PostThreadMessageW.argtypes=[wintypes.DWORD,wintypes.UINT,wintypes.WPARAM,wintypes.LPARAM];user.PostThreadMessageW.restype=wintypes.BOOL
    user.PostThreadMessageW(self.thread_id,0x0012,0,0)
   if self.thread:self.thread.join(timeout=3)
+

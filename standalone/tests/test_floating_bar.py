@@ -1,6 +1,8 @@
 """Floating transport behavior with Win32 calls mocked; a real Windows GUI is still required."""
+import sys
 import ctypes,importlib.util,pathlib,threading,unittest,unittest.mock,tempfile
 ROOT=pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'app'))
 spec=importlib.util.spec_from_file_location('floating_bar',ROOT/'app/floating_bar.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 class Function:
  def __init__(self,fn):self.fn=fn

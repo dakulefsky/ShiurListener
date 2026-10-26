@@ -2,7 +2,7 @@
 import queue,sys,threading,pathlib
 from rendering import rounded_png,icon_png
 from version import APP_VERSION
-import updater,profile_backup
+import updater,profile_backup,hotkeys
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from controller import clock
@@ -568,11 +568,66 @@ class PlayerWindow:
   SoftToggle(pop,text='Show mini player when minimized',variable=mini,command=save_mini).pack(anchor='w',fill='x',padx=24,pady=8)
   self.label(pop,'Speed button: 1× → 1.5× → 2× → 0.5× → 1×',10,MUTED).pack(anchor='w',fill='x',padx=24,pady=8)
   global_keys=tk.BooleanVar(value=self.player.saved.get('globalShortcuts',False));SoftToggle(pop,text='Enable shortcuts while using other apps',variable=global_keys,command=lambda:self.safe(lambda:self.shortcuts(global_keys.get()))).pack(anchor='w',fill='x',padx=24,pady=12)
-  self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+Q: add to queue\n\nGlobal keys: Ctrl+Alt+Shift+P: play/pause\nCtrl+Alt+Shift+Left / Right: skip',10,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
+  self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+Q: add to queue\nCustomize global keys below; they also work in other apps.',10,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
+  self.button(pop,'Customize keyboard shortcuts…',lambda:(pop.destroy(),self.edit_shortcuts())).pack(anchor='w',padx=24,pady=(0,4))
   self.label(pop,'LISTENING BACKUP',9,MUTED).pack(anchor='w',padx=24,pady=(18,8))
   row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24)
   self.button(row,'Export backup…',self.export_backup).pack(side='left');self.button(row,'Restore backup…',self.restore_backup).pack(side='left',padx=8)
   self.label(pop,'Includes positions, collections and bookmarks. Audio stays in its folder.',9,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
+ def edit_shortcuts(self):
+  path=self.player.data_dir/'hotkeys.json'
+  draft=hotkeys.load_config(path)
+  pop=tk.Toplevel(self.root);pop.title('Keyboard shortcuts');pop.geometry('720x650');pop.minsize(660,600);pop.configure(bg=BG);pop.transient(self.root)
+  self.label(pop,'Keyboard shortcuts',20).pack(anchor='w',padx=20,pady=(16,4))
+  self.label(pop,'Choose an action, then a key and modifiers. Ctrl, Alt or Win is required.',10,MUTED).pack(anchor='w',padx=20,pady=(0,8))
+  enabled=tk.BooleanVar(pop,value=self.player.saved.get('globalShortcuts',False))
+  SoftToggle(pop,text='Enable shortcuts while using other apps',variable=enabled,command=lambda:None).pack(fill='x',padx=20)
+  frame=tk.Frame(pop,bg=BG);frame.pack(fill='both',expand=True,padx=20,pady=8)
+  tree=ttk.Treeview(frame,columns=('action','shortcut'),show='headings',selectmode='browse',height=7)
+  tree.heading('action',text='Action');tree.heading('shortcut',text='Shortcut');tree.column('action',width=250);tree.column('shortcut',width=300)
+  scrollbar=SlimScrollbar(frame,tree.yview);tree.configure(yscrollcommand=scrollbar.set);scrollbar.pack(side='right',fill='y');tree.pack(fill='both',expand=True)
+  labels={'toggle':'Play / pause','back':'Skip backward','forward':'Skip forward','slower':'Slower','faster':'Faster','previous':'Previous recording','next':'Next recording','skip10':'Use 10-second skips','skip15':'Use 15-second skips','skip60':'Use 60-second skips','stop':'Stop','floating':'Show / hide mini player'}
+  selected=[None];variables={name:tk.BooleanVar(pop) for name in hotkeys.MODS};key=tk.StringVar(pop);disabled=tk.BooleanVar(pop)
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=20,pady=6)
+  for name,var in variables.items():tk.Checkbutton(row,text=name.title(),variable=var,bg=BG,activebackground=BG).pack(side='left',padx=(0,8))
+  combo=ttk.Combobox(row,textvariable=key,values=sorted(hotkeys.KEYS),state='readonly',width=12);combo.pack(side='left',padx=8)
+  tk.Checkbutton(row,text='Disabled',variable=disabled,bg=BG,activebackground=BG).pack(side='left')
+  error=self.label(pop,'',10,ERROR,wraplength=650,justify='left');error.pack(fill='x',padx=20,pady=4)
+  def populate():
+   for name in hotkeys.DEFAULTS:
+    value=draft[name];label='Disabled' if value is None else '+'.join(value['modifiers']+[value['key']])
+    if tree.exists(name):tree.item(name,values=(labels[name],label))
+    else:tree.insert('', 'end',iid=name,values=(labels[name],label))
+  def show(event=None):
+   if not tree.selection():return
+   selected[0]=tree.selection()[0];value=draft[selected[0]];disabled.set(value is None)
+   for name,var in variables.items():var.set(bool(value and name in value['modifiers']))
+   key.set(value['key'] if value else hotkeys.DEFAULTS[selected[0]]['key'])
+  def assign():
+   name=selected[0]
+   if not name:return False
+   value=None if disabled.get() else {'modifiers':[name for name,var in variables.items() if var.get()],'key':key.get()}
+   candidate={**draft,name:value}
+   try:hotkeys.bindings(candidate)
+   except ValueError as issue:error.configure(text=str(issue));return False
+   draft.update(candidate);populate();error.configure(text='');return True
+  def reset():
+   draft.clear();draft.update(hotkeys.default_config());populate();show();error.configure(text='')
+  def save():
+   if not assign():return
+   try:
+    hotkeys.save_config(path,draft);self.shortcuts(enabled.get())
+    conflicts=[status.get('label',status['name'])+': '+status['error'] for status in self.player.hotkey_status if not status['registered']]
+    if enabled.get() and conflicts:error.configure(text='Saved, but unavailable: '+'; '.join(conflicts));return
+    pop.destroy()
+   except (OSError,ValueError) as issue:error.configure(text=str(issue))
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=20,pady=(4,16))
+  self.button(row,'Set shortcut',assign).pack(side='left')
+  self.button(row,'Reset defaults',reset).pack(side='left',padx=8)
+  self.button(row,'Cancel',pop.destroy).pack(side='right')
+  self.button(row,'Save',save,True).pack(side='right',padx=8)
+  tree.bind('<<TreeviewSelect>>',show);populate();tree.selection_set('toggle');show()
+  self.shortcut_controls={'popup':pop,'tree':tree,'key':key,'modifiers':variables,'disabled':disabled,'enabled':enabled,'assign':assign,'save':save,'reset':reset}
  def timer(self):
   minutes=self.ask_value('Sleep timer','Minutes until pause (0 turns it off):',minvalue=0,maxvalue=180)
   if minutes is not None:self.command('sleep_timer',minutes=minutes)

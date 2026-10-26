@@ -35,6 +35,9 @@ def icon_png(name,color,size=22):
  ink=rgb(color);rows=[]
  def inside(x,y):
   x=(x-size/2)*22/size;y=(y-size/2)*22/size
+  if name=='Close':return abs(x-y)<1.2 and abs(x)<=6 and abs(y)<=6 or abs(x+y)<1.2 and abs(x)<=6 and abs(y)<=6
+  if name=='Collapse':return abs(y)<1.1 and abs(x)<=6
+  if name=='Expand':return (abs(x+y)<1.1 and abs(x)<=6 and abs(y)<=6) or (abs(y+6)<1.1 and -3<=x<=6) or (abs(x-6)<1.1 and -6<=y<=3)
   if name=='Pause':return -7<=y<=7 and (-5.5<=x<=-2.5 or 2.5<=x<=5.5)
   if name=='Prev':x=-x
   triangle=-5<=x<=7 and abs(y)<=(7-x)*2/3

@@ -118,6 +118,25 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_custom_shortcut_editor_saves_and_reloads_global_keys(self):
+  import hotkeys
+  fixture=test_player.Tests();fixture.setUp();window=None;calls=[]
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,calls.append);window.edit_shortcuts();window.root.update()
+   ui=window.shortcut_controls;ui['key'].set('F8')
+   for name,var in ui['modifiers'].items():var.set(name=='CTRL')
+   ui['enabled'].set(True);ui['save']();window.root.update()
+   self.assertEqual(calls,[True])
+   saved=hotkeys.load_config(fixture.player.data_dir/'hotkeys.json')
+   self.assertEqual(saved['toggle'],{'modifiers':['CTRL'],'key':'F8'})
+   window.edit_shortcuts();window.root.update()
+   self.assertEqual(window.shortcut_controls['key'].get(),'F8')
+   window.shortcut_controls['reset']()
+   self.assertEqual(hotkeys.load_config(fixture.player.data_dir/'hotkeys.json'),saved)
+   window.shortcut_controls['popup'].destroy()
+  finally:
+   if window:window.close()
+   fixture.tearDown()
  def test_queue_actions_fit_at_minimum_window_size(self):
   from window import SoftButton
   fixture=test_player.Tests();fixture.setUp();window=None
