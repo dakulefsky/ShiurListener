@@ -61,8 +61,8 @@ class Tests(unittest.TestCase):
    window.root.geometry(f'{window.minimum_size[0]}x{window.minimum_size[1]}');window.root.update()
    dock_height=window.dock_card.winfo_height();list_height=window.tree.winfo_height()
    current=next(t for t in fixture.player.tracks if t['id']==fixture.player.saved['currentId'])
-   current['name']='A very long shiur title with many words '*60+'.mp3'
-   current['source']='A very long source folder '*60
+   current['name']='A very long shiur title\nwith many words '*60+'.mp3'
+   current['source']='A very long source\nfolder '*60
    window.refresh();window.root.update()
    self.assertEqual(window.dock_card.winfo_height(),dock_height)
    self.assertGreaterEqual(window.tree.winfo_height(),list_height)
@@ -73,6 +73,27 @@ class Tests(unittest.TestCase):
    window.dock_toggle.invoke();window.root.update()
    self.assertTrue(window.dock_collapsed)
    self.assertGreater(window.tree.winfo_height(),list_height)
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+ def test_long_collection_keeps_mini_player_available_and_hover_shows_name(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   name='A long collection name '*40
+   fixture.library.collection('folder_create',name)
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   window.root.geometry(f'{window.minimum_size[0]}x{window.minimum_size[1]}');window.root.update()
+   self.assertTrue(window.mini_button.winfo_ismapped())
+   self.assertGreater(window.mini_button.winfo_width(),1)
+   self.assertLessEqual(window.mini_button.winfo_rootx()+window.mini_button.winfo_width(),window.root.winfo_rootx()+window.root.winfo_width())
+   self.assertLessEqual(window.heading.winfo_rootx()+window.heading.winfo_width(),window.mini_button.winfo_rootx())
+   tip=window.heading_tip;tip.show();window.root.update()
+   self.assertIsNotNone(tip.popup)
+   self.assertEqual(tip.popup.winfo_children()[0].cget('text'),name.strip())
+   self.assertLessEqual(tip.popup.winfo_rootx()+tip.popup.winfo_width(),window.root.winfo_screenwidth())
+   tip.hide();self.assertIsNone(tip.popup)
+   tip.schedule();self.assertIsNotNone(tip.pending)
+   tip.hide();self.assertIsNone(tip.pending)
   finally:
    if window:window.close()
    fixture.tearDown()
