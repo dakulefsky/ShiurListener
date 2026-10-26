@@ -4,7 +4,7 @@ An English-only local shiur player for Windows x64. The recording library and pl
 
 ## Download
 
-**[Download the standalone Windows app — 0.9.4](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-0.9.4.exe)**
+**[Download the standalone Windows app — 0.9.5](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-0.9.5.exe)**
 
 Close the older player and run the **setup EXE once**. It creates desktop and Start menu shortcuts. Use **Check for updates** inside the app for future releases—no repeated manual extraction. Python and VLC are bundled. Existing standalone listening data stays in the same profile.
 
@@ -13,6 +13,8 @@ After restarting the computer, open the Shiur Player shortcut and press Play. Th
 ![Redesigned player, rendered on Linux](previews/shiur-player-modern-development.png)
 
 ## Features
+
+Version 0.9.5 adds × close buttons to the mini player, keeps long titles from crowding the shiurim list, and shows full titles on hover. The Windows installer has passed startup, repair and saved-position checks.
 
 - Unplayed and Finished views; natural numbered sorting and multiword search.
 - Editable queue with Play next, reordering and removal of upcoming recordings.
