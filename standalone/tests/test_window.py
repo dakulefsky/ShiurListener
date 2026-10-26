@@ -97,6 +97,27 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_expanded_player_leaves_room_for_recordings_at_minimum_size(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   window.root.geometry(f'{window.minimum_size[0]}x{window.minimum_size[1]}');window.root.update()
+   self.assertFalse(window.dock_collapsed)
+   self.assertTrue(window.seek.winfo_ismapped())
+   self.assertLessEqual(window.tree.winfo_rooty()-window.root.winfo_rooty(),170)
+   self.assertGreaterEqual(window.tree.winfo_height(),190)
+   self.assertLessEqual(window.dock_card.winfo_height(),210)
+   self.assertLessEqual(window.tree.winfo_rooty()+window.tree.winfo_height(),window.dock_card.winfo_rooty())
+   for button in (window.mini_button,window.update_button,window.dock_toggle,window.play_button):
+    self.assertTrue(button.winfo_ismapped());self.assertGreater(button.winfo_width(),1)
+   self.assertFalse(window.status.winfo_ismapped())
+   fixture.player.error='Audio output missing';window.refresh();window.root.update()
+   self.assertTrue(window.status.winfo_ismapped())
+   fixture.player.error='';window.refresh();window.root.update()
+   self.assertFalse(window.status.winfo_ismapped())
+  finally:
+   if window:window.close()
+   fixture.tearDown()
  def test_queue_actions_fit_at_minimum_window_size(self):
   from window import SoftButton
   fixture=test_player.Tests();fixture.setUp();window=None
