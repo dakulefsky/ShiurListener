@@ -61,3 +61,6 @@ d1bc031c8b59fc05796b1ba00933500fc4b39c1604f1599cc68d904d007fabc4  shiur-player-w
 fced6e3b02fab77e18dd9f419d38ce459df5291de9d223217443e5503fde62c6  shiur-player-setup-0.9.5.exe
 664b8f85e98099ff20bbde693b28472f66deb9e3a4a614420c91d2757a595b6b  shiur-player-windows-x64-0.9.5.zip
 8bdc3dd6282915fcc80b24fafa7a1adaabc3ac466f7f46336aeffb3ff710fc4b  shiur-player-standalone-source-0.9.5.zip
+8fe78c0f4ede584f0383e7b02a2cf074c9ed3c73e543a73628d966c8cf2ea94b  shiur-player-setup-0.9.6.exe
+79cfab9b6a5701ba6ea8bab967ee5502e1f8ad5cf8cde4774d220b42d65ef5bb  shiur-player-windows-x64-0.9.6.zip
+f2e14fe09285e89bc41fddad049570a42ee2ed9bf12606176161106543d59aa1  shiur-player-standalone-source-0.9.6.zip
