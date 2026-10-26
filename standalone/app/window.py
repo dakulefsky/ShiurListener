@@ -292,8 +292,8 @@ class PlayerWindow:
   eyebrow=tk.Frame(track_info,bg=PAPER);self.dock_eyebrow=eyebrow;eyebrow.pack(fill='x')
   self.label(eyebrow,'Now playing',9,MUTED).pack(side='left')
   self.state_label=self.label(eyebrow,'',9,MUTED);self.state_label.pack(side='left',padx=14)
-  self.track_title=self.label(track_info,'No recording selected',15,anchor='w');self.track_title.pack(fill='x',pady=(4,0))
-  self.source=self.label(track_info,'Choose an audio folder to begin.',9,MUTED,anchor='w');self.source.pack(fill='x',pady=(2,0))
+  self.track_title=self.label(track_info,'No recording selected',15,anchor='w',width=1);self.track_title.pack(fill='x',pady=(4,0))
+  self.source=self.label(track_info,'Choose an audio folder to begin.',9,MUTED,anchor='w',width=1);self.source.pack(fill='x',pady=(2,0))
   self.dock_toggle=self.button(info,'Collapse player',self.toggle_dock);self.dock_toggle.pack(side='right',padx=(8,0))
   self.compact_play=self.button(info,'Play',self.toggle,True)
   self.compact_speed=self.button(info,'1×',lambda:self.command('speed_cycle'))
@@ -692,7 +692,8 @@ class PlayerWindow:
    self.set_options(self.folder_label,text=self.player.root.name if self.player.root else 'No folder selected')
    self.set_options(self.track_title,text=current['name'].rsplit('.',1)[0] if current else 'No recording selected');self.set_options(self.source,text=current['source'] if current and current['source']!=current['name'] else '' if current else 'Choose a recording to begin.')
    playing=state['status']=='playing' or bool(self.player.pending and self.player.pending['autoplay']);self.set_options(self.play_button,text='Pause' if playing else 'Play');self.set_options(self.compact_play,text='Pause' if playing else 'Play');self.set_options(self.compact_speed,text=f"{state['speed']:g}×")
-   self.set_options(self.track_title,wraplength=max(280,self.root.winfo_width()-420))
+   # A wrapped filename can grow the dock until the library has no space.
+   self.set_options(self.track_title,wraplength=0)
    self.set_options(self.state_label,text='Loading…' if state['status']=='loading' else 'Playing' if playing else 'Paused' if current else '')
    if not self.dragging:self.seek.configure(to=max(1,state['duration']));self.seek.set(state['position'])
    self.set_options(self.time,text=f"{clock(state['position'])} / {clock(state['duration'])}");self.set_options(self.back,text=f"-{state['skipSeconds']}s");self.set_options(self.forward,text=f"+{state['skipSeconds']}s")
@@ -720,3 +721,4 @@ class PlayerWindow:
   for callback in self.root.tk.call('after','info'):self.root.tk.call('after','cancel',callback)
   self.root.destroy();return True
  def run(self):self.root.mainloop()
+
