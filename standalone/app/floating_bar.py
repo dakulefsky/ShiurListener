@@ -29,7 +29,7 @@ def color(value,fallback):
 def layout(width,height,collapsed=False,hovered=False,hover_left=False):
  """Client coordinates; title, transport, timing and a clickable progress strip."""
  if collapsed:
-  bounds={102:(16,6,76,32),108:(98,6,36,32)}
+  bounds={102:(16,6,40,32),108:(62,6,30,32),109:(98,6,36,32)}
   if hovered:
    if hover_left:
     bounds={ident:(x+108,y,w,h) for ident,(x,y,w,h) in bounds.items()}
@@ -39,7 +39,7 @@ def layout(width,height,collapsed=False,hovered=False,hover_left=False):
  width=max(270,width);height=max(96,height);pad=14;gap=8
  available=width-2*pad-3*gap;back=int(available*.19);play=int(available*.32);speed=available-2*back-play
  row_height=max(26,min(44,height-74));bottom=height-34
- return {100:(pad,6,width-148,22),108:(width-112,4,30,24),105:(width-76,4,66,24),
+ return {100:(pad,6,width-148,22),108:(width-112,4,30,24),105:(width-76,4,30,24),109:(width-40,4,30,24),
          101:(pad,34,back,row_height),102:(pad+back+gap,34,play,row_height),
          103:(pad+back+play+2*gap,34,back,row_height),106:(width-pad-speed,34,speed,row_height),
          104:(pad,bottom,width-2*pad,20),107:(pad,height-10,width-2*pad,8)}
@@ -47,7 +47,7 @@ def layout(width,height,collapsed=False,hovered=False,hover_left=False):
 def hit_test(x,y,width,height,collapsed=False,hovered=False,hover_left=False):
  """Return HTCLIENT over controls so Windows can route clicks to child buttons."""
  for ident,(left,top,w,h) in layout(width,height,collapsed,hovered,hover_left).items():
-  if ident in (101,102,103,105,106,107,108) and left<=x<left+w and top<=y<top+h:return 1
+  if ident in (101,102,103,105,106,107,108,109) and left<=x<left+w and top<=y<top+h:return 1
  if not collapsed:
   left=x<6;right=x>=width-6;top=y<6;bottom=y>=height-6
   if top and left:return 13
@@ -136,7 +136,7 @@ class FloatingBar:
   addfont=bind(gdi,'AddFontResourceExW',ctypes.c_int,[w.LPCWSTR,w.DWORD,w.LPVOID]);removefont=bind(gdi,'RemoveFontResourceExW',w.BOOL,[w.LPCWSTR,w.DWORD,w.LPVOID])
   fontpath=pathlib.Path(__file__).resolve().parent/'assets/Rubik.ttf';fontloaded=bool(fontpath.exists() and addfont(str(fontpath),0x10,None))
   current_family='Rubik' if fontloaded else 'Segoe UI'
-  controls={};labels={101:'−15',102:'Play',103:'+15',105:'Open',106:'1x',108:'−'};palette={};resources=[];font=None
+  controls={};labels={101:'−15',102:'Play',103:'+15',105:'Open',106:'1x',108:'−',109:'Close mini player'};palette={};resources=[];font=None
   progress_ratio=0.;last_progress=None;hot_control=None
   texts={};enabled={};visible=self.player.saved.get('floatingVisible',False)
   collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE);hovered=False;hover_intent=HoverIntent();sizing=False;hover_origin=None;last_layout=None;hover_left=False
@@ -267,6 +267,8 @@ class FloatingBar:
      update();return 0
     if msg==0x0111:
      ident=wp&0xffff
+     if (wp>>16)==0 and ident==109:
+      return proc(hwnd,0x0010,0,0)
      if (wp>>16)==0 and ident==108:
       collapsed=not collapsed;hovered=False;hover_origin=None;hover_intent.reset()
       with self.player.lock:self.player.saved['floatingCollapsed']=collapsed;self.player.persist()
@@ -318,7 +320,7 @@ class FloatingBar:
      ink=color(palette.get('onPrimary') if primary else palette.get('onSurface'),'#FFFFFF' if primary else '#242332')
      if item.state&4:ink=color('#A7A5B5','#A7A5B5')
      setcolor(item.dc,ink);setbg(item.dc,1)
-     if item.id in (102,105,108):
+     if item.id in (102,105,108,109):
       cx=(item.rect.left+item.rect.right)//2;cy=(item.rect.top+item.rect.bottom)//2
       iconbrush=brush(ink);iconpen=penfn(0,2,ink);oldb=select(item.dc,iconbrush);oldp=select(item.dc,iconpen)
       if item.id==102:
@@ -327,6 +329,9 @@ class FloatingBar:
          r=w.RECT(cx+offset,cy-6,cx+offset+3,cy+6);fill(item.dc,ctypes.byref(r),iconbrush)
        else:
         points=(w.POINT*3)(w.POINT(cx-4,cy-7),w.POINT(cx+6,cy),w.POINT(cx-4,cy+7));polygon(item.dc,points,3)
+      elif item.id==109:
+       linefrom(item.dc,cx-5,cy-5,None);lineto(item.dc,cx+5,cy+5)
+       linefrom(item.dc,cx-5,cy+5,None);lineto(item.dc,cx+5,cy-5)
       elif item.id==108 and not collapsed:linefrom(item.dc,cx-5,cy,None);lineto(item.dc,cx+5,cy)
       else:
        linefrom(item.dc,cx-5,cy+5,None);lineto(item.dc,cx+5,cy-5)
@@ -374,3 +379,4 @@ class FloatingBar:
    if font:delete(font)
    for resource in resources:delete(resource)
    if fontloaded:removefont(str(fontpath),0x10,None)
+
