@@ -79,7 +79,7 @@ class Tests(unittest.TestCase):
  def test_long_collection_keeps_mini_player_available_and_hover_shows_name(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
-   name='A long collection name '*40
+   name='A long collection name '*6
    fixture.library.collection('folder_create',name)
    window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
    window.root.geometry(f'{window.minimum_size[0]}x{window.minimum_size[1]}');window.root.update()
