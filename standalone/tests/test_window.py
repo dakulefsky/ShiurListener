@@ -25,8 +25,8 @@ class Tests(unittest.TestCase):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
    window=PlayerWindow(fixture.player,fixture.library,lambda _:None);window.toggle_dock();window.root.update()
-   with patch.object(fixture.player,'snapshot',side_effect=RuntimeError('Audio output missing')):window.refresh()
-   window.root.update()
+   with patch.object(fixture.player,'snapshot',side_effect=RuntimeError('Audio output missing')):
+    window.refresh();window.root.update()
    self.assertEqual(window.status.cget('text'),'Audio output missing');self.assertTrue(window.status.winfo_ismapped())
   finally:
    if window:window.close()
