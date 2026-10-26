@@ -6,7 +6,7 @@
 
 ## Current standalone: 0.9.6
 
-[Download setup](shiur-player-setup-0.9.6.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.6
+[Download setup](shiur-player-setup-0.9.6.exe) or choose **Check for updates** in the app.
 
 The shiurim list starts higher on the screen, with less unused header space and a shorter expanded player. Main-player cards, buttons, playback icons, toggles and slider knobs now have antialiased edges. Windows DPI awareness improves rendering at the system display scale. The existing Windows styling, playback controls and saved listening positions are preserved.
 
