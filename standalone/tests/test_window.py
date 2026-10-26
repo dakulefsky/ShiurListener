@@ -53,6 +53,29 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_long_recording_title_does_not_cover_library_or_hide_collapse(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   fixture.library.play();fixture.player.tick()
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   window.root.geometry(f'{window.minimum_size[0]}x{window.minimum_size[1]}');window.root.update()
+   dock_height=window.dock_card.winfo_height();list_height=window.tree.winfo_height()
+   current=next(t for t in fixture.player.tracks if t['id']==fixture.player.saved['currentId'])
+   current['name']='A very long shiur title with many words '*60+'.mp3'
+   current['source']='A very long source folder '*60
+   window.refresh();window.root.update()
+   self.assertEqual(window.dock_card.winfo_height(),dock_height)
+   self.assertGreaterEqual(window.tree.winfo_height(),list_height)
+   self.assertGreater(window.tree.winfo_height(),54)
+   self.assertLessEqual(window.tree.winfo_rooty()+window.tree.winfo_height(),window.dock_card.winfo_rooty())
+   self.assertTrue(window.dock_toggle.winfo_ismapped())
+   self.assertGreater(window.dock_toggle.winfo_width(),1)
+   window.dock_toggle.invoke();window.root.update()
+   self.assertTrue(window.dock_collapsed)
+   self.assertGreater(window.tree.winfo_height(),list_height)
+  finally:
+   if window:window.close()
+   fixture.tearDown()
  def test_queue_actions_fit_at_minimum_window_size(self):
   from window import SoftButton
   fixture=test_player.Tests();fixture.setUp();window=None
@@ -267,3 +290,4 @@ class Tests(unittest.TestCase):
    if window:window.close()
    fixture.tearDown()
 if __name__=='__main__':unittest.main(verbosity=2)
+
