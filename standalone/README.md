@@ -1,8 +1,8 @@
-# Shiur Player 0.9.5
+# Shiur Player 0.9.6
 
 An English-only local Windows x64 desktop player with a light interface, rounded controls, violet accents and a dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
 
-Close the old player and run **shiur-player-setup-0.9.5.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
+Close the old player and run **shiur-player-setup-0.9.6.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
 
 Click **Check for updates** in the app for subsequent releases. Checks run only when requested. The app fetches a small release JSON from this repository, validates its version/URL/size/SHA-256, downloads the installer in a worker thread, saves playback state and starts setup. Setup waits for the old player process to exit before selecting and starting the new version. Program files use separate version directories and an atomic `active.json` pointer, leaving the previous version selected if extraction/activation fails. User data and audio recordings are outside the installation tree. Previous program versions are retained; old portable copies are not removed.
 
@@ -107,3 +107,9 @@ See [the detailed review and verification record](../docs/STANDALONE_REVIEW_0.9.
 ## 0.9.5 player visibility
 
 Both mini player views include an × close button that hides the panel while audio keeps playing. Reopen it from the main Mini player button. Long or multiline recording titles no longer expand the playback dock over the library, and long collection names leave the Mini player button visible. Hover over the collection heading, recording title or source to read its full text. Existing listening positions and speeds are preserved.
+
+## 0.9.6 more room and smoother rendering
+
+The shiurim list starts higher on the screen, with less unused header space and a shorter expanded player. Main-player cards, buttons, playback icons, toggles and slider knobs now have antialiased edges. Windows DPI awareness improves rendering at the system display scale. The existing Windows styling, playback controls and saved listening positions are preserved.
+
+For the clearest result, launch the app on the display you use for listening. Moving an open window between monitors with different scaling may still let Windows rescale it; reopen it on that monitor if needed.
