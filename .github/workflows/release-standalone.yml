@@ -1,0 +1,58 @@
+name: Release standalone player
+on:
+  push:
+    branches: [main]
+    paths: ['standalone/app/version.py']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: standalone-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /standalone/
+            /.github/workflows/
+            /downloads/SHA256SUMS.txt
+            /downloads/standalone-latest.json
+            /downloads/README.md
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+          cache: false
+      - name: Source and native mouse regression checks
+        run: python standalone/tests/run_suite.py
+      - name: Build installer from checksum-verified runtime and current source
+        run: python standalone/build/release.py build
+      - name: Configure release commit author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Stage candidate without changing the public update channel
+        run: python standalone/build/release.py stage
+      - name: Verify actual setup, startup, shortcut, duplicate guard, repair and retained positions
+        shell: pwsh
+        run: |
+          $env:SHIUR_INSTALLER_VERSION = python -c "import runpy; print(runpy.run_path('standalone/app/version.py')['APP_VERSION'])"
+          python standalone/tests/test_windows_installation.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Publish verified installer and update channel
+        run: python standalone/build/release.py publish
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $version = python -c "import runpy; print(runpy.run_path('standalone/app/version.py')['APP_VERSION'])"
+          $head = git rev-parse HEAD
+          gh release create "standalone-v$version" --target $head --title "Shiur Player $version" --notes "Adds a close button to the mini player, keeps the shiurim list visible with long titles, protects library controls, and adds full-title hover previews. Windows/Linux desktop checks and actual Windows installation/repair tests pass. Existing listening positions are preserved." "downloads/shiur-player-setup-$version.exe" "downloads/shiur-player-windows-x64-$version.zip" "downloads/shiur-player-standalone-source-$version.zip"

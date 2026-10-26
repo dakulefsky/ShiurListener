@@ -1,8 +1,8 @@
-# Shiur Player 0.9.4
+# Shiur Player 0.9.5
 
 An English-only local Windows x64 desktop player with a light interface, rounded controls, violet accents and a dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
 
-Close the old player and run **shiur-player-setup-0.9.4.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
+Close the old player and run **shiur-player-setup-0.9.5.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
 
 Click **Check for updates** in the app for subsequent releases. Checks run only when requested. The app fetches a small release JSON from this repository, validates its version/URL/size/SHA-256, downloads the installer in a worker thread, saves playback state and starts setup. Setup waits for the old player process to exit before selecting and starting the new version. Program files use separate version directories and an atomic `active.json` pointer, leaving the previous version selected if extraction/activation fails. User data and audio recordings are outside the installation tree. Previous program versions are retained; old portable copies are not removed.
 
@@ -103,3 +103,7 @@ Reviewed playback, recovery, state persistence, library actions, bookmarks, back
 
 See [the detailed review and verification record](../docs/STANDALONE_REVIEW_0.9.4.md). CI runs the source tests on Linux and Windows, actual Win32 injected mouse controls, and real Windows VLC/Tk interaction using a dummy output. A manual candidate-install workflow validates the packaged EXE before the public update channel is advanced. No test-only dependencies are added to the shipped application.
 
+
+## 0.9.5 player visibility
+
+Both mini player views include an × close button that hides the panel while audio keeps playing. Reopen it from the main Mini player button. Long or multiline recording titles no longer expand the playback dock over the library, and long collection names leave the Mini player button visible. Hover over the collection heading, recording title or source to read its full text. Existing listening positions and speeds are preserved.
