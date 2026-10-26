@@ -3,7 +3,7 @@
 const $=id=>document.getElementById(id), C=ShiurCore;
 const engine=new VisiblePlayback(document.getElementById('audio'));
 let state=C.fresh(),view='all',query='',ready=false,loadedId=null,loadRevision=0,queue=[],saveChain=Promise.resolve(),importing=false,loading=false,initializing=false;
-const status=(message,error=false)=>{$('status').textContent=message;$('status').classList.toggle('error',error);$('recovery').hidden=!error;if(error){$('error-detail').textContent='נגן שיעורים 1.6.0\n'+message;$('player-state').textContent='נדרשת בדיקה';}};
+const status=(message,error=false)=>{$('status').textContent=message;$('status').classList.toggle('error',error);$('recovery').hidden=!error;if(error){$('error-detail').textContent='נגן שיעורים 1.6.1\n'+message;$('player-state').textContent='נדרשת בדיקה';}};
 async function rpc(method,args={}){const r=await window.Otzaria.call(method,args);if(!r || !r.success)throw new Error(r?.error?.message||`הפעולה נכשלה: ${method}`);return r.data;}
 function safe(fn){return (...args)=>Promise.resolve().then(()=>fn(...args)).catch(e=>status(e.message||String(e),true));}
 function save(){
@@ -37,7 +37,7 @@ function renderTracks(){
   if(!tracks.length){const empty=document.createElement('div');empty.className='empty';const title=document.createElement('strong');title.textContent=state.tracks.length?'אין שיעורים בתצוגה הזו':'כל שיעור מתחיל בהקשבה';const text=document.createElement('p');text.textContent=state.tracks.length?'אפשר לשנות את החיפוש או להוסיף שיעורים לרשימה.':'הוסיפו קובץ שמע או תיקייה כדי להתחיל.';empty.append(title,text);list.append(empty);return;}
   for(const t of tracks){
     const row=document.createElement('article');row.className='track'+(state.currentId===t.id?' selected':'');row.dataset.trackId=t.id;
-    const info=document.createElement('div');const title=button(t.name,()=>selectTrack(t.id,false,tracks.map(t=>t.id)),'track-title');title.dir='auto';
+    const info=document.createElement('div');info.className='track-info';const title=button(t.name,()=>selectTrack(t.id,false,tracks.map(t=>t.id)),'track-title');title.dir='auto';
     const source=document.createElement('small');source.textContent=t.source||'קובץ מקומי';source.dir='auto';
     const progress=document.createElement('small');progress.className='track-progress';progress.textContent=C.progressLabel(t);
     info.append(title,source,progress);

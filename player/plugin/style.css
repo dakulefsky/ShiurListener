@@ -130,3 +130,11 @@ body.compact-mode .keyboard-help{margin-inline:12px}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 
 .build-version{font-size:.68em;font-weight:450;color:var(--color-on-surface-variant);margin-inline-start:.3em}
+
+/* Keep long recording titles and controls usable in a side pane. */
+main>*,.brand>div,.section-head>*{min-width:0}
+#current-title,.track-title{overflow-wrap:anywhere}
+.player-heading,.section-head{flex-wrap:wrap;gap:8px}
+dialog{max-height:90dvh;overflow:auto}
+#seek{min-height:32px;cursor:pointer}
+@media(max-width:600px){header .brand{flex-shrink:1}header .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}header .actions button{white-space:normal}.transport{flex-wrap:wrap}.player-options{flex-wrap:wrap}.track{grid-template-columns:1fr}.track-info{flex:1 1 180px;min-width:0}.track-actions{max-width:none;width:100%;display:block}.track-actions summary{text-align:start}.track-actions[open]{padding-top:8px;border-top:1px solid var(--color-outline-variant)}.keyboard-help{overflow-wrap:anywhere}.notice{margin-inline:14px;font-size:.75rem}}
