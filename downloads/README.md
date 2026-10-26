@@ -4,9 +4,9 @@
 
 [Download plugin](shiur-player-1.5.0.otzplugin). Bundled offline model/runtime; no Python or companion installation. Keeps the five-minute minimum, checks speech/music locally before playback, and preserves saved positions. Filtering is experimental and can make mistakes. [Instructions and limitations](../player/README.md). Install as an update to נגן שיעורים in Otzaria.
 
-## Current standalone: 0.8.2
+## Current standalone: 0.9.5
 
-[Download setup](shiur-player-setup-0.8.2.exe) or Check for updates. Custom player branding, no Favorites section, and Rename recording with saved-place/bookmark/collection preservation. Both speed buttons cycle 1× → 1.5× → 2× → 0.5× → 1×.
+[Download setup](shiur-player-setup-0.9.5.exe) or choose **Check for updates** in the app. Adds an × close button to both mini player views, keeps long titles from crowding the shiurim list, protects the Mini player button beside long collection names, and adds full-title hover previews. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
 
 ## Standalone: 0.8.1
 
