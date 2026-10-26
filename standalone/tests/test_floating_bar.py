@@ -24,7 +24,7 @@ class TestBar(unittest.TestCase):
  def test_buttons_are_client_targets_not_window_drag_targets(self):
   for width,height,collapsed,hovered in [(360,150,False,False),(144,44,True,False),(252,44,True,True)]:
    for ident,(x,y,w,h) in module.layout(width,height,collapsed,hovered).items():
-    if ident in (101,102,103,105,106,107,108):
+    if ident in (101,102,103,105,106,107,108,109):
      self.assertEqual(module.hit_test(x+w//2,y+h//2,width,height,collapsed,hovered),1,f'Control {ident} must receive clicks')
    self.assertEqual(module.hit_test(8,20,width,height,collapsed,hovered),2)
  def test_hover_waits_for_intent_and_ignores_brief_crossings(self):
@@ -51,7 +51,7 @@ class TestBar(unittest.TestCase):
   original=module.layout(144,44,True,False)
   expanded=module.layout(252,44,True,True,True)
   shift=module.HOVER_SIZE[0]-module.COLLAPSED_SIZE[0]
-  for ident in (102,108):
+  for ident in (102,108,109):
    self.assertEqual(expanded[ident][0]-shift,original[ident][0])
   for ident,(x,y,width,height) in expanded.items():
    self.assertEqual(module.hit_test(x+width//2,y+height//2,252,44,True,True,True),1)
@@ -66,7 +66,9 @@ class TestBar(unittest.TestCase):
   self.test_native_transport_and_hiding(collapse=True)
  def test_hover_reveals_skip_and_leaving_collapses_again(self):
   self.test_native_transport_and_hiding(collapse=True,hover=True)
- def test_native_transport_and_hiding(self,collapse=False,hover=False):
+ def test_close_button_hides_without_playback_commands(self):
+  self.test_native_transport_and_hiding(close_button=True)
+ def test_native_transport_and_hiding(self,collapse=False,hover=False,close_button=False):
   from ctypes import wintypes as w
   with tempfile.TemporaryDirectory() as tmp:
    class Player:
@@ -80,8 +82,9 @@ class TestBar(unittest.TestCase):
      if cmd['op']=='seek':self.state['position']=cmd['value']
     def persist(self):self.writes+=1
    player=Player();callbacks={};handles={};shows=[];texts=[];next_handle=10;messages=[(0x111,106),(0x111,105),(0x0005,0),(0x0232,0)]+[(0x113,0)]*10+[(0x111,107),(0x111,102),(0x111,101),(0x111,103),(0x10,0),(0x8001,0),(0x8003,1),(0x8003,1),(0x8003,0)];registered_style=[];window_sizes=[];invalidations=[];moves=[];caption_updates=[];bounds={};idle_checks=[]
+   if close_button:messages[messages.index((0x10,0))]=(0x111,109)
    messages.append((0x000F,0))
-   messages.extend((0x002B,ident) for ident in (102,105,108,106,107))
+   messages.extend((0x002B,ident) for ident in (102,105,108,109,106,107))
    mode_sizes=[];position_flags=[];paint_calls=[]
    if collapse:messages[14:14]=[(0x111,108),(0x0232,0),(0x111,108)]
    cursor_reads=[];cursor_position=[0,0];fake_clock=[0.]
@@ -97,7 +100,7 @@ class TestBar(unittest.TestCase):
    def message(pointer,*args):
     if not messages:
      for ident,(x,y,width,height) in module.layout(404,140).items():
-      if ident in (101,102,103,105,106,107,108):
+      if ident in (101,102,103,105,106,107,108,109):
        packed=((96+y+height//2)&0xffff)<<16 | ((72+x+width//2)&0xffff)
        self.assertEqual(callbacks['proc'](11,0x0084,0,packed),1,f'Native control {ident} must be clickable')
      return 0
@@ -142,5 +145,6 @@ class TestBar(unittest.TestCase):
     self.assertEqual(mode_sizes,[module.COLLAPSED_SIZE,module.HOVER_SIZE,module.COLLAPSED_SIZE,(420,180)] if hover else [module.COLLAPSED_SIZE,(420,180)])
     self.assertFalse(player.saved['floatingCollapsed'])
     self.assertIn((108,'↗'),caption_updates)
-    self.assertEqual(set(module.layout(*module.COLLAPSED_SIZE,collapsed=True)),{102,108})
+    self.assertEqual(set(module.layout(*module.COLLAPSED_SIZE,collapsed=True)),{102,108,109})
 if __name__=='__main__':unittest.main(verbosity=2)
+

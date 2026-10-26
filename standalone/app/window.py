@@ -17,6 +17,38 @@ def rounded_points(x,y,width,height,radius=18):
  r=min(radius,max(0,width/2),max(0,height/2));right=x+width;bottom=y+height
  return [x+r,y,right-r,y,right,y,right,y+r,right,bottom-r,right,bottom,right-r,bottom,x+r,bottom,x,bottom,x,bottom-r,x,y+r,x,y]
 
+def single_line(value):
+ """Keep external recording and collection names from adding layout rows."""
+ return ' '.join(str(value).split())
+
+class HoverTip:
+ """Read clipped label text without expanding its surrounding panel."""
+ def __init__(self,widget):
+  self.widget=widget;self.pending=None;self.popup=None
+  widget.bind('<Enter>',self.schedule,add='+')
+  for event in ('<Leave>','<ButtonPress>','<Unmap>','<Destroy>'):widget.bind(event,self.hide,add='+')
+ def schedule(self,event=None):
+  self.hide();self.pending=self.widget.after(600,self.show)
+ def hide(self,event=None):
+  if self.pending is not None:
+   self.widget.after_cancel(self.pending);self.pending=None
+  if self.popup is not None:self.popup.destroy();self.popup=None
+ def show(self):
+  self.hide()
+  if not self.widget.winfo_viewable():return
+  text=self.widget.cget('text')
+  if not text:return
+  popup=tk.Toplevel(self.widget);self.popup=popup
+  popup.withdraw();popup.overrideredirect(True)
+  popup.attributes('-topmost',True)
+  screen_w=self.widget.winfo_screenwidth();screen_h=self.widget.winfo_screenheight()
+  tk.Label(popup,text=text,font=(FONT,10),bg=PAPER,fg=INK,justify='left',wraplength=min(480,max(80,screen_w-40)),padx=12,pady=8,relief='solid',bd=1).pack()
+  popup.update_idletasks()
+  x=max(0,min(self.widget.winfo_rootx(),screen_w-popup.winfo_reqwidth()))
+  y=self.widget.winfo_rooty()+self.widget.winfo_height()+6
+  if y+popup.winfo_reqheight()>screen_h:y=max(0,self.widget.winfo_rooty()-popup.winfo_reqheight()-6)
+  popup.geometry(f'+{x}+{y}');popup.deiconify()
+
 class RoundedCard(tk.Canvas):
  """Rounded surface with a real frame inside, preserving normal widget behavior."""
  def __init__(self,parent,inset=14,stretch=False,**kw):
@@ -259,8 +291,9 @@ class PlayerWindow:
   self.label(header,'YOUR LIBRARY',9,MUTED,anchor='w').pack(side='left')
   self.update_button=self.button(header,'Check for updates',self.check_updates);self.update_button.pack(side='right')
   title_row=tk.Frame(content,bg=BG);title_row.pack(fill='x',pady=(2,0))
-  self.heading=self.label(title_row,'All shiurim',24,anchor='w');self.heading.pack(side='left',fill='x',expand=True)
+  self.heading=self.label(title_row,'All shiurim',24,anchor='w',width=1);self.heading.pack(side='left',fill='x',expand=True)
   self.mini_button=self.button(title_row,'Mini player',lambda:self.command('floating_toggle'));self.mini_button.pack(side='right')
+  self.heading_tip=HoverTip(self.heading)
   self.subtitle=self.label(content,'0 recordings',10,MUTED,anchor='w');self.subtitle.pack(fill='x',pady=(4,18))
   self.search_card=RoundedCard(content,inset=8);self.search_card.pack(fill='x',pady=(0,16))
   search_row=self.search_card.body
@@ -292,8 +325,9 @@ class PlayerWindow:
   eyebrow=tk.Frame(track_info,bg=PAPER);self.dock_eyebrow=eyebrow;eyebrow.pack(fill='x')
   self.label(eyebrow,'Now playing',9,MUTED).pack(side='left')
   self.state_label=self.label(eyebrow,'',9,MUTED);self.state_label.pack(side='left',padx=14)
-  self.track_title=self.label(track_info,'No recording selected',15,anchor='w');self.track_title.pack(fill='x',pady=(4,0))
-  self.source=self.label(track_info,'Choose an audio folder to begin.',9,MUTED,anchor='w');self.source.pack(fill='x',pady=(2,0))
+  self.track_title=self.label(track_info,'No recording selected',15,anchor='w',width=1);self.track_title.pack(fill='x',pady=(4,0))
+  self.source=self.label(track_info,'Choose an audio folder to begin.',9,MUTED,anchor='w',width=1);self.source.pack(fill='x',pady=(2,0))
+  self.title_tip=HoverTip(self.track_title);self.source_tip=HoverTip(self.source)
   self.dock_toggle=self.button(info,'Collapse player',self.toggle_dock);self.dock_toggle.pack(side='right',padx=(8,0))
   self.compact_play=self.button(info,'Play',self.toggle,True)
   self.compact_speed=self.button(info,'1×',lambda:self.command('speed_cycle'))
@@ -658,7 +692,7 @@ class PlayerWindow:
    self.set_options(self.empty,text=message);self.empty.place(relx=.5,rely=.55,anchor='center')
   else:self.empty.place_forget()
   folders=self.player.saved['folders'];name=next((f['name'] for f in folders if f['id']==self.library.view),VIEWS.get(self.library.view,'All shiurim'))
-  self.set_options(self.heading,text=name);self.set_options(self.subtitle,text=f"{len(tracks)} recording{'s' if len(tracks)!=1 else ''}")
+  self.set_options(self.heading,text=single_line(name));self.set_options(self.subtitle,text=f"{len(tracks)} recording{'s' if len(tracks)!=1 else ''}")
   signature=(self.library.view,tuple((f['id'],f['name']) for f in folders))
   if signature!=self.nav_signature:
    self.nav_signature=signature
@@ -690,9 +724,10 @@ class PlayerWindow:
    if not self.volume.winfo_containing(self.root.winfo_pointerx(),self.root.winfo_pointery()) is self.volume:self.volume.set(state['volume'])
    self.set_options(self.mute_button,text='Muted' if not state['volume'] else 'Volume')
    self.set_options(self.folder_label,text=self.player.root.name if self.player.root else 'No folder selected')
-   self.set_options(self.track_title,text=current['name'].rsplit('.',1)[0] if current else 'No recording selected');self.set_options(self.source,text=current['source'] if current and current['source']!=current['name'] else '' if current else 'Choose a recording to begin.')
+   self.set_options(self.track_title,text=single_line(current['name'].rsplit('.',1)[0]) if current else 'No recording selected');self.set_options(self.source,text=single_line(current['source']) if current and current['source']!=current['name'] else '' if current else 'Choose a recording to begin.')
    playing=state['status']=='playing' or bool(self.player.pending and self.player.pending['autoplay']);self.set_options(self.play_button,text='Pause' if playing else 'Play');self.set_options(self.compact_play,text='Pause' if playing else 'Play');self.set_options(self.compact_speed,text=f"{state['speed']:g}×")
-   self.set_options(self.track_title,wraplength=max(280,self.root.winfo_width()-420))
+   # A wrapped filename can grow the dock until the library has no space.
+   self.set_options(self.track_title,wraplength=0)
    self.set_options(self.state_label,text='Loading…' if state['status']=='loading' else 'Playing' if playing else 'Paused' if current else '')
    if not self.dragging:self.seek.configure(to=max(1,state['duration']));self.seek.set(state['position'])
    self.set_options(self.time,text=f"{clock(state['position'])} / {clock(state['duration'])}");self.set_options(self.back,text=f"-{state['skipSeconds']}s");self.set_options(self.forward,text=f"+{state['skipSeconds']}s")
@@ -720,3 +755,4 @@ class PlayerWindow:
   for callback in self.root.tk.call('after','info'):self.root.tk.call('after','cancel',callback)
   self.root.destroy();return True
  def run(self):self.root.mainloop()
+
