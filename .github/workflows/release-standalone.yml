@@ -2,8 +2,10 @@ name: Release standalone player
 on:
   push:
     branches: [main]
-    paths: ['standalone/app/version.py']
+    paths: ['standalone/app/version.py', 'standalone/build/release.py']
   workflow_dispatch:
+env:
+  PYTHONUTF8: '1'
 permissions:
   contents: write
 concurrency:

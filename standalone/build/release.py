@@ -43,7 +43,7 @@ def build():
    assert bundle.read(prefix+name)
  subprocess.run([os.sys.executable,str(ROOT/'build/build_installer.py')],check=True)
  # Keep the public channel unchanged until the actual candidate passes installation.
- metadata=json.loads((REPO/'downloads/standalone-latest.json').read_text())
+ metadata=json.loads((REPO/'downloads/standalone-latest.json').read_text(encoding='utf-8'))
  (ROOT/'build/release-metadata.json').write_text(json.dumps(metadata,indent=2)+'\n')
  git('restore','downloads/standalone-latest.json')
  print('Verified source bytes and preserved runtime; candidate built.',flush=True)
@@ -56,7 +56,7 @@ def stage():
  git('commit','-m',f'Stage standalone {VERSION} installer for native Windows verification')
  git('push','origin','HEAD:main')
 def publish():
- metadata=json.loads((ROOT/'build/release-metadata.json').read_text())
+ metadata=json.loads((ROOT/'build/release-metadata.json').read_text(encoding='utf-8'))
  setup=REPO/'downloads'/f'shiur-player-setup-{VERSION}.exe'
  assert digest(setup)==metadata['sha256'] and setup.stat().st_size==metadata['size']
  portable=REPO/'downloads'/f'shiur-player-windows-x64-{VERSION}.zip'
@@ -70,15 +70,15 @@ def publish():
    archive.write(path,'standalone/'+relative.as_posix())
   archive.write(REPO/'.github/workflows/release-standalone.yml','.github/workflows/release-standalone.yml')
  sums=REPO/'downloads/SHA256SUMS.txt'
- text=sums.read_text().rstrip()+'\n'
+ text=sums.read_text(encoding='utf-8').rstrip()+'\n'
  for path in (setup,portable,source):
   text+=f'{digest(path)}  {path.name}\n'
- sums.write_text(text)
+ sums.write_text(text,encoding='utf-8')
  (REPO/'downloads/standalone-latest.json').write_text(json.dumps(metadata,indent=2)+'\n')
  readme=REPO/'downloads/README.md'
- text=readme.read_text()
+ text=readme.read_text(encoding='utf-8')
  text=re.sub(r'## Current standalone:.*?(?=\n## )',f'## Current standalone: {VERSION}\n\n[Download setup](shiur-player-setup-{VERSION}.exe) or choose **Check for updates** in the app. Adds an × close button to both mini player views, keeps long titles from crowding the shiurim list, protects the Mini player button beside long collection names, and adds full-title hover previews. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.\n',text,count=1,flags=re.S)
- readme.write_text(text)
+ readme.write_text(text,encoding='utf-8')
  paths=[f'downloads/{path.name}' for path in (setup,portable,source)]+['downloads/SHA256SUMS.txt','downloads/standalone-latest.json','downloads/README.md']
  git('add','-f',*paths)
  git('commit','-m',f'Release Shiur Player {VERSION} after native installer verification')
