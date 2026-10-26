@@ -218,7 +218,7 @@ class PlayerWindow:
   style.map('TCombobox',fieldbackground=[('readonly',PAPER)],background=[('readonly',PAPER)],foreground=[('readonly',INK)],selectbackground=[('readonly',PAPER)],selectforeground=[('readonly',INK)])
   style.configure('TScale',sliderlength=14,sliderthickness=14,borderwidth=0,background=PAPER,troughcolor=LINE)
   style.layout('Treeview',[('Treeview.treearea',{'sticky':'nswe'})])
-  style.configure('Treeview',background=PAPER,fieldbackground=PAPER,foreground=INK,rowheight=54,borderwidth=0,font=(FONT,11))
+  style.configure('Treeview',background=PAPER,fieldbackground=PAPER,foreground=INK,rowheight=44,borderwidth=0,font=(FONT,11))
   style.configure('Treeview.Heading',background=PAPER,foreground=MUTED,font=(FONT,9),padding=(8,14),relief='flat',borderwidth=0,lightcolor=BG,darkcolor=BG)
   style.map('Treeview',background=[('selected',TINT)],foreground=[('selected',INK)])
   style.configure('TScale',background=PAPER,troughcolor=LINE)
@@ -265,7 +265,7 @@ class PlayerWindow:
   if changed:widget.configure(**changed)
 
  def build(self):
-  self.dock_card=RoundedCard(self.root,inset=20);self.dock_card.pack(side='bottom',fill='x',padx=18,pady=(0,18))
+  self.dock_card=RoundedCard(self.root,inset=12);self.dock_card.pack(side='bottom',fill='x',padx=18,pady=(0,12))
   self.dock=self.dock_card.body
   top=tk.Frame(self.root,bg=BG);top.pack(fill='both',expand=True)
   self.sidebar=tk.Frame(top,bg=SIDEBAR,width=232);self.sidebar.pack(side='left',fill='y');self.sidebar.pack_propagate(False)
@@ -286,16 +286,14 @@ class PlayerWindow:
   nav_canvas.bind('<Configure>',lambda e:nav_canvas.itemconfigure(nav_id,width=e.width))
   nav_canvas.bind('<MouseWheel>',lambda e:nav_canvas.yview_scroll(-int(e.delta/120),'units'))
   self.nav_canvas=nav_canvas
-  content=tk.Frame(top,bg=BG);content.pack(side='left',fill='both',expand=True,padx=(8,24),pady=(24,20))
-  header=tk.Frame(content,bg=BG);header.pack(fill='x')
-  self.label(header,'YOUR LIBRARY',9,MUTED,anchor='w').pack(side='left')
-  self.update_button=self.button(header,'Check for updates',self.check_updates);self.update_button.pack(side='right')
-  title_row=tk.Frame(content,bg=BG);title_row.pack(fill='x',pady=(2,0))
-  self.heading=self.label(title_row,'All shiurim',24,anchor='w',width=1);self.heading.pack(side='left',fill='x',expand=True)
+  content=tk.Frame(top,bg=BG);content.pack(side='left',fill='both',expand=True,padx=(8,24),pady=(12,8))
+  title_row=tk.Frame(content,bg=BG);title_row.pack(fill='x')
+  self.heading=self.label(title_row,'All shiurim',20,anchor='w',width=1);self.heading.pack(side='left',fill='x',expand=True)
   self.mini_button=self.button(title_row,'Mini player',lambda:self.command('floating_toggle'));self.mini_button.pack(side='right')
+  self.update_button=self.button(title_row,'Check for updates',self.check_updates);self.update_button.pack(side='right',padx=(0,6))
   self.heading_tip=HoverTip(self.heading)
-  self.subtitle=self.label(content,'0 recordings',10,MUTED,anchor='w');self.subtitle.pack(fill='x',pady=(4,18))
-  self.search_card=RoundedCard(content,inset=8);self.search_card.pack(fill='x',pady=(0,16))
+  self.subtitle=self.label(content,'0 recordings',10,MUTED,anchor='w');self.subtitle.pack(fill='x',pady=(0,8))
+  self.search_card=RoundedCard(content,inset=8);self.search_card.pack(fill='x',pady=(0,8))
   search_row=self.search_card.body
   self.label(search_row,'Search',10,MUTED).pack(side='left',padx=(0,12))
   self.query=tk.StringVar();self.search=tk.Entry(search_row,textvariable=self.query,relief='flat',bg=PAPER,fg=INK,insertbackground=INK,font=(FONT,11),highlightthickness=0,bd=0);self.search.pack(side='left',fill='x',expand=True,ipady=6)
@@ -307,7 +305,7 @@ class PlayerWindow:
   self.organize_button=self.button(actions,'Add to collection',self.add_collection);self.organize_button.pack(side='left',padx=5)
   self.button(actions,'More ···',self.more).pack(side='right')
   self.selection_info=self.label(actions,'',9,MUTED,anchor='w');self.selection_info.pack(side='left',padx=6)
-  self.library_card=RoundedCard(content,inset=12,stretch=True);self.library_card.pack(fill='both',expand=True)
+  self.library_card=RoundedCard(content,inset=8,stretch=True);self.library_card.pack(fill='both',expand=True)
   table=self.library_card.body
   self.tree=ttk.Treeview(table,columns=('name','resume','duration'),show='headings',selectmode='extended',height=4)
   for name,title,width in [('name','Recording',400),('resume','Saved place',112),('duration','Length',90)]:
@@ -325,7 +323,7 @@ class PlayerWindow:
   eyebrow=tk.Frame(track_info,bg=PAPER);self.dock_eyebrow=eyebrow;eyebrow.pack(fill='x')
   self.label(eyebrow,'Now playing',9,MUTED).pack(side='left')
   self.state_label=self.label(eyebrow,'',9,MUTED);self.state_label.pack(side='left',padx=14)
-  self.track_title=self.label(track_info,'No recording selected',15,anchor='w',width=1);self.track_title.pack(fill='x',pady=(4,0))
+  self.track_title=self.label(track_info,'No recording selected',13,anchor='w',width=1);self.track_title.pack(fill='x',pady=(4,0))
   self.source=self.label(track_info,'Choose an audio folder to begin.',9,MUTED,anchor='w',width=1);self.source.pack(fill='x',pady=(2,0))
   self.title_tip=HoverTip(self.track_title);self.source_tip=HoverTip(self.source)
   self.dock_toggle=self.button(info,'Collapse player',self.toggle_dock);self.dock_toggle.pack(side='right',padx=(8,0))
@@ -359,8 +357,8 @@ class PlayerWindow:
  def apply_dock_layout(self):
   for widget in (self.dock_eyebrow,self.source,self.queue_button,self.dock_timeline,self.dock_controls,self.status,self.compact_play,self.compact_speed):widget.pack_forget()
   self.set_options(self.dock_toggle,text='Expand player' if self.dock_collapsed else 'Collapse player')
-  self.track_title.configure(font=(FONT,11,'bold') if self.dock_collapsed else (FONT,15,'bold'))
-  self.dock_card.inset=12 if self.dock_collapsed else 20
+  self.track_title.configure(font=(FONT,11,'bold') if self.dock_collapsed else (FONT,13,'bold'))
+  self.dock_card.inset=10 if self.dock_collapsed else 12
   self.dock_card.coords(self.dock_card.window,self.dock_card.inset,self.dock_card.inset)
   if self.dock_collapsed:
    self.compact_speed.pack(side='right',padx=6);self.compact_play.pack(side='right',padx=6)
@@ -368,7 +366,8 @@ class PlayerWindow:
   else:
    self.dock_eyebrow.pack(fill='x',before=self.track_title);self.source.pack(fill='x',pady=(2,0))
    self.queue_button.pack(side='right')
-   self.dock_timeline.pack(fill='x',pady=(8,4));self.dock_controls.pack(fill='x');self.status.pack(fill='x',pady=(6,0))
+   self.dock_timeline.pack(fill='x',pady=(4,2));self.dock_controls.pack(fill='x')
+   if self.status.cget('text'):self.status.pack(fill='x',pady=(6,0))
   self.dock_card.content_changed();self.dock_card.resize()
  def speed_menu(self):
   menu=tk.Menu(self.root,tearoff=False,bg=PAPER,fg=INK,activebackground=TINT,activeforeground=GREEN,font=(FONT,11),bd=0)
@@ -736,13 +735,12 @@ class PlayerWindow:
    sleep=f"Pauses in {clock(state['sleepRemaining'])}" if state['sleepRemaining'] else 'Pauses after this recording' if state.get('sleepAtEnd') else ''
    loop=f"Repeat {clock(state['loopA'])}–{clock(state['loopB'])}" if state.get('loopB') is not None else ''
    self.set_options(self.status,text=state['error'] or '   ·   '.join(t for t in (sleep,loop) if t),fg=ERROR if state['error'] else MUTED)
-   if self.dock_collapsed:
-    if self.status.cget('text') and not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
-    elif not self.status.cget('text') and self.status.winfo_manager():self.status.pack_forget()
+   if self.status.cget('text') and not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
+   elif not self.status.cget('text') and self.status.winfo_manager():self.status.pack_forget()
    self.refresh_tools(state);self.refresh_queue()
   except Exception as error:
    self.set_options(self.status,text=str(error),fg=ERROR)
-   if self.dock_collapsed and not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
+   if not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
   self.root.after(500,self.refresh)
  def close(self):
   try:
