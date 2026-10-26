@@ -19,13 +19,16 @@ def rounded_png(width,height,radius,fill,border=''):
    if border:
     row=bytes((*edge,255))+row[4:-4]+bytes((*edge,255)) if width>1 else bytes((*edge,255))
    rows.append(row);continue
-  pixels=bytearray()
-  for x in range(width):
+  def pixel(x):
    a=coverage(x+.5,y+.5);inside=coverage(x+.5,y+.5,1) if border else a
    mix=min(1.,inside/a) if a else 0.
    color=tuple(round(edge[i]*(1-mix)+foreground[i]*mix) for i in range(3))
-   pixels.extend((*color,round(a*255)))
-  rows.append(bytes(pixels))
+   return bytes((*color,round(a*255)))
+  corners=min(math.ceil(radius),width//2)
+  left=b''.join(pixel(x) for x in range(corners))
+  middle=pixel(width//2)*(width-2*corners)
+  right=b''.join(pixel(x) for x in range(width-corners,width))
+  rows.append(left+middle+right)
  return png(width,height,rows)
 @functools.lru_cache(maxsize=64)
 def icon_png(name,color,size=22):
