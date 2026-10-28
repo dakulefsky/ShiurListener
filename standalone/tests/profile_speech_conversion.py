@@ -9,6 +9,7 @@ import pathlib
 import runpy
 import sys
 import tempfile
+import threading
 import time
 import urllib.request
 import wave
@@ -27,10 +28,10 @@ def install_assets(app, assets):
         target.write_bytes(data)
 
 
-def process_peak_working_set_mib():
-    """Return the process peak working set on Windows, including native allocations."""
+def current_and_peak_working_set_mib():
+    """Return current and process-lifetime peak working set, including native allocations."""
     if sys.platform != "win32":
-        return None
+        return None, None
     import ctypes
     from ctypes import wintypes
 
@@ -61,7 +62,17 @@ def process_peak_working_set_mib():
         kernel32.GetCurrentProcess(), ctypes.byref(counters), counters.cb
     ):
         raise ctypes.WinError(ctypes.get_last_error())
-    return counters.PeakWorkingSetSize / (1024 * 1024)
+    return (
+        counters.WorkingSetSize / (1024 * 1024),
+        counters.PeakWorkingSetSize / (1024 * 1024),
+    )
+
+
+def sample_working_set(stop_event, samples):
+    while not stop_event.wait(0.05):
+        current, _ = current_and_peak_working_set_mib()
+        if current is not None:
+            samples.append(current)
 
 
 def main():
@@ -116,7 +127,14 @@ def main():
         converted = root / "converted-mono-16k.wav"
         conversion_progress = []
         pipeline_started = time.monotonic()
-        peak_working_set_before = process_peak_working_set_mib()
+        working_set_start, _ = current_and_peak_working_set_mib()
+        memory_samples = [working_set_start] if working_set_start is not None else []
+        memory_stop = threading.Event()
+        memory_sampler = threading.Thread(
+            target=sample_working_set, args=(memory_stop, memory_samples),
+            name="speech-profile-memory-sampler", daemon=True,
+        )
+        memory_sampler.start()
         started = time.monotonic()
         se._convert_to_mono_16k(source_path, converted, app, None, conversion_progress.append)
         conversion_seconds = time.monotonic() - started
@@ -139,7 +157,10 @@ def main():
         )
         denoise_seconds = time.monotonic() - started
         pipeline_elapsed = time.monotonic() - pipeline_started
-        peak_working_set_after = process_peak_working_set_mib()
+        memory_stop.set()
+        memory_sampler.join(timeout=1)
+        working_set_after, process_peak_working_set_after = current_and_peak_working_set_mib()
+        sampled_peak_working_set = max(memory_samples) if memory_samples else None
         with wave.open(str(enhanced), "rb") as wav:
             output_params = wav.getparams()
             output_frames = wav.getnframes()
@@ -155,10 +176,13 @@ def main():
         compute_seconds = stage_timings.get("denoising_frame_seconds", 0.0)
         output_write_seconds = stage_timings.get("output_write_seconds", 0.0)
         memory_report = (
-            f" process_peak_working_set_mib_before={peak_working_set_before:.1f}"
-            f" process_peak_working_set_mib_after={peak_working_set_after:.1f}"
-            if peak_working_set_before is not None and peak_working_set_after is not None
-            else " process_peak_working_set_mib=unavailable"
+            f" working_set_start_mib={working_set_start:.1f}"
+            f" working_set_sampled_peak_mib={sampled_peak_working_set:.1f}"
+            f" working_set_end_mib={working_set_after:.1f}"
+            f" process_lifetime_peak_mib={process_peak_working_set_after:.1f}"
+            if working_set_start is not None and working_set_after is not None
+            and sampled_peak_working_set is not None and process_peak_working_set_after is not None
+            else " working_set_measurement=unavailable"
         )
         print(
             f"STAGE_PROFILE duration={duration:.1f}s conversion={conversion_seconds:.2f}s "
