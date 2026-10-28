@@ -48,7 +48,7 @@ def _validate(payload):
     state = payload.get('state')
     _require(isinstance(state, dict), 'saved profile is missing.')
     allowed = {'tracks', 'folders', 'bookmarks', 'currentId', 'queue', 'autoNext',
-               'speed', 'volume', 'skipSeconds', 'language', 'libraryRoot', 'audioEnhancement', 'speechEnhancementEnabled',
+               'speed', 'volume', 'skipSeconds', 'language', 'libraryRoot', 'audioEnhancement', 'speechEnhancementEnabled', 'speechEnhancementStrength',
                'librarySort', 'librarySortDescending', 'floatingVisible', 'floatingCollapsed', 'mainDockCollapsed',
                'floatingPosition', 'floatingSize', 'windowSize', 'floatingTheme',
                'halfSpeedCycleMigration', 'miniOnMinimize', 'globalShortcuts', 'miniSpeedMiddle', 'miniSpeedCycleIndex'}
@@ -127,6 +127,9 @@ def _validate(payload):
         for name, value in audio.items():
             _require(type(value) in (int, float) and math.isfinite(value) and -6 <= value <= 6,
                      'audio enhancement values must be between -6 and +6 dB.')
+    if 'speechEnhancementStrength' in state:
+        value = state['speechEnhancementStrength']
+        _require(type(value) is int and 10 <= value <= 60, 'speech suppression strength must be between 10 and 60.')
     if 'floatingTheme' in state:
         theme = state['floatingTheme']
         colors = ('primary', 'onPrimary', 'surface', 'onSurface', 'surfaceContainer')
