@@ -4,15 +4,13 @@
 
 [Download plugin](shiur-player-1.5.0.otzplugin). Bundled offline model/runtime; no Python or companion installation. Keeps the five-minute minimum, checks speech/music locally before playback, and preserves saved positions. Filtering is experimental and can make mistakes. [Instructions and limitations](../player/README.md). Install as an update to נגן שיעורים in Otzaria.
 
-## Current standalone: 0.9.14
+## Current standalone: 0.9.15
 
-[Download setup](shiur-player-setup-0.9.14.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.14
+[Download setup](shiur-player-setup-0.9.15.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.15
 
-Fixes the collapsed mini-player resize interaction: resize edges and corners take priority over nearby controls, and hover expansion is suppressed while the pointer is near a resize edge.
+Fixes Settings and Audio Enhancements layout problems. All dialog actions now live inside the scrollable content, and long labels adapt to the available width instead of being clipped on narrower windows. This also keeps the Offline Speech Enhancement entry button accessible when the window is short.
 
-Fixes the Settings, Audio Enhancements and Offline Speech Enhancement windows on shorter displays. Their content is now scrollable and their initial height adapts to the screen, so lower controls remain reachable.
-
-Allows offline speech enhancement to target a selected library recording even if playback has not started. Enhancement remains local, creates a separate copy, and never overwrites the original.
+Retains the collapsed mini-player resize fix, the selected-recording enhancement flow, and the local-only audio processing introduced in recent releases. Enhanced audio is saved as a separate copy; the original is never overwritten.
 
 Existing listening positions, collections, bookmarks and audio files are preserved. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
 
