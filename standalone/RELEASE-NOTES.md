@@ -1,9 +1,9 @@
-# Shiur Player 0.9.8
+# Shiur Player 0.9.9
 
-Compatible Bluetooth headphone and keyboard media buttons can now control playback when global shortcuts are enabled: Play/Pause toggles playback, Previous skips backward, and Next skips forward using the configured skip interval. The shortcut editor lists these actions separately and explains how to configure them.
+Adds **Audio enhancements** under Settings. Speech-oriented presets include Speech clarity, Strong speech, Warm voice and Off, with controls for bass, voice body, speech presence and high-frequency detail. Changes apply immediately, are saved with the player profile, and are restored when recordings load. The settings are included in profile backups.
 
-Keyboard shortcut settings now follow a clearer select, configure, apply, and save flow, with clearer descriptions for global shortcuts and reset behavior.
+These controls use VLC's built-in equalizer to reshape tone. They can help speech stand out in muffled recordings, but they do not yet perform AI vocal isolation or noise-source separation. Those would require a separate signal-processing model and additional testing.
 
-The 0.9.7 mini-player refinements remain included: the collapsed pill resizes independently, its expand and close controls are stacked, and the Shiur Player name no longer clips in the main sidebar.
+Bluetooth headphone media keys and the clearer keyboard shortcut editor from 0.9.8 remain included. The resizable collapsed mini-player and sidebar layout fixes from 0.9.7 are also included.
 
-Existing playback positions, collections, bookmarks, and saved preferences are preserved. Media-key support is implemented through Windows global media-key registration; physical Bluetooth headset compatibility can vary by device and should be checked on the target Windows system.
+Existing listening positions, collections, bookmarks and audio files are preserved.
