@@ -142,21 +142,58 @@ class Player:
         strength=max(10,min(60,int(round(float(strength)))))
         return self.data_dir/'speech-cache'/f'{ident}-{stat.st_size}-{stat.st_mtime_ns}-hush-v1.0.0-s{strength}.wav'
     def scan(self,root=None):
+        # Walk the folder outside the playback lock so large libraries do not
+        # freeze playback. Reconcile the snapshot under the lock afterwards.
         with self.lock:
             selected=pathlib.Path(root).resolve() if root else self.root
-            if selected is None:raise ValueError('Choose a recordings folder first.')
-            if not selected.is_dir():raise ValueError('The recordings folder is missing or disconnected.')
-            paths={};tracks=[]
-            import hashlib
-            for path in sorted(selected.rglob('*')):
+        if selected is None:raise ValueError('Choose a recordings folder first.')
+        if not selected.is_dir():raise ValueError('The recordings folder is missing or disconnected.')
+        discovered=[]
+        import hashlib
+        for path in sorted(selected.rglob('*')):
+            try:
                 if not path.is_file() or path.suffix.lower() not in EXTENSIONS:continue
                 real=path.resolve()
                 if not real.is_relative_to(selected):continue
+                stat=path.stat()
                 relative=path.relative_to(selected).as_posix()
+                discovered.append((path,relative,stat.st_dev,stat.st_ino,stat.st_size,stat.st_mtime_ns))
+            except (OSError,ValueError):
+                # A file may be moved/deleted while the scan is in progress.
+                continue
+        with self.lock:
+            old_root=self.root
+            old_paths=dict(self.paths)
+            old_tracks={track['id']:dict(track) for track in self.tracks}
+            old_identity={}
+            for ident,old_path in old_paths.items():
+                try:
+                    stat=old_path.stat()
+                    if stat.st_ino:
+                        key=(stat.st_dev,stat.st_ino)
+                        old_identity.setdefault(key,[]).append(ident)
+                except OSError:pass
+            used=set()
+            paths={};tracks=[]
+            for path,relative,device,inode,size,mtime in discovered:
                 ident=hashlib.sha256((str(selected)+'/'+relative).encode()).hexdigest()[:24]
-                paths[ident]=path;tracks.append({'id':ident,'name':path.name,'source':relative})
+                if ident not in old_paths and inode:
+                    matches=old_identity.get((device,inode),[])
+                    if len(matches)==1 and matches[0] not in used:
+                        # NTFS file IDs survive an external rename/move. Keeping
+                        # the old app ID preserves positions, bookmarks and queues.
+                        ident=matches[0]
+                if ident in used:
+                    ident=hashlib.sha256((str(selected)+'/'+relative).encode()).hexdigest()[:24]
+                used.add(ident)
+                paths[ident]=path
+                tracks.append({'id':ident,'name':path.name,'source':relative})
+            changed=(old_root!=selected or old_tracks!={t['id']:t for t in tracks}
+                     or old_paths!={ident:path for ident,path in paths.items()})
+            if not changed:return self.snapshot()
             self.capture()
-            if self.active and self.active not in paths:self.backend.stop();self.active=None;self.pending=None;self.clear_loop()
+            if self.active and self.active not in paths:
+                self.backend.stop();self.active=None;self.pending=None;self.seek_target=None;self.clear_loop()
             self.root=selected;self.paths=paths;self.tracks=tracks;self.library_revision+=1;self.error=''
             self.saved['libraryRoot']=str(selected)
             self.saved['queue']=[i for i in self.saved['queue'] if i in paths]
