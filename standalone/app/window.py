@@ -187,6 +187,9 @@ class SoftButton(tk.Canvas):
   if 'text' in kw:self.caption=kw.pop('text')
   if 'state' in kw:self.disabled=kw.pop('state')=='disabled'
   if 'bg' in kw:self.fill_color=kw.pop('bg')
+  # Canvas has no native -command option; retain callbacks in our action slot.
+  # Speech enhancement rebinds Start/Cancel/Use original after creating controls.
+  if 'command' in kw:self.action=kw.pop('command')
   if kw:super().configure(**kw)
   self.paint()
  def paint(self):
@@ -604,7 +607,7 @@ class PlayerWindow:
    if items.curselection():self.library.bookmark_action(marks[items.curselection()[0]]['id'],delete,track_id=track_id);pop.destroy()
   self.button(pop,'Jump to bookmark',lambda:action()).pack(side='left',padx=16,pady=12);self.button(pop,'Delete',lambda:action(True)).pack(side='right',padx=16)
  def settings(self):
-  pop=tk.Toplevel(self.root);pop.title('Settings & backup');pop.geometry('600x660');pop.configure(bg=BG);pop.transient(self.root)
+  pop=tk.Toplevel(self.root);pop.title('Settings & backup');pop.geometry('640x740');pop.minsize(600,560);pop.resizable(True,True);pop.configure(bg=BG);pop.transient(self.root)
   self.label(pop,f'Settings · {APP_VERSION}',20).pack(anchor='w',padx=24,pady=20)
   auto=tk.BooleanVar(value=self.player.saved['autoNext']);SoftToggle(pop,text='Automatically play the next recording',variable=auto,command=lambda:self.safe(lambda:self.command('autonext',value=auto.get()))).pack(anchor='w',fill='x',padx=24)
   mini=tk.BooleanVar(value=self.player.saved.get('miniOnMinimize',True))
@@ -613,7 +616,7 @@ class PlayerWindow:
   SoftToggle(pop,text='Show mini player when minimized',variable=mini,command=save_mini).pack(anchor='w',fill='x',padx=24,pady=8)
   self.label(pop,'Speed button: 1× → 1.5× → 2× → 0.5× → 1×',10,MUTED).pack(anchor='w',fill='x',padx=24,pady=8)
   global_keys=tk.BooleanVar(value=self.player.saved.get('globalShortcuts',False));SoftToggle(pop,text='Enable shortcuts while using other apps',variable=global_keys,command=lambda:self.safe(lambda:self.shortcuts(global_keys.get()))).pack(anchor='w',fill='x',padx=24,pady=12)
-  self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+Q: add to queue\nCustomize global keys below; they also work in other apps.',10,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
+  self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+Q: add to queue\nCustomize global keys below; they also work in other apps.',10,MUTED,wraplength=560,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
   self.button(pop,'Customize keyboard shortcuts…',lambda:(pop.destroy(),self.edit_shortcuts())).pack(anchor='w',padx=24,pady=(0,4))
   self.button(pop,'Audio enhancements…',lambda:(pop.destroy(),self.audio_settings())).pack(anchor='w',padx=24,pady=(10,0))
   self.label(pop,'LISTENING BACKUP',9,MUTED).pack(anchor='w',padx=24,pady=(18,8))
@@ -621,7 +624,7 @@ class PlayerWindow:
   self.button(row,'Export backup…',self.export_backup).pack(side='left');self.button(row,'Restore backup…',self.restore_backup).pack(side='left',padx=8)
   self.label(pop,'Includes positions, collections and bookmarks. Audio stays in its folder.',9,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
  def audio_settings(self):
-  pop=tk.Toplevel(self.root);pop.title('Audio enhancements');pop.geometry('600x720');pop.minsize(560,680);pop.configure(bg=BG);pop.transient(self.root)
+  pop=tk.Toplevel(self.root);pop.title('Audio enhancements');pop.geometry('640x850');pop.minsize(600,620);pop.resizable(True,True);pop.configure(bg=BG);pop.transient(self.root)
   self.label(pop,'Make speech easier to hear',20).pack(anchor='w',padx=24,pady=(18,4))
   self.label(pop,'Adjust the sound for quiet, muffled shiurim. Changes apply immediately and are saved automatically.',10,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(0,12))
   initial=self.player.saved.get('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0})
