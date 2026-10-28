@@ -23,7 +23,7 @@ class Tests(unittest.TestCase):
   self.assertEqual(self.player.saved['audioEnhancement'],settings)
   restored=Player(None,self.root/'data',Audio())
   self.assertEqual(restored.saved['audioEnhancement'],settings)
-  with self.assertRaisesRegex(ValueError,'between -6 and +6'):
+  with self.assertRaisesRegex(ValueError,'between -6 and \\+6'):
    self.player.command({'op':'audio_enhancement','value':{'clarity':8}})
   with self.assertRaisesRegex(ValueError,'object'):
    self.player.command({'op':'audio_enhancement','value':'loud'})
