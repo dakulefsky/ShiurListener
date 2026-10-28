@@ -107,6 +107,13 @@ def _process_wav(source_path, output_path, library_path, model_path, cancel, pro
             raise RuntimeError("The speech processor returned an unsupported frame size.")
         input_buffer = (ctypes.c_float * frame_length)()
         output_buffer = (ctypes.c_float * frame_length)()
+        last_progress = -1
+        def report(value):
+            nonlocal last_progress
+            value = max(0, min(100, int(value)))
+            if value != last_progress:
+                last_progress = value
+                _report(progress, value)
         with wave.open(str(source_path), "rb") as src:
             total = src.getnframes()
             if total <= 0:
@@ -140,8 +147,8 @@ def _process_wav(source_path, output_path, library_path, model_path, cancel, pro
                         cleaned.byteswap()
                     dst.writeframesraw(cleaned.tobytes())
                     done += valid
-                    _report(progress, 10 + round(85 * done / total))
-        _report(progress, 98)
+                    report(10 + round(85 * done / total))
+        report(98)
     finally:
         if session and lib:
             lib.weya_nc_session_free(session)
