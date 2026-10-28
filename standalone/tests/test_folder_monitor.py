@@ -93,7 +93,7 @@ class FolderMonitorTests(unittest.TestCase):
                 root = pathlib.Path(root)
                 if root == first:
                     calls["first"] += 1
-                    if calls["first"] == 5:
+                    if calls["first"] == 7:
                         player.root = second
                         return {"old.mp3": (300, 3)}
                     return old_snapshot
