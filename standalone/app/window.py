@@ -397,7 +397,49 @@ class PlayerWindow:
   threading.Thread(target=work,daemon=True).start()
  def update_event(self,event):
   action,value=event
-  if action=='update_error':
+  if action=='speech_progress':
+   job=self.speech_job
+   if job and job.get('busy'):
+    try:
+     if job['popup'].winfo_exists():
+      job['progress'].configure(value=value);job['status'].configure(text=f'Enhancing locally… {value}%')
+    except tk.TclError:pass
+  elif action=='speech_done':
+   ident,output=value;job=self.speech_job
+   if job and job.get('track_id')==ident:
+    job['busy']=False;self.speech_job=None
+    try:
+     visible=bool(job['popup'].winfo_exists())
+    except tk.TclError:visible=False
+    if visible:
+     job['progress'].configure(value=100);job['status'].configure(text='Enhanced copy ready. The original recording is unchanged.')
+     job['start_button'].configure(text='Use enhanced copy',state='normal',command=job['start'])
+     job['cancel_button'].configure(text='Done',state='normal',command=job['popup'].destroy)
+     if messagebox.askyesno('Enhanced audio ready','Use the enhanced copy now? The original remains unchanged.',parent=job['popup']):
+      self.safe(lambda:self.command('speech_enhancement_enabled',value=True))
+  elif action=='speech_cancelled':
+   job=self.speech_job
+   if job:
+    job['busy']=False;self.speech_job=None
+    try:
+     if job['popup'].winfo_exists():
+      job['status'].configure(text='Cancelled. The original recording is unchanged.')
+      job['start_button'].configure(text='Enhance current shiur',state='normal',command=job['start'])
+      job['cancel_button'].configure(text='Done',state='normal',command=job['popup'].destroy)
+    except tk.TclError:pass
+  elif action=='speech_error':
+   job=self.speech_job
+   if job:
+    job['busy']=False;self.speech_job=None
+    try:
+     visible=bool(job['popup'].winfo_exists())
+    except tk.TclError:visible=False
+    if visible:
+     job['status'].configure(text='Enhancement failed. Your original is unchanged.')
+     job['start_button'].configure(text='Try again',state='normal',command=job['start'])
+     job['cancel_button'].configure(text='Done',state='normal',command=job['popup'].destroy)
+     messagebox.showerror('Speech enhancement',value,parent=job['popup'])
+  elif action=='update_error':
    self.update_busy=False;self.set_options(self.update_button,text='Check for updates',state='normal')
    messagebox.showerror('Update unavailable',value+'\nYou can keep using the player and try again later.',parent=self.root)
   elif action=='update_checked':
