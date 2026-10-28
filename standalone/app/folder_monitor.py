@@ -76,7 +76,18 @@ class FolderMonitor:
             if current == self._applied:
                 continue
             try:
-                self.player.scan(root)
+                with self.player.lock:
+                    still_selected = (
+                        self.player.root is not None
+                        and pathlib.Path(self.player.root).resolve() == pathlib.Path(root).resolve()
+                    )
+                if not still_selected:
+                    previous = None
+                    stable_count = 0
+                    continue
+                # Do not pass the captured root into scan(): a manual folder
+                # change can race this check, and scan() must use the current root.
+                self.player.scan()
                 self._applied = current
             except (OSError, ValueError, RuntimeError):
                 # Folder can be disconnected or renamed while the monitor runs.
