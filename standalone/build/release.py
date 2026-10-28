@@ -69,6 +69,7 @@ def build():
     bundle.write(path,prefix+path.relative_to(ROOT/'app').as_posix())
   bundle.write(ROOT/'build/Shiur Player.exe',prefix+'Shiur Player.exe')
   bundle.write(ROOT/'READ ME FIRST.txt',prefix+'READ ME FIRST.txt')
+  bundle.write(ROOT/'THIRD-PARTY-SPEECH-NOTICE.txt',prefix+'THIRD-PARTY-SPEECH-NOTICE.txt')
   for name,data in hush_assets.items():bundle.writestr(prefix+name,data)
   info=json.loads(old.read(prefix+'BUILD-INFO.json'))
   info.update(version=VERSION,baseStandaloneVersion=BASE_VERSION,baseStandaloneSha256=BASE_SHA256)
@@ -80,6 +81,7 @@ def build():
    if path.is_file() and '__pycache__' not in path.parts and path.relative_to(ROOT/'app').parts[0]!='runtime':
     assert bundle.read(prefix+path.relative_to(ROOT/'app').as_posix())==path.read_bytes()
   for name,data in hush_assets.items():assert bundle.read(prefix+name)==data
+  assert bundle.read(prefix+'THIRD-PARTY-SPEECH-NOTICE.txt')==(ROOT/'THIRD-PARTY-SPEECH-NOTICE.txt').read_bytes()
   for name in ('runtime/python/pythonw.exe','runtime/python/_tkinter.pyd','runtime/tcl/tk8.6/tk.tcl','runtime/vlc/libvlc.dll','runtime/vlc/vlc.exe','runtime/speech/weya_nc.dll','runtime/speech/advanced_dfnet16k_model_best_onnx.tar.gz','runtime/speech/LICENSE','runtime/speech/DATASETS.md'):
    assert bundle.read(prefix+name)
  subprocess.run([os.sys.executable,str(ROOT/'build/build_installer.py')],check=True)
