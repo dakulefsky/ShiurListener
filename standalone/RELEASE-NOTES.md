@@ -1,9 +1,7 @@
-# Shiur Player 0.9.10
+# Shiur Player 0.9.11
 
-Fixes the floating mini-player so the expanded window can resize smaller as well as larger. The expanded minimum size is now more compact, and the resize borders remain clear of the controls so shrinking works reliably. Playback controls and the progress strip reflow with the window size.
+Adds optional **offline speech enhancement**. From Settings → Audio enhancements, choose **Enhance current shiur** to create a separate cleaned copy using a local CPU model. Choose a suppression strength from gentle to strong. Processing runs in the background, shows progress, can be cancelled, and works without a cloud service or runtime model download. Enhanced copies are cached separately; the original recording is never overwritten, and **Use original audio** switches back while preserving the listening position.
 
-Hover over the playback-time display in the expanded mini-player to reveal a larger seek scrubber. Hold the mouse button and drag along the bar to move through the shiur; the normal time display returns when the pointer leaves.
+The enhancement can reduce hiss, hum, and some competing voices, but results depend on the recording. It is not guaranteed vocal/music separation and cannot restore speech that was not captured. Existing EQ presets remain available. The optional model/runtime and its license/dataset notices are bundled with the installer.
 
-The Settings audio equalizer from 0.9.9 remains available, with Speech clarity, Strong speech, Warm voice and Off presets. These EQ controls do not yet perform AI vocal isolation. The separate offline speech-enhancement engine is still being evaluated, including redistribution rights for its pretrained model, before we bundle it.
-
-Bluetooth headphone media keys and the clearer keyboard shortcut editor from 0.9.8 remain included. Existing listening positions, collections, bookmarks and audio files are preserved.
+Includes the mini-player resizing, responsive controls, and hover-to-scrub improvements from 0.9.10. Existing listening positions, collections, bookmarks and audio files are preserved.

@@ -68,29 +68,78 @@ class VLC:
         self.stop()
         if self.equalizer:self.lib.libvlc_audio_equalizer_release(self.equalizer);self.equalizer=None
         self.lib.libvlc_media_player_release(self.player);self.lib.libvlc_release(self.instance)
+        if getattr(self,'dll_directory',None):self.dll_directory.close();self.dll_directory=None
 
 class Player:
     def __init__(self,root,data_dir,backend):
         self.root=pathlib.Path(root).resolve() if root else None;self.data_dir=pathlib.Path(data_dir);self.data_dir.mkdir(parents=True,exist_ok=True)
         self.file=self.data_dir/'state.json';self.lock=threading.RLock();self.backend=backend;self.error='';self.pending=None;self.was_playing=False
-        self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'audioEnhancement':{'bass':0,'body':0,'clarity':0,'treble':0},'skipSeconds':15,'folders':[],'language':'en'}
+        self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'audioEnhancement':{'bass':0,'body':0,'clarity':0,'treble':0},'speechEnhancementEnabled':False,'speechEnhancementStrength':35,'skipSeconds':15,'folders':[],'language':'en'}
         if self.file.exists():
+            from profile_backup import FORMAT,_read,_validate
             try:
-                from profile_backup import FORMAT,_read,_validate
                 stored=_read(self.file)
                 if not isinstance(stored,dict):raise ValueError('Saved state must be an object.')
                 self.saved=_validate({'format':FORMAT,'version':1,'state':{**self.saved,**stored}})
-            except (ValueError,OSError):raise RuntimeError('Cannot read saved player state. Back up state.json before resetting it.')
+            except (ValueError,OSError) as original_error:
+                # Never overwrite a state file that this build cannot read. Keep a
+                # byte-for-byte recovery copy before attempting a conservative repair.
+                import datetime,shutil
+                stamp=datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+                backup=self.data_dir/f'state.json.recovery-{stamp}.bak'
+                try:
+                    shutil.copy2(self.file,backup)
+                except OSError as backup_error:
+                    raise RuntimeError(f'Cannot read saved player state ({original_error}). The automatic backup failed ({backup_error}); your original state.json was not changed.') from original_error
+                try:
+                    raw=json.loads(self.file.read_text(encoding='utf-8'))
+                    if not isinstance(raw,dict):raise ValueError('Saved state is not a JSON object.')
+                    defaults=dict(self.saved)
+                    # Recover each recording independently so one malformed entry
+                    # cannot discard the positions for every other shiur.
+                    tracks=raw.get('tracks',{})
+                    recovered_tracks={}
+                    if isinstance(tracks,dict):
+                        for ident,track in tracks.items():
+                            candidate={**defaults,'tracks':{ident:track}}
+                            try:_validate({'format':FORMAT,'version':1,'state':candidate})
+                            except (ValueError,TypeError):continue
+                            recovered_tracks[ident]=track
+                    raw['tracks']=recovered_tracks
+                    # Keep only individually valid top-level settings; malformed
+                    # optional settings are dropped, not the user's whole library.
+                    recovered=dict(defaults)
+                    for key,value in raw.items():
+                        candidate={**recovered,'tracks':recovered_tracks,key:value}
+                        try:_validate({'format':FORMAT,'version':1,'state':candidate})
+                        except (ValueError,TypeError):continue
+                        recovered[key]=value
+                    recovered['tracks']=recovered_tracks
+                    self.saved=_validate({'format':FORMAT,'version':1,'state':recovered})
+                    self.error=f'Saved state was repaired. Original preserved as {backup.name}. Please export a fresh backup from Settings.'
+                except (ValueError,OSError,TypeError,RecursionError) as recovery_error:
+                    # If JSON itself is truncated, open with a clean profile only
+                    # after preserving the complete original bytes above.
+                    self.saved=dict(self.saved)
+                    self.error=f'The saved state could not be repaired automatically. Original preserved as {backup.name}; playback positions may need manual recovery.'
         self.active=None;self.last_save=0;self.previous_status='stopped';self.hotkey_status=[];self.floating_bar=None;self.sleep_deadline=None;self.sleep_minutes=0;self.sleep_paused=False
         self.sleep_at_end=False;self.loop_a=None;self.loop_b=None;self.loop_track=None;self.loop_seek_at=0
         self.seek_target=None
         self.paths={};self.tracks=[];self.library_revision=0;self.choose_folder=None;self.show_window=None;self.hide_window=None
-        self.saved.setdefault('folders',[]);self.saved.setdefault('skipSeconds',15);self.saved.setdefault('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0})
+        self.saved.setdefault('folders',[]);self.saved.setdefault('skipSeconds',15);self.saved.setdefault('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0});self.saved.setdefault('speechEnhancementEnabled',False);self.saved.setdefault('speechEnhancementStrength',35)
         selected=self.root or (pathlib.Path(self.saved['libraryRoot']) if self.saved.get('libraryRoot') else None)
         if selected:
             self.root=selected.resolve()
             if self.root.is_dir():self.scan(self.root)
             else:self.error='The recordings folder is missing or disconnected. Reconnect it, then click Refresh.'
+    def speech_cache_path(self,ident,strength=None):
+        source=self.paths.get(ident)
+        if source is None:return None
+        try:stat=source.stat()
+        except OSError:return None
+        if strength is None:strength=self.saved.get('speechEnhancementStrength',35)
+        strength=max(10,min(60,int(round(float(strength)))))
+        return self.data_dir/'speech-cache'/f'{ident}-{stat.st_size}-{stat.st_mtime_ns}-hush-v1.0.0-s{strength}.wav'
     def scan(self,root=None):
         with self.lock:
             selected=pathlib.Path(root).resolve() if root else self.root
@@ -169,7 +218,11 @@ class Player:
         self.saved['speed']=rate if rate in (.5,.75,1,1.25,1.5,1.75,2) else 1
         if self.loop_track!=ident:self.clear_loop()
         try:
-            self.backend.load(self.paths[ident]);self.active=ident
+            source=self.paths[ident]
+            if self.saved.get('speechEnhancementEnabled'):
+                enhanced=self.speech_cache_path(ident)
+                if enhanced and enhanced.is_file():source=enhanced
+            self.backend.load(source);self.active=ident
             self.pending={'position':start,'autoplay':autoplay,'started':time.monotonic()}
             if hasattr(self.backend,'audio_settings'):self.backend.audio_settings(self.saved.get('audioEnhancement',{}))
             self.backend.volume(0);self.backend.play()
@@ -319,6 +372,16 @@ class Player:
                 if any(not math.isfinite(v) or not -6<=v<=6 for v in clean.values()):raise ValueError('Audio controls must be between -6 and +6 dB.')
                 if hasattr(self.backend,'audio_settings'):self.backend.audio_settings(clean)
                 self.saved['audioEnhancement']=clean
+            elif op=='speech_enhancement_enabled':
+                enabled=data.get('value')
+                if type(enabled) is not bool:raise ValueError('Choose whether enhanced audio should be used.')
+                ident=self.saved.get('currentId')
+                current=self.snapshot() if ident else None
+                self.saved['speechEnhancementEnabled']=enabled
+                if ident in self.paths:
+                    position=current.get('position',0) if current else 0
+                    autoplay=bool((self.pending and self.pending['autoplay']) or (current and current['status']=='playing'))
+                    self.load(ident,position=position,autoplay=autoplay)
             elif op=='volume':
                 value=float(data['value'])
                 if not 0<=value<=1:raise ValueError('Invalid volume.')
