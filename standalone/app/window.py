@@ -417,7 +417,7 @@ class PlayerWindow:
      job['start_button'].configure(text='Use enhanced copy',state='normal',command=job['start'])
      job['cancel_button'].configure(text='Done',state='normal',command=job['popup'].destroy)
      if messagebox.askyesno('Enhanced audio ready','Use the enhanced copy now? The original remains unchanged.',parent=job['popup']):
-      self.safe(lambda:self.command('speech_enhancement_enabled',value=True))
+      job['use_enhanced']()
   elif action=='speech_cancelled':
    job=self.speech_job
    if job:
@@ -700,8 +700,11 @@ class PlayerWindow:
   def use_enhanced():
    def apply():
     save_strength()
+    if self.player.saved.get('currentId')!=ident:
+     position=self.player.saved.get('tracks',{}).get(ident,{}).get('position',0)
+     self.player.load(ident,position=position,autoplay=False)
     self.command('speech_enhancement_enabled',value=True)
-    if pop.winfo_exists():status.configure(text='Enhanced playback is enabled for processed shiurim.')
+    if pop.winfo_exists():status.configure(text='Enhanced playback is enabled for this shiur.')
    self.safe(apply)
   def use_original():
    def apply():
@@ -735,7 +738,7 @@ class PlayerWindow:
     except Exception as error:
      self.requests.put(('speech_error',str(error)))
    threading.Thread(target=work,daemon=True).start()
-  job['start']=start;scale.configure(command=on_strength)
+  job['start']=start;job['use_enhanced']=use_enhanced;scale.configure(command=on_strength)
   start_button.configure(command=lambda:self.safe(start));original_button.configure(command=use_original)
   cancel_button.configure(command=cancel_or_close)
   pop.protocol('WM_DELETE_WINDOW',cancel_or_close)
