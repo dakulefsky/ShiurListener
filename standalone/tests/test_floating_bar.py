@@ -74,7 +74,7 @@ class TestBar(unittest.TestCase):
   for ident in (102,108,109):
    self.assertEqual(expanded[ident][0]-shift,original[ident][0])
   for ident,(x,y,width,height) in expanded.items():
-   self.assertEqual(module.hit_test(x+width//2,y+height//2,252,44,True,True,True),1)
+   self.assertEqual(module.hit_test(x+width//2,y+height//2,*module.HOVER_SIZE,True,True,True,module.COLLAPSED_SIZE[0]),1)
  def test_labels_and_colors(self):
   state={'currentId':'a','skipSeconds':60,'status':'playing'}
   self.assertEqual(module.display(state,[{'id':'a','name':'Shiur'}]),('Shiur','Pause','−60','+60'))
