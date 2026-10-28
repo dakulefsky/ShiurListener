@@ -56,5 +56,17 @@ jobs:
         shell: pwsh
         run: |
           $version = python -c "import runpy; print(runpy.run_path('standalone/app/version.py')['APP_VERSION'])"
-          $head = git rev-parse HEAD
-          gh release create "standalone-v$version" --target $head --title "Shiur Player $version" --notes-file standalone/RELEASE-NOTES.md "downloads/shiur-player-setup-$version.exe" "downloads/shiur-player-windows-x64-$version.zip" "downloads/shiur-player-standalone-source-$version.zip"
+          $tag = "standalone-v$version"
+          $assets = @("downloads/shiur-player-setup-$version.exe", "downloads/shiur-player-windows-x64-$version.zip", "downloads/shiur-player-standalone-source-$version.zip")
+          $releases = gh release list --limit 100 --json tagName | ConvertFrom-Json
+          $existing = @($releases | Where-Object { $_.tagName -eq $tag }).Count -gt 0
+          if ($existing) {
+            gh release edit $tag --title "Shiur Player $version" --notes-file standalone/RELEASE-NOTES.md
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            gh release upload $tag $assets --clobber
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } else {
+            $head = git rev-parse HEAD
+            gh release create $tag --target $head --title "Shiur Player $version" --notes-file standalone/RELEASE-NOTES.md $assets
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
