@@ -191,7 +191,7 @@ def _process_wav(source_path, output_path, library_path, model_path, cancel, pro
             dll_directory.close()
 
 
-def enhance_file(source, output, app_dir, cancel=None, progress=None, strength_db=35.0):
+def enhance_file(source, output, app_dir, cancel=None, progress=None, strength_db=20.0):
     """Create a new enhanced WAV; never write to or replace the source recording."""
     source = pathlib.Path(source).resolve()
     output = pathlib.Path(output).resolve()
