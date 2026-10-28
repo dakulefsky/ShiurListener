@@ -252,10 +252,12 @@ class Player:
             index=queue.index(current)+delta
             if 0<=index<len(queue):self.load(queue[index],autoplay=True)
     def command(self,data):
+        # A rescan walks the filesystem; do not inherit the command lock across it.
+        if isinstance(data,dict) and data.get('op')=='rescan':
+            return self.scan()
         with self.lock:
             op=data.get('op')
             if not isinstance(op,str):raise ValueError('Command op is required.')
-            if op=='rescan':return self.scan()
             if op=='choose_folder':
                 if not self.choose_folder:raise ValueError('Open the player window to choose a recordings folder.')
                 self.choose_folder();return self.snapshot()
