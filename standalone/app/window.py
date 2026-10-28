@@ -219,7 +219,7 @@ def scrollable_dialog_content(pop):
  """Put tall settings dialogs in a screen-sized scrollable viewport."""
  outer=tk.Frame(pop,bg=BG);outer.pack(fill='both',expand=True)
  canvas=tk.Canvas(outer,bg=BG,highlightthickness=0,bd=0)
- scrollbar=ttk.Scrollbar(outer,orient='vertical',command=canvas.yview)
+ scrollbar=SlimScrollbar(outer,canvas.yview)
  canvas.configure(yscrollcommand=scrollbar.set)
  scrollbar.pack(side='right',fill='y');canvas.pack(side='left',fill='both',expand=True)
  body=tk.Frame(canvas,bg=BG)
@@ -254,6 +254,36 @@ def scrollable_dialog_content(pop):
   widget.bind('<MouseWheel>',wheel,add='+')
   widget.bind('<Button-4>',wheel,add='+');widget.bind('<Button-5>',wheel,add='+')
  return body
+
+class ModernPopupMenu:
+ """Lightweight app-styled popup replacing native square system menus."""
+ def __init__(self,root,x,y,items,width=260):
+  self.root=root;self.popup=tk.Toplevel(root);self.popup.withdraw();self.popup.overrideredirect(True)
+  self.popup.configure(bg=PAPER,highlightbackground=LINE,highlightthickness=1);self.popup.attributes('-topmost',True)
+  body=tk.Frame(self.popup,bg=PAPER);body.pack(fill='both',expand=True,padx=1,pady=1)
+  for item in items:
+   if item is None:
+    tk.Frame(body,bg=LINE,height=1).pack(fill='x',padx=8,pady=4);continue
+   label,command=item
+   SoftButton(body,label,lambda fn=command:self.choose(fn),anchor='w').pack(fill='x',padx=4,pady=1)
+  self.popup.update_idletasks();actual_width=max(width,self.popup.winfo_reqwidth());actual_height=self.popup.winfo_reqheight()
+  sw=self.popup.winfo_screenwidth();sh=self.popup.winfo_screenheight()
+  x=max(4,min(int(x),sw-actual_width-4));y=max(4,min(int(y),sh-actual_height-4))
+  self.popup.geometry(f'{actual_width}x{actual_height}+{x}+{y}')
+  self.popup.bind('<Escape>',lambda _:self.popup.destroy());self.popup.bind('<FocusOut>',self.focus_lost,add='+')
+  self.popup.deiconify();self.popup.lift();self.popup.focus_force()
+ def focus_lost(self,event=None):
+  if self.popup.winfo_exists():self.popup.after(180,self.close_if_unfocused)
+ def close_if_unfocused(self):
+  try:
+   if self.popup.winfo_exists() and self.popup.focus_displayof() is None:self.popup.destroy()
+  except tk.TclError:pass
+ def choose(self,command):
+  try:
+   if self.popup.winfo_exists():self.popup.destroy()
+  except tk.TclError:pass
+  command()
+
 
 class PlayerWindow:
  def __init__(self,player,library,shortcuts):
@@ -428,10 +458,9 @@ class PlayerWindow:
    if self.status.cget('text'):self.status.pack(fill='x',pady=(6,0))
   self.dock_card.content_changed();self.dock_card.resize()
  def speed_menu(self):
-  menu=tk.Menu(self.root,tearoff=False,bg=PAPER,fg=INK,activebackground=TINT,activeforeground=GREEN,font=(FONT,11),bd=0)
-  for rate in [.5,.75,1,1.25,1.5,1.75,2]:menu.add_command(label=f'{rate:g}×',command=lambda r=rate:self.safe(lambda:self.command('speed',value=r)))
-  try:menu.tk_popup(self.speed_button.winfo_rootx(),self.speed_button.winfo_rooty()-210)
-  finally:menu.grab_release()
+  items=[(f'{rate:g}×'+('  ✓' if rate==self.player.saved.get('speed',1) else ''),lambda r=rate:self.safe(lambda:self.command('speed',value=r))) for rate in [.5,.75,1,1.25,1.5,1.75,2]]
+  ModernPopupMenu(self.root,self.speed_button.winfo_rootx(),self.speed_button.winfo_rooty()-250,items,width=170)
+
  def check_updates(self):
   if self.update_busy:return
   self.update_busy=True;self.set_options(self.update_button,text='Checking...',state='disabled')
@@ -541,16 +570,11 @@ class PlayerWindow:
   ident=self.tree.identify_row(event.y)
   if not ident:return
   if ident not in self.tree.selection():self.tree.selection_set(ident)
-  self.tree.focus(ident);self.select();menu=tk.Menu(self.root,tearoff=False,bg=PAPER,fg=INK,activebackground=TINT,activeforeground=GREEN,relief='flat',bd=0,font=(FONT,10))
-  menu.add_command(label='Play from saved position',command=lambda:self.safe(self.resume))
-  menu.add_command(label='Rename recording…',command=lambda:self.safe(self.rename_recording))
-  menu.add_command(label='Play next',command=lambda:self.safe(lambda:self.add_queue(True)))
-  menu.add_command(label='Add to queue',command=lambda:self.safe(lambda:self.add_queue(False)))
-  menu.add_separator()
-  menu.add_command(label=f'Add {len(self.selected_ids())} to collection…',command=lambda:self.safe(self.add_collection))
-  if self.library.view not in VIEWS:menu.add_command(label='Remove selected from collection',command=lambda:self.safe(self.remove_selected))
-  try:menu.tk_popup(event.x_root,event.y_root)
-  finally:menu.grab_release()
+  self.tree.focus(ident);self.select()
+  items=[('Play from saved position',lambda:self.safe(self.resume)),('Rename recording…',lambda:self.safe(self.rename_recording)),('Play next',lambda:self.safe(lambda:self.add_queue(True))),('Add to queue',lambda:self.safe(lambda:self.add_queue(False))),None,(f'Add {len(self.selected_ids())} to collection…',lambda:self.safe(self.add_collection))]
+  if self.library.view not in VIEWS:items.append(('Remove selected from collection',lambda:self.safe(self.remove_selected)))
+  ModernPopupMenu(self.root,event.x_root,event.y_root,items,width=265)
+
  def sort_by(self,column):self.library.set_sort(column);self.update_rows()
  def resume(self):self.library.play(force=True)
  def toggle(self):
@@ -611,15 +635,10 @@ class PlayerWindow:
    self.auto_bar=False;self.player.error='Mini player: '+str(error)
    if minimized:self.root.deiconify()
  def more(self):
-  menu=tk.Menu(self.root,tearoff=False,bg=PAPER,fg=INK,activebackground=TINT,activeforeground=GREEN,relief='flat',bd=0,font=(FONT,10))
-  menu.add_command(label='Rename recording…',command=lambda:self.safe(self.rename_recording))
-  menu.add_command(label='Play next',command=lambda:self.safe(lambda:self.add_queue(True)))
-  menu.add_command(label='Add to queue',command=lambda:self.safe(lambda:self.add_queue(False)))
-  menu.add_separator();menu.add_command(label='Reset selected recording to the beginning',command=lambda:self.safe(self.reset_selected))
-  if self.library.view not in VIEWS:
-   menu.add_command(label='Remove selected from this collection',command=lambda:self.safe(self.remove_selected))
-   menu.add_command(label='Rename collection',command=lambda:self.safe(self.rename_collection));menu.add_command(label='Delete collection',command=lambda:self.safe(self.delete_collection))
-  menu.tk_popup(self.root.winfo_pointerx(),self.root.winfo_pointery())
+  items=[('Rename recording…',lambda:self.safe(self.rename_recording)),('Play next',lambda:self.safe(lambda:self.add_queue(True))),('Add to queue',lambda:self.safe(lambda:self.add_queue(False))),None,('Reset selected recording to the beginning',lambda:self.safe(self.reset_selected))]
+  if self.library.view not in VIEWS:items.extend([('Remove selected from this collection',lambda:self.safe(self.remove_selected)),('Rename collection',lambda:self.safe(self.rename_collection)),('Delete collection',lambda:self.safe(self.delete_collection))])
+  ModernPopupMenu(self.root,self.root.winfo_pointerx(),self.root.winfo_pointery(),items,width=280)
+
  def reset_selected(self):
   ids=self.selected_ids()
   if len(ids)!=1:raise ValueError('Select one recording to reset.')
