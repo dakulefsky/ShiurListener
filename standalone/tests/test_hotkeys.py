@@ -15,6 +15,19 @@ class Tests(unittest.TestCase):
   with self.assertRaises(ValueError):hotkeys.bindings({'toggle':{'modifiers':['CTRL','ALT','SHIFT'],'key':'LEFT'}})
   self.assertEqual(len(hotkeys.bindings({'toggle':None})),len(items)-1)
 
+ def test_bluetooth_media_keys_are_valid_and_map_to_play_pause_and_skip(self):
+  items=hotkeys.bindings(hotkeys.default_config())
+  by_name={name:(mods,key,label,action) for name,mods,key,label,action in items}
+  self.assertEqual(by_name['media_toggle'][0],0)
+  self.assertEqual(by_name['media_toggle'][1],0xB3)
+  self.assertEqual(by_name['media_toggle'][3],{'op':'toggle'})
+  self.assertEqual(by_name['media_back'][3],{'op':'skip','direction':-1})
+  self.assertEqual(by_name['media_forward'][3],{'op':'skip','direction':1})
+  with self.assertRaisesRegex(ValueError,'Ctrl, Alt or Win'):
+   hotkeys.bindings({'toggle':{'modifiers':[],'key':'P'}})
+  with self.assertRaisesRegex(ValueError,'Duplicate'):
+   hotkeys.bindings({'media_toggle':{'modifiers':[],'key':'MEDIA_PLAY_PAUSE'},'media_back':{'modifiers':[],'key':'MEDIA_PLAY_PAUSE'}})
+
  def test_custom_shortcuts_save_reload_and_invalid_changes_preserve_file(self):
   fixture=test_player.Tests();fixture.setUp()
   try:
