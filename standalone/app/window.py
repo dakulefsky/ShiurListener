@@ -707,7 +707,7 @@ class PlayerWindow:
   strength_var=tk.DoubleVar(value=strength)
   strength_label=self.label(body,f'Suppression strength: {strength}',10,INK)
   strength_label.pack(anchor='w',padx=24,pady=(0,2))
-  scale=ttk.Scale(pop,from_=10,to=60,orient='horizontal',variable=strength_var)
+  scale=ttk.Scale(body,from_=10,to=60,orient='horizontal',variable=strength_var)
   scale.pack(fill='x',padx=24,pady=(0,2))
   strength_range=tk.Frame(body,bg=BG);strength_range.pack(fill='x',padx=24,pady=(0,6))
   self.label(strength_range,'Gentle',9,MUTED).pack(side='left')
