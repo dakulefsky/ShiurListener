@@ -4,15 +4,15 @@
 
 [Download plugin](shiur-player-1.5.0.otzplugin). Bundled offline model/runtime; no Python or companion installation. Keeps the five-minute minimum, checks speech/music locally before playback, and preserves saved positions. Filtering is experimental and can make mistakes. [Instructions and limitations](../player/README.md). Install as an update to נגן שיעורים in Otzaria.
 
-## Current standalone: 0.9.21
+## Current standalone: 0.9.22
 
-[Download setup](shiur-player-setup-0.9.21.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.21
+[Download setup](shiur-player-setup-0.9.22.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.22
 
-Fixes mini-player seek behavior so both the normal progress strip and the hover-to-scrub control respond to a click, not only a drag. Moves the collapsed mini-player's stacked expand/close controls farther from the right edge so they no longer block resizing from that side.
+Hardens the standalone player after a whole-app reliability audit. Fixes background updater download startup, preserves the language preference on startup and profile import, and makes profile restore safer so a failed profile write does not stop current playback.
 
-Fixes the Settings → Audio enhancements transition by opening the next dialog after the current click callback completes. Long settings labels now wrap responsively instead of being clipped in narrower windows. Mouse clicks no longer leave persistent keyboard-focus rings around custom buttons, switches, and sliders; keyboard navigation remains supported.
+Improves folder monitoring so a scan cannot switch the library back to an outdated folder after the user manually changes it. Normalizes natural-sort keys and adds regression coverage for these fixes.
 
-Existing listening positions, collections, bookmarks and original recordings are preserved. Offline speech enhancement remains optional and runs locally. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
+Speech enhancement remains optional and runs locally. Existing listening positions, collections, bookmarks and original recordings are preserved. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
 
 ## Standalone: 0.8.1
 
