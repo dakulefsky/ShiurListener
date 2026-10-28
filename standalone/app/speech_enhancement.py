@@ -42,10 +42,9 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
     sout = f'#transcode{{acodec=s16l,channels=1,samplerate=16000}}:std{{access=file,mux=wav,dst="{destination}"}}'
     decoder = None
     try:
-        decoder = VLC(options=[f'--sout={sout}', '--sout-keep'])
-        decoder.load(source)
-        if decoder.play() < 0:
-            raise RuntimeError("VLC could not start audio conversion.")
+        decoder = VLC(options=['--aout=dummy'])
+        decoder.load(source, options=[f':sout={sout}', ':sout-keep'])
+        decoder.play()
         started = time.monotonic()
         while True:
             _check_cancel(cancel)
