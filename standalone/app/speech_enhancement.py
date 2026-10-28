@@ -99,7 +99,7 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
                     chunk = min(32768, remaining)
                     target_wav.writeframesraw(source_wav.readframes(chunk))
                     remaining -= chunk
-                target_wav.writeframesraw(b"\\x00" * missing * params.nchannels * params.sampwidth)
+                target_wav.writeframesraw(b"\x00" * missing * params.nchannels * params.sampwidth)
             os.replace(padded, output)
     _report(progress, 10)
 
