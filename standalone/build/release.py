@@ -6,6 +6,24 @@ VERSION=runpy.run_path(str(ROOT/'app/version.py'))['APP_VERSION']
 BASE_VERSION='0.9.4'
 BASE_SHA256='d1bc031c8b59fc05796b1ba00933500fc4b39c1604f1599cc68d904d007fabc4'
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+HUSH_TAG='v1.0.0'
+HUSH_ASSETS=[
+ ('runtime/speech/weya_nc.dll','deployment/lib/weya_nc.dll',22464512,'688bd35590ff29f922579d6567d1b4a3f0709d17'),
+ ('runtime/speech/advanced_dfnet16k_model_best_onnx.tar.gz','deployment/models/advanced_dfnet16k_model_best_onnx.tar.gz',8558968,'2838b4a4ec8ed2cb7bff4cd4e89f8bff828e3db0'),
+ ('runtime/speech/LICENSE','LICENSE',8549,'1c714550021949d38379ad619f5034caeeb4d843'),
+ ('runtime/speech/DATASETS.md','DATASETS.md',3606,'486d7ccbec16a48f431e98feff7d1b42da1e57ad'),
+]
+def download_hush_assets():
+ assets={}
+ for target,source,size,expected_blob in HUSH_ASSETS:
+  url=f'https://raw.githubusercontent.com/pulp-vision/Hush/{HUSH_TAG}/{source}'
+  with urllib.request.urlopen(url,timeout=90) as response:data=response.read()
+  if len(data)!=size:raise ValueError(f'Unexpected Hush asset size: {source}')
+  blob=hashlib.sha1(f'blob {len(data)}\\0'.encode()+data).hexdigest()
+  if blob!=expected_blob:raise ValueError(f'Hush asset identity mismatch: {source}')
+  assets[target]=data
+ print('Verified pinned Hush native runtime, model, license and dataset notice.',flush=True)
+ return assets
 def git(*args):subprocess.run(['git',*args],cwd=REPO,check=True)
 def build():
  if not re.fullmatch(r'\d+\.\d+\.\d+',VERSION):raise ValueError('Invalid version')
@@ -14,6 +32,7 @@ def build():
  url=f'https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-windows-x64-{BASE_VERSION}.zip'
  urllib.request.urlretrieve(url,base)
  assert digest(base)==BASE_SHA256,'Prior runtime checksum mismatch'
+ hush_assets=download_hush_assets()
  env={**os.environ,'GOOS':'windows','GOARCH':'amd64','CGO_ENABLED':'0','GO111MODULE':'off','GOTOOLCHAIN':'local'}
  subprocess.run(['go','build','-trimpath','-ldflags=-s -w -H windowsgui','-o',str(ROOT/'build/Shiur Player.exe'),str(ROOT/'build/launcher.go')],env=env,check=True)
  prefix='Shiur Player/'
@@ -30,6 +49,7 @@ def build():
     bundle.write(path,prefix+path.relative_to(ROOT/'app').as_posix())
   bundle.write(ROOT/'build/Shiur Player.exe',prefix+'Shiur Player.exe')
   bundle.write(ROOT/'READ ME FIRST.txt',prefix+'READ ME FIRST.txt')
+  for name,data in hush_assets.items():bundle.writestr(prefix+name,data)
   info=json.loads(old.read(prefix+'BUILD-INFO.json'))
   info.update(version=VERSION,baseStandaloneVersion=BASE_VERSION,baseStandaloneSha256=BASE_SHA256)
   bundle.writestr(prefix+'BUILD-INFO.json',json.dumps(info,indent=2)+'\n')
@@ -39,7 +59,8 @@ def build():
   for path in (ROOT/'app').rglob('*'):
    if path.is_file() and '__pycache__' not in path.parts and path.relative_to(ROOT/'app').parts[0]!='runtime':
     assert bundle.read(prefix+path.relative_to(ROOT/'app').as_posix())==path.read_bytes()
-  for name in ('runtime/python/pythonw.exe','runtime/python/_tkinter.pyd','runtime/tcl/tk8.6/tk.tcl','runtime/vlc/libvlc.dll'):
+  for name,data in hush_assets.items():assert bundle.read(prefix+name)==data
+  for name in ('runtime/python/pythonw.exe','runtime/python/_tkinter.pyd','runtime/tcl/tk8.6/tk.tcl','runtime/vlc/libvlc.dll','runtime/speech/weya_nc.dll','runtime/speech/advanced_dfnet16k_model_best_onnx.tar.gz','runtime/speech/LICENSE','runtime/speech/DATASETS.md'):
    assert bundle.read(prefix+name)
  subprocess.run([os.sys.executable,str(ROOT/'build/build_installer.py')],check=True)
  # Keep the public channel unchanged until the actual candidate passes installation.
