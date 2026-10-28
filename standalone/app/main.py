@@ -24,7 +24,7 @@ def main():
  backend=None;player=None;bar=None;keys=None;worker=None;monitor=None;stop=threading.Event()
  try:
   backend=VLC()
-  player=Player(args.folder,data,backend);controller=LibraryController(player);player.saved['language']='en'
+  player=Player(args.folder,data,backend);controller=LibraryController(player)
   monitor=FolderMonitor(player);monitor.start()
   player.saved.setdefault('floatingVisible',False)
   player.saved.setdefault('floatingTheme',{'primary':'#6558D3','onPrimary':'#FFFFFF','surface':'#FFFFFF','onSurface':'#242332','surfaceContainer':'#E9E7F0','fontFamily':'Rubik'})
