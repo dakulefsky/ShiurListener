@@ -8,7 +8,6 @@ import array
 import math
 import pathlib
 import runpy
-import statistics
 import sys
 import tempfile
 import time
@@ -72,7 +71,9 @@ def main():
     release = runpy.run_path(str(ROOT / "build" / "release.py"))
     assets = release["download_hush_assets"]()
     import speech_enhancement
-    with tempfile.TemporaryDirectory(prefix="shiur-native-quality-") as directory:
+    # Windows keeps a loaded DLL locked until process exit, so ignore cleanup
+    # failures for that one temporary runtime directory.
+    with tempfile.TemporaryDirectory(prefix="shiur-native-quality-", ignore_cleanup_errors=True) as directory:
         root = pathlib.Path(directory)
         app = root / "app"
         runtime = app / "runtime" / "speech"
@@ -87,7 +88,6 @@ def main():
         source = root / "noisy-reference.wav"
         clean, noisy = make_signal(source, 12)
         source_original = source.read_bytes()
-        metrics = []
         for strength in (20, 35, 50):
             output = root / f"enhanced-{strength}.wav"
             progress = []
@@ -106,7 +106,6 @@ def main():
             assert rms(processed) > 0.001, f"output unexpectedly silent at strength {strength}"
             input_snr = snr_db(clean, noisy)
             output_snr = snr_db(clean, processed)
-            metrics.append((strength, elapsed, input_snr, output_snr, rms(noisy), rms(processed), clipped))
             print(
                 f"QUALITY strength={strength} duration=12s elapsed={elapsed:.2f}s "
                 f"input_snr={input_snr:.2f}dB output_snr={output_snr:.2f}dB "
@@ -114,7 +113,6 @@ def main():
                 flush=True,
             )
 
-        # A longer file catches frame-loop, progress, and runtime scaling issues.
         long_source = root / "long-noisy.wav"
         long_clean, long_noisy = make_signal(long_source, 60, seed=20261029)
         long_output = root / "long-enhanced.wav"
@@ -132,7 +130,7 @@ def main():
             f"output_snr={snr_db(long_clean, processed):.2f}dB",
             flush=True,
         )
-        print("Native enhancement stress test completed; inspect SNR results before drawing quality conclusions.", flush=True)
+        print("Synthetic benchmark finished. These SNR values do not establish quality on real shiur audio.", flush=True)
 
 
 if __name__ == "__main__":
