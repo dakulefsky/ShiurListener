@@ -762,7 +762,7 @@ class PlayerWindow:
    source=self.player.paths.get(ident) if ident else None
   if not ident or source is None:
    messagebox.showinfo('Speech enhancement','Select a shiur in your library first, then open Audio enhancements.',parent=self.root);return
-  strength=int(self.player.saved.get('speechEnhancementStrength',35))
+  strength=int(self.player.saved.get('speechEnhancementStrength',20))
   output=self.player.speech_cache_path(ident,strength)
   pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry(f'540x{max(380,min(560,self.root.winfo_screenheight()-100))}');pop.minsize(440,340);pop.resizable(True,True);pop.configure(bg=BG)
   body=scrollable_dialog_content(pop)
