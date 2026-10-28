@@ -214,6 +214,29 @@ class SoftButton(tk.Canvas):
 
 
 
+
+def scrollable_dialog_content(pop):
+ """Put tall settings dialogs in a screen-sized scrollable viewport."""
+ outer=tk.Frame(pop,bg=BG);outer.pack(fill='both',expand=True)
+ canvas=tk.Canvas(outer,bg=BG,highlightthickness=0,bd=0)
+ scrollbar=ttk.Scrollbar(outer,orient='vertical',command=canvas.yview)
+ canvas.configure(yscrollcommand=scrollbar.set)
+ scrollbar.pack(side='right',fill='y');canvas.pack(side='left',fill='both',expand=True)
+ body=tk.Frame(canvas,bg=BG)
+ item=canvas.create_window((0,0),window=body,anchor='nw')
+ def content_changed(_=None):canvas.configure(scrollregion=canvas.bbox('all'))
+ def viewport_changed(event):canvas.itemconfigure(item,width=event.width)
+ body.bind('<Configure>',content_changed);canvas.bind('<Configure>',viewport_changed)
+ def wheel(event):
+  if getattr(event,'delta',0):canvas.yview_scroll(-int(event.delta/120) or (-1 if event.delta>0 else 1),'units')
+  elif getattr(event,'num',None)==4:canvas.yview_scroll(-1,'units')
+  elif getattr(event,'num',None)==5:canvas.yview_scroll(1,'units')
+  return 'break'
+ for widget in (pop,outer,canvas,body):
+  widget.bind('<MouseWheel>',wheel,add='+')
+  widget.bind('<Button-4>',wheel,add='+');widget.bind('<Button-5>',wheel,add='+')
+ return body
+
 class PlayerWindow:
  def __init__(self,player,library,shortcuts):
   self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False;self.update_busy=False;self.speech_job=None;self.queue_window=None;self.tools_window=None;self.last_volume=1;self.dock_collapsed=bool(player.saved.get('mainDockCollapsed',False))
@@ -607,9 +630,10 @@ class PlayerWindow:
    if items.curselection():self.library.bookmark_action(marks[items.curselection()[0]]['id'],delete,track_id=track_id);pop.destroy()
   self.button(pop,'Jump to bookmark',lambda:action()).pack(side='left',padx=16,pady=12);self.button(pop,'Delete',lambda:action(True)).pack(side='right',padx=16)
  def settings(self):
-  pop=tk.Toplevel(self.root);pop.title('Settings & backup');pop.geometry('640x740');pop.minsize(600,560);pop.resizable(True,True);pop.configure(bg=BG);pop.transient(self.root)
-  self.label(pop,f'Settings · {APP_VERSION}',20).pack(anchor='w',padx=24,pady=20)
-  auto=tk.BooleanVar(value=self.player.saved['autoNext']);SoftToggle(pop,text='Automatically play the next recording',variable=auto,command=lambda:self.safe(lambda:self.command('autonext',value=auto.get()))).pack(anchor='w',fill='x',padx=24)
+  pop=tk.Toplevel(self.root);pop.title('Settings & backup');pop.geometry(f'640x{max(420,min(740,self.root.winfo_screenheight()-100))}');pop.minsize(480,360);pop.resizable(True,True);pop.configure(bg=BG);pop.transient(self.root)
+  body=scrollable_dialog_content(pop)
+  self.label(body,f'Settings · {APP_VERSION}',20).pack(anchor='w',padx=24,pady=20)
+  auto=tk.BooleanVar(value=self.player.saved['autoNext']);SoftToggle(body,text='Automatically play the next recording',variable=auto,command=lambda:self.safe(lambda:self.command('autonext',value=auto.get()))).pack(anchor='w',fill='x',padx=24)
   mini=tk.BooleanVar(value=self.player.saved.get('miniOnMinimize',True))
   def save_mini():
    with self.player.lock:self.player.saved['miniOnMinimize']=mini.get();self.player.persist()
@@ -620,12 +644,13 @@ class PlayerWindow:
   self.button(pop,'Customize keyboard shortcuts…',lambda:(pop.destroy(),self.edit_shortcuts())).pack(anchor='w',padx=24,pady=(0,4))
   self.button(pop,'Audio enhancements…',lambda:(pop.destroy(),self.audio_settings())).pack(anchor='w',padx=24,pady=(10,0))
   self.label(pop,'LISTENING BACKUP',9,MUTED).pack(anchor='w',padx=24,pady=(18,8))
-  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24)
+  row=tk.Frame(body,bg=BG);row.pack(fill='x',padx=24)
   self.button(row,'Export backup…',self.export_backup).pack(side='left');self.button(row,'Restore backup…',self.restore_backup).pack(side='left',padx=8)
   self.label(pop,'Includes positions, collections and bookmarks. Audio stays in its folder.',9,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
  def audio_settings(self):
-  pop=tk.Toplevel(self.root);pop.title('Audio enhancements');pop.geometry('640x850');pop.minsize(600,620);pop.resizable(True,True);pop.configure(bg=BG);pop.transient(self.root)
-  self.label(pop,'Make speech easier to hear',20).pack(anchor='w',padx=24,pady=(18,4))
+  pop=tk.Toplevel(self.root);pop.title('Audio enhancements');pop.geometry(f'640x{max(420,min(850,self.root.winfo_screenheight()-100))}');pop.minsize(480,360);pop.resizable(True,True);pop.configure(bg=BG);pop.transient(self.root)
+  body=scrollable_dialog_content(pop)
+  self.label(body,'Make speech easier to hear',20).pack(anchor='w',padx=24,pady=(18,4))
   self.label(pop,'Adjust the sound for quiet, muffled shiurim. Changes apply immediately and are saved automatically.',10,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(0,12))
   initial=self.player.saved.get('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0})
   values={name:tk.DoubleVar(pop,value=float(initial.get(name,0))) for name in ('bass','body','clarity','treble')}
@@ -639,7 +664,7 @@ class PlayerWindow:
    presets={'Off':(0,0,0,0),'Speech clarity':(-2,-1,3,1),'Strong speech':(-3,-1,5,2),'Warm voice':(-1,2,1,-1)}
    for key,value in zip(values,presets[name]):values[key].set(value)
    apply()
-  presetrow=tk.Frame(pop,bg=BG);presetrow.pack(fill='x',padx=24,pady=(0,12))
+  presetrow=tk.Frame(body,bg=BG);presetrow.pack(fill='x',padx=24,pady=(0,12))
   self.label(presetrow,'START WITH A PRESET',9,MUTED).pack(anchor='w',pady=(0,6))
   buttons=tk.Frame(presetrow,bg=BG);buttons.pack(anchor='w')
   for name in ('Off','Speech clarity','Strong speech','Warm voice'):self.button(buttons,name,lambda n=name:set_preset(n),primary=(name=='Speech clarity')).pack(side='left',padx=(0,6))
@@ -649,7 +674,7 @@ class PlayerWindow:
    row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24,pady=5)
    self.label(row,labels[name],10,INK).pack(side='left')
    readouts[name]=self.label(row,f'{var.get():+.1f} dB',10,MUTED);readouts[name].pack(side='right')
-   scale=ModernScale(pop,from_=-6,to=6,value=var.get(),command=lambda value,n=name:(values[n].set(float(value)),readouts[n].configure(text=f'{float(value):+.1f} dB'),apply()),dark=False)
+   scale=ModernScale(body,from_=-6,to=6,value=var.get(),command=lambda value,n=name:(values[n].set(float(value)),readouts[n].configure(text=f'{float(value):+.1f} dB'),apply()),dark=False)
    scale.configure(width=500);scale.pack(fill='x',padx=24,pady=(0,4));scales[name]=scale
   self.label(pop,'Tip: start with Speech clarity. If the voice sounds thin or sharp, lower Speech presence or raise Voice body slightly.',10,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(10,8))
   self.label(pop,'The equalizer reshapes tone; it does not remove noise or separate competing voices.',9,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(0,12))
@@ -667,8 +692,9 @@ class PlayerWindow:
    messagebox.showinfo('Speech enhancement','Play or select a shiur first, then open Audio enhancements.',parent=self.root);return
   strength=int(self.player.saved.get('speechEnhancementStrength',35))
   output=self.player.speech_cache_path(ident,strength)
-  pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry('540x410');pop.minsize(500,380);pop.configure(bg=BG);pop.transient(self.root)
-  self.label(pop,'Make this shiur easier to hear',18).pack(anchor='w',padx=24,pady=(20,5))
+  pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry(f'540x{max(380,min(560,self.root.winfo_screenheight()-100))}');pop.minsize(440,340);pop.resizable(True,True);pop.configure(bg=BG);pop.transient(self.root)
+  body=scrollable_dialog_content(pop)
+  self.label(body,'Make this shiur easier to hear',18).pack(anchor='w',padx=24,pady=(20,5))
   self.label(pop,f'Current recording: {source.name}',10,INK,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,7))
   self.label(pop,'Creates a separate cleaned copy on this computer. It may reduce hiss, hum and some competing voices; results depend on the recording.',10,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,7))
   self.label(pop,'Original audio is never overwritten. Processing can take a while for long recordings.',9,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,8))
@@ -677,14 +703,14 @@ class PlayerWindow:
   strength_label.pack(anchor='w',padx=24,pady=(0,2))
   scale=ttk.Scale(pop,from_=10,to=60,orient='horizontal',variable=strength_var)
   scale.pack(fill='x',padx=24,pady=(0,2))
-  strength_range=tk.Frame(pop,bg=BG);strength_range.pack(fill='x',padx=24,pady=(0,6))
+  strength_range=tk.Frame(body,bg=BG);strength_range.pack(fill='x',padx=24,pady=(0,6))
   self.label(strength_range,'Gentle',9,MUTED).pack(side='left')
   self.label(strength_range,'Strong',9,MUTED).pack(side='right')
   self.label(pop,'Higher settings suppress more background, but can make the voice sound thinner or less natural.',9,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,6))
   status=self.label(pop,'Enhanced copy is ready for this strength.' if output and output.is_file() else 'Ready to process the current shiur.',10,INK,wraplength=490,justify='left')
   status.pack(anchor='w',padx=24,pady=(16,6))
-  progress=ttk.Progressbar(pop,maximum=100,mode='determinate');progress.pack(fill='x',padx=24,pady=(0,12))
-  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24,pady=(0,16))
+  progress=ttk.Progressbar(body,maximum=100,mode='determinate');progress.pack(fill='x',padx=24,pady=(0,12))
+  row=tk.Frame(body,bg=BG);row.pack(fill='x',padx=24,pady=(0,16))
   cancel_button=self.button(row,'Close',pop.destroy);cancel_button.pack(side='right',padx=(8,0))
   start_button=self.button(row,'Use enhanced copy' if output and output.is_file() else 'Enhance current shiur',lambda:None,True);start_button.pack(side='left')
   original_button=self.button(row,'Use original audio',lambda:None);original_button.pack(side='right',padx=(8,0))
