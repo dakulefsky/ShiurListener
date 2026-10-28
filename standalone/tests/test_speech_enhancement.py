@@ -144,6 +144,26 @@ class SpeechEnhancementTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "separate"):
             enhancement.enhance_file(self.source, self.source, self.root)
 
+
+    def test_enhance_file_defaults_to_benchmarked_strength_20(self):
+        write_wav(self.source, [100, -200, 300, -400])
+        runtime = self.root / "runtime" / "speech"
+        runtime.mkdir(parents=True)
+        (runtime / "weya_nc.dll").write_bytes(b"fake dll")
+        (runtime / "advanced_dfnet16k_model_best_onnx.tar.gz").write_bytes(b"fake model")
+
+        observed = {}
+
+        def fake_process(source, output, library, model, cancel, progress, strength_db=20.0):
+            observed["strength_db"] = strength_db
+            write_wav(output, [100, -200, 300, -400])
+
+        with mock.patch.object(enhancement, "_process_wav", side_effect=fake_process):
+            enhancement.enhance_file(self.source, self.output, self.root)
+
+        self.assertEqual(observed.get("strength_db"), 20.0)
+        self.assertTrue(self.output.is_file())
+
     def test_missing_runtime_fails_before_touching_original(self):
         samples = [100, -200, 300]
         write_wav(self.source, samples)
