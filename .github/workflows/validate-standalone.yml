@@ -43,6 +43,9 @@ jobs:
       - name: Verify offline speech model and conversion through bundled VLC
         if: runner.os == 'Windows'
         run: python -c "import runpy; p=runpy.run_path('standalone/build/release.py'); a=p['download_hush_assets'](); a.update(p['download_vlc_callback_assets']()); p['smoke_test_hush'](a, True)"
+      - name: Measure native speech enhancement quality and long-file performance
+        if: runner.os == 'Windows'
+        run: python standalone/tests/test_speech_enhancement_native.py
       - name: Actual Windows desktop controls with real VLC (dummy audio output)
         if: runner.os == 'Windows'
         run: python standalone/tests/test_desktop_vlc.py
