@@ -82,6 +82,36 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_folder_monitor_detects_new_recordings_without_manual_rescan(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   before=fixture.player.library_revision
+   (fixture.audio/'new shiur.mp3').write_bytes(b'fake')
+   window.monitor_folder_once();window.root.update()
+   self.assertEqual(len(fixture.player.tracks),3)
+   self.assertGreater(fixture.player.library_revision,before)
+   self.assertIn('new shiur.mp3',[track['name'] for track in fixture.player.tracks])
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+
+ def test_open_request_from_explorer_loads_and_plays_recording(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   target=fixture.audio/'02.mp3'
+   request=fixture.player.data_dir/'open-request.json'
+   request.write_text(__import__('json').dumps({'path':str(target)}),encoding='utf-8')
+   window.process_open_request();window.root.update()
+   ident=next(track['id'] for track in fixture.player.tracks if track['name']=='02.mp3')
+   self.assertEqual(fixture.player.saved['currentId'],ident)
+   self.assertEqual(fixture.backend.status,'playing')
+   self.assertFalse(request.exists())
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+
  def test_hidden_or_cleared_selection_cannot_reset_recordings(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
