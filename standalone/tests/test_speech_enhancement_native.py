@@ -20,7 +20,7 @@ import wave
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "app"))
-SAMPLE_URL = "https://raw.githubusercontent.com/pyannote/pyannote-audio/develop/src/pyannote/audio/sample/sample.wav"
+SAMPLE_URL = "https://raw.githubusercontent.com/pyannote/pyannote-audio/93ad8b90ca7c7c7fbf82e39e4a5a005543bda66e/src/pyannote/audio/sample/sample.wav"
 SAMPLE_GIT_BLOB_SHA = "150d49a69dc2da2310fbb526759ff26638595bdc"
 SAMPLE_BYTES = 960104
 
@@ -46,7 +46,7 @@ def write_float(path, samples, rate=16000):
 def make_real_noisy_sample(root):
     with urllib.request.urlopen(SAMPLE_URL, timeout=60) as response:
         payload = response.read()
-    blob = hashlib.sha1(f"blob {len(payload)}\\0".encode() + payload).hexdigest()
+    blob = hashlib.sha1(f"blob {len(payload)}\0".encode() + payload).hexdigest()
     assert len(payload) == SAMPLE_BYTES and blob == SAMPLE_GIT_BLOB_SHA, (
         f"Public-domain speech fixture changed: bytes={len(payload)}, git_blob={blob}"
     )
