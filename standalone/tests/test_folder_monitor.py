@@ -76,6 +76,35 @@ class FolderMonitorTests(unittest.TestCase):
             self.assertEqual(player.scans, [root])
             self.assertEqual(monitor._applied, finished)
 
+    def test_monitor_does_not_switch_back_after_manual_folder_change(self):
+        with __import__("tempfile").TemporaryDirectory() as directory:
+            base = pathlib.Path(directory)
+            first = base / "first"
+            second = base / "second"
+            first.mkdir()
+            second.mkdir()
+            player = FakePlayer(first)
+            monitor = FolderMonitor(player, interval=1, stable_polls=2)
+            old_snapshot = {"old.mp3": (100, 1)}
+            new_snapshot = {"new.mp3": (200, 2)}
+            calls = {"first": 0}
+
+            def snapshot(root):
+                root = pathlib.Path(root)
+                if root == first:
+                    calls["first"] += 1
+                    if calls["first"] == 5:
+                        player.root = second
+                        return {"old.mp3": (300, 3)}
+                    return old_snapshot
+                return new_snapshot
+
+            monitor._snapshot = snapshot
+            monitor.stop_event = SequenceEvent([False] * 12 + [True])
+            monitor._run()
+            self.assertNotIn(first, player.scans)
+            self.assertTrue(all(path == second for path in player.scans))
+
     def test_missing_root_does_not_crash_monitor(self):
         player = FakePlayer(None)
         monitor = FolderMonitor(player, interval=1)
