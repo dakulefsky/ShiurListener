@@ -17,6 +17,19 @@ class Tests(unittest.TestCase):
   self.tmp=tempfile.TemporaryDirectory();self.root=pathlib.Path(self.tmp.name).resolve();self.audio=self.root/'audio';self.audio.mkdir();(self.audio/'01.wav').write_bytes(b'fake');(self.audio/'02.mp3').write_bytes(b'fake')
   self.backend=Audio();self.player=Player(self.audio,self.root/'data',self.backend);self.library=LibraryController(self.player)
  def tearDown(self):self.tmp.cleanup()
+ def test_unreadable_saved_state_is_backed_up_and_recovers_positions(self):
+  ident=self.player.tracks[0]['id']
+  self.player.saved['tracks'][ident]={'position':42,'duration':120,'completed':False}
+  self.player.persist()
+  raw=__import__('json').loads(self.player.file.read_text(encoding='utf-8'))
+  raw['speechEnhancementStrength']=999
+  self.player.file.write_text(__import__('json').dumps(raw),encoding='utf-8')
+  restored=Player(None,self.root/'data',Audio())
+  self.assertEqual(restored.saved['tracks'][ident]['position'],42)
+  self.assertTrue(restored.saved['tracks'][ident]['position']==42)
+  backups=list((self.root/'data').glob('state.json.recovery-*.bak'))
+  self.assertEqual(len(backups),1)
+  self.assertEqual(__import__('json').loads(backups[0].read_text(encoding='utf-8'))['speechEnhancementStrength'],999)
  def test_audio_enhancement_settings_validate_and_persist(self):
   settings={'bass':-2,'body':1,'clarity':4,'treble':2}
   self.player.command({'op':'audio_enhancement','value':settings})
@@ -27,6 +40,28 @@ class Tests(unittest.TestCase):
    self.player.command({'op':'audio_enhancement','value':{'clarity':8}})
   with self.assertRaisesRegex(ValueError,'object'):
    self.player.command({'op':'audio_enhancement','value':'loud'})
+ def test_enhanced_cache_is_optional_and_original_is_preserved(self):
+  ident=self.player.tracks[0]['id'];source=self.player.paths[ident];original=source.read_bytes()
+  cache=self.player.speech_cache_path(ident);cache.parent.mkdir(parents=True);cache.write_bytes(b'enhanced copy')
+  self.player.load(ident,autoplay=False)
+  self.assertEqual(pathlib.Path(self.backend.path),source)
+  self.player.command({'op':'speech_enhancement_enabled','value':True})
+  self.assertEqual(pathlib.Path(self.backend.path),cache)
+  self.assertTrue(self.player.saved['speechEnhancementEnabled'])
+  self.assertEqual(source.read_bytes(),original)
+  self.player.command({'op':'speech_enhancement_enabled','value':False})
+  self.assertEqual(pathlib.Path(self.backend.path),source)
+  self.assertFalse(self.player.saved['speechEnhancementEnabled'])
+  restored=Player(None,self.root/'data',Audio())
+  self.assertFalse(restored.saved['speechEnhancementEnabled'])
+
+ def test_speech_suppression_strength_is_persisted_and_separates_cache(self):
+  ident=self.player.tracks[0]['id'];balanced=self.player.speech_cache_path(ident)
+  self.player.saved['speechEnhancementStrength']=50;self.player.persist()
+  strong=self.player.speech_cache_path(ident)
+  self.assertNotEqual(balanced,strong)
+  restored=Player(None,self.root/'data',Audio())
+  self.assertEqual(restored.saved['speechEnhancementStrength'],50)
  def test_next_day_open_and_play_needs_no_connection(self):
   self.library.play();self.player.tick();self.backend.position=65.432;self.player.command({'op':'pause'})
   backend=Audio();restored=Player(None,self.root/'data',backend);view=LibraryController(restored)
