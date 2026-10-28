@@ -126,7 +126,7 @@ class Player:
         self.active=None;self.last_save=0;self.previous_status='stopped';self.hotkey_status=[];self.floating_bar=None;self.sleep_deadline=None;self.sleep_minutes=0;self.sleep_paused=False
         self.sleep_at_end=False;self.loop_a=None;self.loop_b=None;self.loop_track=None;self.loop_seek_at=0
         self.seek_target=None
-        self.paths={};self.tracks=[];self.library_revision=0;self.choose_folder=None;self.show_window=None;self.hide_window=None
+        self.paths={};self.tracks=[];self.file_ids={};self.library_revision=0;self.choose_folder=None;self.show_window=None;self.hide_window=None
         self.saved.setdefault('folders',[]);self.saved.setdefault('skipSeconds',15);self.saved.setdefault('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0});self.saved.setdefault('speechEnhancementEnabled',False);self.saved.setdefault('speechEnhancementStrength',35)
         selected=self.root or (pathlib.Path(self.saved['libraryRoot']) if self.saved.get('libraryRoot') else None)
         if selected:
@@ -166,15 +166,10 @@ class Player:
             old_paths=dict(self.paths)
             old_tracks={track['id']:dict(track) for track in self.tracks}
             old_identity={}
-            for ident,old_path in old_paths.items():
-                try:
-                    stat=old_path.stat()
-                    if stat.st_ino:
-                        key=(stat.st_dev,stat.st_ino)
-                        old_identity.setdefault(key,[]).append(ident)
-                except OSError:pass
+            for ident,key in self.file_ids.items():
+                if key and key[1]:old_identity.setdefault(key,[]).append(ident)
             used=set()
-            paths={};tracks=[]
+            paths={};tracks=[];file_ids={}
             for path,relative,device,inode,size,mtime in discovered:
                 ident=hashlib.sha256((str(selected)+'/'+relative).encode()).hexdigest()[:24]
                 if ident not in old_paths and inode:
@@ -186,7 +181,7 @@ class Player:
                 if ident in used:
                     ident=hashlib.sha256((str(selected)+'/'+relative).encode()).hexdigest()[:24]
                 used.add(ident)
-                paths[ident]=path
+                paths[ident]=path;file_ids[ident]=(device,inode)
                 tracks.append({'id':ident,'name':path.name,'source':relative})
             changed=(old_root!=selected or old_tracks!={t['id']:t for t in tracks}
                      or old_paths!={ident:path for ident,path in paths.items()})
@@ -194,7 +189,7 @@ class Player:
             self.capture()
             if self.active and self.active not in paths:
                 self.backend.stop();self.active=None;self.pending=None;self.seek_target=None;self.clear_loop()
-            self.root=selected;self.paths=paths;self.tracks=tracks;self.library_revision+=1;self.error=''
+            self.root=selected;self.paths=paths;self.tracks=tracks;self.file_ids=file_ids;self.library_revision+=1;self.error=''
             self.saved['libraryRoot']=str(selected)
             self.saved['queue']=[i for i in self.saved['queue'] if i in paths]
             if self.saved['currentId'] not in paths:self.saved['currentId']=None
