@@ -101,7 +101,7 @@ def rms(values):
     return math.sqrt(sum(x*x for x in values) / max(1, len(values)))
 
 
-def align_for_diagnostic(reference, observed, max_lag=5120, stride=16):
+def align_for_diagnostic(reference, observed, max_lag=5120, stride=32):
     """Estimate coarse global delay so a buffering offset is not mistaken for noise."""
     ref = reference[::stride]
     obs = observed[::stride]
@@ -248,21 +248,37 @@ def main():
             f"by at least 0.5 dB (best gain {best_hum_gain:.2f} dB)."
         )
 
-        long_source = root / "long-synthetic.wav"
-        long_clean, long_noisy = make_synthetic_signal(long_source, 60)
+        # Stress a full minute of actual human speech, not a synthetic tone.
+        # Repeat the pinned 30-second clip to keep the fixture deterministic and
+        # exercise the same native processing path used for real shiurim.
+        long_source = root / "long-human-speech.wav"
+        long_clean = clean + clean
+        long_noisy = noisy + noisy
+        write_float(long_source, long_noisy)
         long_output = root / "long-enhanced.wav"
         started = time.monotonic()
-        speech_enhancement.enhance_file(long_source, long_output, app)
+        speech_enhancement.enhance_file(long_source, long_output, app, strength_db=20)
         elapsed = time.monotonic() - started
         processed, params = read_float(long_output)
         assert params.nframes == 16000 * 60, f"60-second output has {params.nframes} frames"
         assert elapsed < 240, f"60-second enhancement took too long: {elapsed:.1f}s"
         assert all(math.isfinite(x) for x in processed), "long output contains non-finite samples"
+        aligned_clean, aligned_processed, lag = align_for_diagnostic(long_clean, processed)
+        aligned_noisy = long_noisy[-lag:] if lag < 0 else (
+            long_noisy[:-lag] if lag > 0 else long_noisy
+        )
+        long_input_snr = snr_db(aligned_clean, aligned_noisy)
+        long_output_snr = snr_db(aligned_clean, aligned_processed)
+        long_gain = long_output_snr - long_input_snr
         print(
-            f"LONG duration=60s elapsed={elapsed:.2f}s realtime_factor={60/max(elapsed, 0.001):.2f}x "
-            f"input_snr={snr_db(long_clean, long_noisy):.2f}dB "
-            f"output_snr={snr_db(long_clean, processed):.2f}dB",
+            f"LONG_HUMAN duration=60s elapsed={elapsed:.2f}s realtime_factor={60/max(elapsed, 0.001):.2f}x "
+            f"aligned_input_snr={long_input_snr:.2f}dB aligned_output_snr={long_output_snr:.2f}dB "
+            f"gain={long_gain:.2f}dB estimated_lag={lag}samples",
             flush=True,
+        )
+        assert long_gain >= 0.5, (
+            f"60-second human-speech enhancement did not improve delay-aligned SNR "
+            f"by at least 0.5 dB (gain {long_gain:.2f} dB)."
         )
         print("Native enhancement quality and long-file benchmark completed.", flush=True)
 
