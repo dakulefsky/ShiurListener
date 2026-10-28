@@ -104,9 +104,11 @@ class SpeechEnhancementTests(unittest.TestCase):
         write_wav(self.source, original)
         native = FakeNativeLibrary(frame_length=4)
         progress = []
+        timings = {}
         with mock.patch.object(enhancement.ctypes, "CDLL", return_value=native):
             enhancement._process_wav(self.source, self.output, self.root / "fake.dll",
-                                     self.root / "fake-model.tar.gz", None, progress.append)
+                                     self.root / "fake-model.tar.gz", None, progress.append,
+                                     timings=timings)
         params, actual = read_samples(self.output)
         self.assertEqual(actual, original)
         self.assertEqual(params.nframes, len(original))
@@ -116,6 +118,8 @@ class SpeechEnhancementTests(unittest.TestCase):
         self.assertEqual(native.freed_sessions, [202])
         self.assertEqual(native.freed_models, [101])
         self.assertEqual(progress[-1], 98)
+        self.assertGreaterEqual(timings["denoising_frame_seconds"], 0)
+        self.assertGreaterEqual(timings["output_write_seconds"], 0)
 
     def test_output_clips_extremes_and_replaces_non_finite_values_with_silence(self):
         write_wav(self.source, [1, 2, 3, 4])
