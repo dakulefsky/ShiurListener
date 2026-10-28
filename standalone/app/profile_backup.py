@@ -206,11 +206,27 @@ def import_profile(player, path):
                 state[key] = previous[key]
         if player.root is not None:
             state['libraryRoot'] = str(player.root)
-        state['language'] = 'en'
         state['queue'] = [ident for ident in state['queue'] if ident in player.paths]
         if state['currentId'] not in player.paths:
             state['currentId'] = None
-        player.backend.stop()
+        # Commit the restored profile before stopping playback. If the disk is
+        # full or the state file cannot be replaced, the current session remains
+        # active and the previous profile stays authoritative.
+        player.saved = state
+        try:
+            player.persist()
+        except Exception:
+            player.saved = previous
+            raise
+        try:
+            player.backend.stop()
+        except Exception:
+            player.saved = previous
+            try:
+                player.persist()
+            except Exception:
+                pass
+            raise
         player.active = None
         player.pending = None
         player.seek_target = None
@@ -221,12 +237,6 @@ def import_profile(player, path):
         player.sleep_at_end = False
         if hasattr(player, 'clear_loop'):
             player.clear_loop()
-        player.saved = state
-        try:
-            player.persist()
-        except Exception:
-            player.saved = previous
-            raise
         player.previous_status = 'stopped'
         player.error = ''
         player.library_revision += 1

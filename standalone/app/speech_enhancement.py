@@ -110,7 +110,7 @@ def _bind(lib, name, result, args):
     return function
 
 
-def _process_wav(source_path, output_path, library_path, model_path, cancel, progress, strength_db=35.0):
+def _process_wav(source_path, output_path, library_path, model_path, cancel, progress, strength_db=20.0, timings=None):
     if not _is_supported_wav(source_path):
         raise ValueError("Speech engine input must be uncompressed 16-bit mono 16 kHz WAV.")
     dll_directory = None
@@ -167,6 +167,7 @@ def _process_wav(source_path, output_path, library_path, model_path, cancel, pro
                     if not valid:
                         break
                     samples.extend([0] * (frame_length - valid))
+                    frame_started = time.perf_counter()
                     for i, sample in enumerate(samples):
                         input_buffer[i] = sample / 32768.0
                     lib.weya_nc_process_frame(session, input_buffer, output_buffer)
@@ -178,7 +179,12 @@ def _process_wav(source_path, output_path, library_path, model_path, cancel, pro
                         cleaned.append(max(-32768, min(32767, round(max(-1.0, min(1.0, value)) * 32768))))
                     if sys.byteorder != "little":
                         cleaned.byteswap()
+                    if timings is not None:
+                        timings["denoising_frame_seconds"] = timings.get("denoising_frame_seconds", 0.0) + time.perf_counter() - frame_started
+                    write_started = time.perf_counter()
                     dst.writeframesraw(cleaned.tobytes())
+                    if timings is not None:
+                        timings["output_write_seconds"] = timings.get("output_write_seconds", 0.0) + time.perf_counter() - write_started
                     done += valid
                     report(10 + round(85 * done / total))
         report(98)
@@ -191,7 +197,7 @@ def _process_wav(source_path, output_path, library_path, model_path, cancel, pro
             dll_directory.close()
 
 
-def enhance_file(source, output, app_dir, cancel=None, progress=None, strength_db=35.0):
+def enhance_file(source, output, app_dir, cancel=None, progress=None, strength_db=20.0):
     """Create a new enhanced WAV; never write to or replace the source recording."""
     source = pathlib.Path(source).resolve()
     output = pathlib.Path(output).resolve()

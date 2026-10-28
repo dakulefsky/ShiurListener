@@ -548,7 +548,7 @@ class PlayerWindow:
    def work():
     try:self.requests.put(('update_downloaded',updater.download(value)))
     except Exception as error:self.requests.put(('update_error',str(error)))
-   threading.Thread(target=work,daemon=True).start()
+   threading.Thread(target=work,name='shiur-update-download',daemon=True).start()
   elif action=='update_downloaded':
    try:
     with self.player.lock:self.player.capture();self.player.persist()
@@ -762,9 +762,9 @@ class PlayerWindow:
    source=self.player.paths.get(ident) if ident else None
   if not ident or source is None:
    messagebox.showinfo('Speech enhancement','Select a shiur in your library first, then open Audio enhancements.',parent=self.root);return
-  strength=int(self.player.saved.get('speechEnhancementStrength',35))
+  strength=int(self.player.saved.get('speechEnhancementStrength',20))
   output=self.player.speech_cache_path(ident,strength)
-  pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry(f'540x{max(380,min(560,self.root.winfo_screenheight()-100))}');pop.minsize(440,340);pop.resizable(True,True);pop.configure(bg=BG);pop.transient(self.root)
+  pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry(f'540x{max(380,min(560,self.root.winfo_screenheight()-100))}');pop.minsize(440,340);pop.resizable(True,True);pop.configure(bg=BG)
   body=scrollable_dialog_content(pop)
   self.label(body,'Make this shiur easier to hear',18).pack(anchor='w',padx=24,pady=(20,5))
   self.label(body,f'Current recording: {source.name}',10,INK,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,7))
@@ -786,7 +786,7 @@ class PlayerWindow:
   cancel_button=self.button(row,'Close',pop.destroy);cancel_button.pack(side='right',padx=(8,0))
   start_button=self.button(row,'Use enhanced copy' if output and output.is_file() else 'Enhance current shiur',lambda:None,True);start_button.pack(side='left')
   original_button=self.button(row,'Switch back to original',lambda:None);original_button.pack(side='right',padx=(8,0))
-  job={'track_id':ident,'source':pathlib.Path(source),'output':output,'popup':pop,'status':status,'progress':progress,'start_button':start_button,'cancel_button':cancel_button,'original_button':original_button,'scale':scale,'strength_var':strength_var,'strength_label':strength_label,'busy':False,'cancel':None,'start':None,'strength':strength}
+  job={'track_id':ident,'source':pathlib.Path(source),'output':output,'popup':pop,'status':status,'progress':progress,'start_button':start_button,'cancel_button':cancel_button,'original_button':original_button,'scale':scale,'strength_var':strength_var,'strength_label':strength_label,'busy':False,'cancel':None,'start':None,'worker':None,'strength':strength}
   def on_strength(value):
    selected=max(10,min(60,int(round(float(value)))))
    job['strength']=selected;job['output']=self.player.speech_cache_path(ident,selected)
@@ -839,7 +839,8 @@ class PlayerWindow:
      self.requests.put(('speech_cancelled',None))
     except Exception as error:
      self.requests.put(('speech_error',str(error)))
-   threading.Thread(target=work,daemon=True).start()
+   job['worker']=threading.Thread(target=work,name=f'speech-enhancement-{ident}',daemon=True)
+   job['worker'].start()
   job['start']=start;job['use_enhanced']=use_enhanced;job['use_original']=use_original;scale.configure(command=on_strength)
   start_button.configure(command=lambda:self.safe(start));original_button.configure(command=use_original)
   cancel_button.configure(command=cancel_or_close)
@@ -1102,7 +1103,12 @@ class PlayerWindow:
     self.player.persist()
   except Exception as error:messagebox.showerror('Could not save your place',str(error),parent=self.root);return False
   if self.speech_job and self.speech_job.get('busy'):
-   self.speech_job['cancel'].set()
+   job=self.speech_job
+   job['cancel'].set()
+   worker=job.get('worker')
+   # Cancellation is checked between decode/denoise chunks. Give the worker
+   # time to release its native model/session before tearing down the player.
+   if worker and worker.is_alive():worker.join(timeout=5)
   self.closed=True
   for callback in self.root.tk.call('after','info'):self.root.tk.call('after','cancel',callback)
   self.root.destroy();return True

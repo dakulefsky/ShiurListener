@@ -3,7 +3,7 @@ import re,secrets
 
 def natural_key(value):
  """Keep numbered shiurim in listening order, including nested source folders."""
- return tuple(int(part) if part.isdecimal() else part for part in re.split(r'(\d+)',value.casefold()))
+ return tuple((0,int(part)) if part.isdecimal() else (1,part) for part in re.split(r'(\d+)',value.casefold()))
 
 def clock(seconds):
  seconds=max(0,int(seconds));h,m,s=seconds//3600,seconds%3600//60,seconds%60

@@ -19,7 +19,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,6 +43,20 @@ jobs:
       - name: Verify offline speech model and conversion through bundled VLC
         if: runner.os == 'Windows'
         run: python -c "import runpy; p=runpy.run_path('standalone/build/release.py'); a=p['download_hush_assets'](); a.update(p['download_vlc_callback_assets']()); p['smoke_test_hush'](a, True)"
+      - name: Measure native speech enhancement quality and long-file performance
+        if: runner.os == 'Windows'
+        run: python standalone/tests/test_speech_enhancement_native.py
+      - name: Profile VLC conversion versus native denoising on a 60-second source
+        if: runner.os == 'Windows'
+        run: python standalone/tests/profile_speech_conversion.py
+      - name: Upload speech enhancement listening samples
+        if: runner.os == 'Windows' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: speech-enhancement-listening-samples
+          path: standalone/test-results/speech-enhancement/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Actual Windows desktop controls with real VLC (dummy audio output)
         if: runner.os == 'Windows'
         run: python standalone/tests/test_desktop_vlc.py

@@ -11,6 +11,7 @@ from controller import LibraryController
 from floating_bar import FloatingBar
 from hotkeys import GlobalHotkeys
 from window import PlayerWindow
+from folder_monitor import FolderMonitor
 
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--folder');parser.add_argument('--data-dir');args=parser.parse_args()
@@ -20,10 +21,11 @@ def main():
  instance=acquire_instance()
  if instance is None:return
  data=args.data_dir or str(pathlib.Path(os.environ.get('LOCALAPPDATA',pathlib.Path.home()))/'ShiurPlayerStandalone')
- backend=None;player=None;bar=None;keys=None;worker=None;stop=threading.Event()
+ backend=None;player=None;bar=None;keys=None;worker=None;monitor=None;stop=threading.Event()
  try:
   backend=VLC()
-  player=Player(args.folder,data,backend);controller=LibraryController(player);player.saved['language']='en'
+  player=Player(args.folder,data,backend);controller=LibraryController(player)
+  monitor=FolderMonitor(player);monitor.start()
   player.saved.setdefault('floatingVisible',False)
   player.saved.setdefault('floatingTheme',{'primary':'#6558D3','onPrimary':'#FFFFFF','surface':'#FFFFFF','onSurface':'#242332','surfaceContainer':'#E9E7F0','fontFamily':'Rubik'})
   if player.saved['floatingTheme'].get('primary') in ('#245C49','#4169E1','#214CDB','#526BFF','#4263EB'):
@@ -44,6 +46,7 @@ def main():
   PlayerWindow(player,controller,shortcuts).run()
  finally:
   stop.set()
+  if monitor:monitor.close()
   if worker:worker.join(timeout=2)
   if keys:keys.close()
   if bar:bar.close()

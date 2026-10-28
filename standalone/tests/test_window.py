@@ -39,6 +39,22 @@ class Tests(unittest.TestCase):
    if window:window.close()
    fixture.tearDown()
 
+ def test_update_download_starts_background_worker(self):
+  from unittest.mock import patch
+  import pathlib
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   release={'version':'99.0.0','url':'https://example.invalid/setup.exe','sha256':'0'*64,'size':1}
+   with patch.object(window_module.messagebox,'askyesno',return_value=True), patch.object(window_module.updater,'download',return_value=pathlib.Path('setup.exe')):
+    window.update_event(('update_checked',release))
+    event,value=window.requests.get(timeout=2)
+   self.assertEqual(event,'update_downloaded')
+   self.assertEqual(value,pathlib.Path('setup.exe'))
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+
  def test_speech_enhancement_accepts_selected_recording_without_playing(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:

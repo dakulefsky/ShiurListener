@@ -74,8 +74,8 @@ class VLC:
 class Player:
     def __init__(self,root,data_dir,backend):
         self.root=pathlib.Path(root).resolve() if root else None;self.data_dir=pathlib.Path(data_dir);self.data_dir.mkdir(parents=True,exist_ok=True)
-        self.file=self.data_dir/'state.json';self.lock=threading.RLock();self.backend=backend;self.error='';self.pending=None;self.was_playing=False
-        self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'audioEnhancement':{'bass':0,'body':0,'clarity':0,'treble':0},'speechEnhancementEnabled':False,'speechEnhancementStrength':35,'skipSeconds':15,'folders':[],'language':'en'}
+        self.file=self.data_dir/'state.json';self.lock=threading.RLock();self.scan_lock=threading.Lock();self.backend=backend;self.error='';self.pending=None;self.was_playing=False
+        self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'audioEnhancement':{'bass':0,'body':0,'clarity':0,'treble':0},'speechEnhancementEnabled':False,'speechEnhancementStrength':20,'skipSeconds':15,'folders':[],'language':'en'}
         if self.file.exists():
             from profile_backup import FORMAT,_read,_validate
             try:
@@ -127,7 +127,7 @@ class Player:
         self.sleep_at_end=False;self.loop_a=None;self.loop_b=None;self.loop_track=None;self.loop_seek_at=0
         self.seek_target=None
         self.paths={};self.tracks=[];self.library_revision=0;self.choose_folder=None;self.show_window=None;self.hide_window=None
-        self.saved.setdefault('folders',[]);self.saved.setdefault('skipSeconds',15);self.saved.setdefault('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0});self.saved.setdefault('speechEnhancementEnabled',False);self.saved.setdefault('speechEnhancementStrength',35)
+        self.saved.setdefault('folders',[]);self.saved.setdefault('skipSeconds',15);self.saved.setdefault('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0});self.saved.setdefault('speechEnhancementEnabled',False);self.saved.setdefault('speechEnhancementStrength',20)
         selected=self.root or (pathlib.Path(self.saved['libraryRoot']) if self.saved.get('libraryRoot') else None)
         if selected:
             self.root=selected.resolve()
@@ -138,23 +138,31 @@ class Player:
         if source is None:return None
         try:stat=source.stat()
         except OSError:return None
-        if strength is None:strength=self.saved.get('speechEnhancementStrength',35)
+        if strength is None:strength=self.saved.get('speechEnhancementStrength',20)
         strength=max(10,min(60,int(round(float(strength)))))
         return self.data_dir/'speech-cache'/f'{ident}-{stat.st_size}-{stat.st_mtime_ns}-hush-v1.0.0-s{strength}.wav'
     def scan(self,root=None):
+        # Serialize manual and background scans without holding the playback lock
+        # while traversing the filesystem.
+        with self.scan_lock:
+            return self._scan_serial(root)
+
+    def _scan_serial(self,root=None):
         with self.lock:
             selected=pathlib.Path(root).resolve() if root else self.root
-            if selected is None:raise ValueError('Choose a recordings folder first.')
+        if selected is None:raise ValueError('Choose a recordings folder first.')
+        if not selected.is_dir():raise ValueError('The recordings folder is missing or disconnected.')
+        paths={};tracks=[]
+        import hashlib
+        for path in sorted(selected.rglob('*')):
+            if not path.is_file() or path.suffix.lower() not in EXTENSIONS:continue
+            real=path.resolve()
+            if not real.is_relative_to(selected):continue
+            relative=path.relative_to(selected).as_posix()
+            ident=hashlib.sha256((str(selected)+'/'+relative).encode()).hexdigest()[:24]
+            paths[ident]=path;tracks.append({'id':ident,'name':path.name,'source':relative})
+        with self.lock:
             if not selected.is_dir():raise ValueError('The recordings folder is missing or disconnected.')
-            paths={};tracks=[]
-            import hashlib
-            for path in sorted(selected.rglob('*')):
-                if not path.is_file() or path.suffix.lower() not in EXTENSIONS:continue
-                real=path.resolve()
-                if not real.is_relative_to(selected):continue
-                relative=path.relative_to(selected).as_posix()
-                ident=hashlib.sha256((str(selected)+'/'+relative).encode()).hexdigest()[:24]
-                paths[ident]=path;tracks.append({'id':ident,'name':path.name,'source':relative})
             self.capture()
             if self.active and self.active not in paths:self.backend.stop();self.active=None;self.pending=None;self.clear_loop()
             self.root=selected;self.paths=paths;self.tracks=tracks;self.library_revision+=1;self.error=''
@@ -244,10 +252,12 @@ class Player:
             index=queue.index(current)+delta
             if 0<=index<len(queue):self.load(queue[index],autoplay=True)
     def command(self,data):
+        # A rescan walks the filesystem; do not inherit the command lock across it.
+        if isinstance(data,dict) and data.get('op')=='rescan':
+            return self.scan()
         with self.lock:
             op=data.get('op')
             if not isinstance(op,str):raise ValueError('Command op is required.')
-            if op=='rescan':return self.scan()
             if op=='choose_folder':
                 if not self.choose_folder:raise ValueError('Open the player window to choose a recordings folder.')
                 self.choose_folder();return self.snapshot()

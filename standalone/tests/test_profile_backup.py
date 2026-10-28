@@ -58,6 +58,13 @@ class Tests(unittest.TestCase):
         reopened = Player(None, self.player.data_dir, test_player.Audio())
         self.assertEqual(reopened.saved['tracks'][self.ids[1]]['position'], 19.375)
 
+    def test_restore_preserves_language_from_backup(self):
+        state = copy.deepcopy(self.player.saved)
+        state['language'] = 'he'
+        self.write_payload(state)
+        import_profile(self.player, self.backup)
+        self.assertEqual(self.player.saved['language'], 'he')
+
     def test_restore_keeps_current_library_and_native_window_preferences(self):
         state = copy.deepcopy(self.player.saved)
         state.update(libraryRoot='Z:/different-machine/audio', globalShortcuts=True,
@@ -127,8 +134,13 @@ class Tests(unittest.TestCase):
         self.assertEqual(json.loads(self.backup.read_text())['state']['tracks'][self.ids[0]]['position'], 12.345)
 
     def test_restore_persist_failure_keeps_previous_profile_and_safety_copy(self):
+        self.library.play()
+        self.player.tick()
+        active_before = self.player.active
         export_profile(self.player, self.backup)
         self.player.saved['tracks'][self.ids[0]] = {'position': 55.5}
+        self.backend.position = 55.5
+        self.player.capture()
         self.player.persist()
         before = copy.deepcopy(self.player.saved)
         actual_persist = self.player.persist
@@ -144,6 +156,8 @@ class Tests(unittest.TestCase):
                 import_profile(self.player, self.backup)
         self.assertEqual(self.player.saved, before)
         self.assertEqual(json.loads(self.player.file.read_text()), before)
+        self.assertEqual(self.player.active, active_before)
+        self.assertEqual(self.backend.status, 'playing')
         self.assertEqual(len(list(self.player.data_dir.glob('state-before-restore-*.json'))), 1)
 
 
