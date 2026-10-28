@@ -1,7 +1,7 @@
-SHIUR PLAYER 0.9.6 — WINDOWS INSTALLER AND IN-APP UPDATES
+SHIUR PLAYER 0.9.8 — WINDOWS INSTALLER AND IN-APP UPDATES
 
 ONE-TIME SETUP
-Close the older player. Run shiur-player-setup-0.9.6.exe and click OK.
+Close the older player. Run shiur-player-setup-0.9.8.exe and click OK.
 There is no ZIP to extract. Setup creates desktop and Start menu shortcuts.
 No administrator access, Python installation or VLC installation is needed.
 Use the Shiur Player shortcut to open the app on future days.
@@ -33,7 +33,7 @@ MINI PLAYER
 Click Mini player, or minimize the main window. The smaller floating player has
 Play/Pause, skips, speed and Open. Drag its edges to resize it; size and position
 are remembered. Speed cycles 1x -> 1.5x -> 2x -> 0.5x -> 1x by default.
-Settings offers the 0.5x alternative and optional shortcuts for use in other apps.
+Settings offers the 0.5x alternative and optional shortcuts for use in other apps. Enable global shortcuts to use compatible Bluetooth headphone media buttons for play/pause and skip backward/forward.
 Closing the main window saves and stops playback. Minimizing keeps playing.
 
 KEYBOARD
@@ -41,7 +41,7 @@ Space: play/pause. Left/Right: skip. Ctrl+F: search. Ctrl+O: audio folder.
 Ctrl+B: bookmark. Ctrl+A selects the visible recordings when the list has focus.
 Tab/Enter operate controls. Text fields keep their usual typing behavior.
 Global shortcuts, when enabled: Ctrl+Alt+Shift+P: play/pause; Left/Right: skip;
-Up/Down: speed; PageUp/PageDown: recordings; 1/2/3: skip length; F: mini player.
+Up/Down: speed; PageUp/PageDown: recordings; 1/2/3: skip length; F: mini player. Headphone media buttons: Play/Pause toggles playback; Previous/Next skip by the configured interval.
 
 PORTABLE OPTION
 A separate portable ZIP is available for those who prefer it. Extract its entire
@@ -56,7 +56,7 @@ and embedded package contents were verified structurally. The actual Windows
 setup UI, shortcuts, restart flow and speaker output remain untested here.
 This is an unsigned per-user installer. Licenses are included with the app.
 
-NEW IN 0.9.6
+NEW IN 0.9.8
 Unplayed and Finished views are in the sidebar. More and right-click
 include Rename recording, Play next and Add to queue. Queue opens the editable play order.
 Listening tools has A-B section repeat, jump to time, skip interval and sleep
@@ -65,7 +65,7 @@ Settings & backup exports/restores positions, collections and bookmarks to JSON.
 Restore pauses audio and keeps a safety backup. Audio files are not included.
 Ctrl+J jumps to time; Ctrl+M toggles mini player; in the list Ctrl+Q adds selected recordings to the queue. Mini progress is clickable.
 
-NEW IN 0.9.6
+NEW IN 0.9.8
 Rounded violet-and-neutral interface throughout the app. Each recording remembers
 its own speed. In the floating player, click minus to collapse to a tiny pill.
 Hover over the pill to reveal skip buttons, or click the expand arrow to restore
@@ -77,7 +77,7 @@ Play/pause and speed remain available. Expand player restores the full controls.
 The choice is remembered. Tiny-player hover now has a short delay and stays
 steady during clicks and dragging.
 
-RELIABILITY REVIEW — 0.9.6
+RELIABILITY REVIEW — 0.9.8
 Improved failed-load recovery, saved-place resets, per-recording speed changes,
 disconnected-folder refresh, bookmark actions, collection naming, update checks
 and installer repair. Repeated launches now share the existing player safely.
