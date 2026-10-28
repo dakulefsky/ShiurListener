@@ -68,6 +68,7 @@ class VLC:
         self.stop()
         if self.equalizer:self.lib.libvlc_audio_equalizer_release(self.equalizer);self.equalizer=None
         self.lib.libvlc_media_player_release(self.player);self.lib.libvlc_release(self.instance)
+        if getattr(self,'dll_directory',None):self.dll_directory.close();self.dll_directory=None
 
 class Player:
     def __init__(self,root,data_dir,backend):
