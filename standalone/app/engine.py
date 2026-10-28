@@ -21,13 +21,14 @@ class VLC:
         else:lib=ctypes.util.find_library('vlc')
         if not lib:raise RuntimeError('VLC runtime not found. Install VLC first.')
         self.lib=ctypes.CDLL(lib)
-        signatures={'libvlc_new':(ctypes.c_void_p,[ctypes.c_int,ctypes.POINTER(ctypes.c_char_p)]),'libvlc_release':(None,[ctypes.c_void_p]),'libvlc_media_player_new':(ctypes.c_void_p,[ctypes.c_void_p]),'libvlc_media_player_release':(None,[ctypes.c_void_p]),'libvlc_media_new_path':(ctypes.c_void_p,[ctypes.c_void_p,ctypes.c_char_p]),'libvlc_media_release':(None,[ctypes.c_void_p]),'libvlc_media_player_set_media':(None,[ctypes.c_void_p,ctypes.c_void_p]),'libvlc_media_player_play':(ctypes.c_int,[ctypes.c_void_p]),'libvlc_media_player_set_pause':(None,[ctypes.c_void_p,ctypes.c_int]),'libvlc_media_player_stop':(None,[ctypes.c_void_p]),'libvlc_media_player_get_time':(ctypes.c_longlong,[ctypes.c_void_p]),'libvlc_media_player_get_length':(ctypes.c_longlong,[ctypes.c_void_p]),'libvlc_media_player_set_time':(None,[ctypes.c_void_p,ctypes.c_longlong]),'libvlc_media_player_get_state':(ctypes.c_int,[ctypes.c_void_p]),'libvlc_media_player_set_rate':(ctypes.c_int,[ctypes.c_void_p,ctypes.c_float]),'libvlc_audio_set_volume':(ctypes.c_int,[ctypes.c_void_p,ctypes.c_int])}
+        signatures={'libvlc_new':(ctypes.c_void_p,[ctypes.c_int,ctypes.POINTER(ctypes.c_char_p)]),'libvlc_release':(None,[ctypes.c_void_p]),'libvlc_media_player_new':(ctypes.c_void_p,[ctypes.c_void_p]),'libvlc_media_player_release':(None,[ctypes.c_void_p]),'libvlc_media_new_path':(ctypes.c_void_p,[ctypes.c_void_p,ctypes.c_char_p]),'libvlc_media_release':(None,[ctypes.c_void_p]),'libvlc_media_player_set_media':(None,[ctypes.c_void_p,ctypes.c_void_p]),'libvlc_media_player_play':(ctypes.c_int,[ctypes.c_void_p]),'libvlc_media_player_set_pause':(None,[ctypes.c_void_p,ctypes.c_int]),'libvlc_media_player_stop':(None,[ctypes.c_void_p]),'libvlc_media_player_get_time':(ctypes.c_longlong,[ctypes.c_void_p]),'libvlc_media_player_get_length':(ctypes.c_longlong,[ctypes.c_void_p]),'libvlc_media_player_set_time':(None,[ctypes.c_void_p,ctypes.c_longlong]),'libvlc_media_player_get_state':(ctypes.c_int,[ctypes.c_void_p]),'libvlc_media_player_set_rate':(ctypes.c_int,[ctypes.c_void_p,ctypes.c_float]),'libvlc_audio_set_volume':(ctypes.c_int,[ctypes.c_void_p,ctypes.c_int]),'libvlc_audio_equalizer_new':(ctypes.c_void_p,[]),'libvlc_audio_equalizer_release':(None,[ctypes.c_void_p]),'libvlc_audio_equalizer_get_band_count':(ctypes.c_uint,[]),'libvlc_audio_equalizer_set_preamp':(ctypes.c_int,[ctypes.c_void_p,ctypes.c_float]),'libvlc_audio_equalizer_set_amp_at_index':(ctypes.c_int,[ctypes.c_void_p,ctypes.c_float,ctypes.c_uint]),'libvlc_media_player_set_equalizer':(ctypes.c_int,[ctypes.c_void_p,ctypes.c_void_p])}
         for name,(result,args) in signatures.items():fn=getattr(self.lib,name);fn.restype=result;fn.argtypes=args
         arguments=[b'--ignore-config',b'--no-video',b'--no-video-title-show',b'--no-lua',b'--no-metadata-network-access',b'--no-plugins-cache']+[option.encode('utf-8') for option in options]
         args=(ctypes.c_char_p*len(arguments))(*arguments)
         self.instance=self.lib.libvlc_new(len(arguments),args)
         if not self.instance:raise RuntimeError('VLC initialization failed.')
         self.player=self.lib.libvlc_media_player_new(self.instance)
+        self.equalizer=None
         if not self.player:
             self.lib.libvlc_release(self.instance)
             raise RuntimeError('VLC player initialization failed.')
@@ -43,14 +44,36 @@ class VLC:
     def speed(self,value):
         if self.lib.libvlc_media_player_set_rate(self.player,value)<0:raise RuntimeError('Playback speed is unavailable for this recording.')
     def volume(self,value):self.lib.libvlc_audio_set_volume(self.player,round(value*100))
+    def audio_settings(self,settings):
+        values={name:max(-6.0,min(6.0,float(settings.get(name,0)))) for name in ('bass','body','clarity','treble')}
+        if not any(values.values()):
+            if self.equalizer:
+                self.lib.libvlc_media_player_set_equalizer(self.player,None)
+                self.lib.libvlc_audio_equalizer_release(self.equalizer);self.equalizer=None
+            return
+        eq=self.lib.libvlc_audio_equalizer_new()
+        if not eq:raise RuntimeError('VLC could not create the audio equalizer.')
+        try:
+            self.lib.libvlc_audio_equalizer_set_preamp(eq,0.0)
+            bands=int(self.lib.libvlc_audio_equalizer_get_band_count())
+            gains=[values['bass'],values['bass']*.65,values['body']*.65,values['body'],values['body']*.6,values['clarity']*.75,values['clarity'],values['treble']*.8,values['treble'],values['treble']*.7]
+            for index,gain in enumerate(gains[:bands]):self.lib.libvlc_audio_equalizer_set_amp_at_index(eq,float(gain),index)
+            if self.lib.libvlc_media_player_set_equalizer(self.player,eq)<0:raise RuntimeError('VLC could not apply the audio equalizer.')
+            previous=self.equalizer;self.equalizer=eq;eq=None
+            if previous:self.lib.libvlc_audio_equalizer_release(previous)
+        finally:
+            if eq:self.lib.libvlc_audio_equalizer_release(eq)
     def state(self):return {'position':max(0,self.lib.libvlc_media_player_get_time(self.player)/1000),'duration':max(0,self.lib.libvlc_media_player_get_length(self.player)/1000),'status':{0:'stopped',1:'loading',2:'loading',3:'playing',4:'paused',5:'stopped',6:'ended',7:'error'}.get(self.lib.libvlc_media_player_get_state(self.player),'error')}
-    def close(self):self.stop();self.lib.libvlc_media_player_release(self.player);self.lib.libvlc_release(self.instance)
+    def close(self):
+        self.stop()
+        if self.equalizer:self.lib.libvlc_audio_equalizer_release(self.equalizer);self.equalizer=None
+        self.lib.libvlc_media_player_release(self.player);self.lib.libvlc_release(self.instance)
 
 class Player:
     def __init__(self,root,data_dir,backend):
         self.root=pathlib.Path(root).resolve() if root else None;self.data_dir=pathlib.Path(data_dir);self.data_dir.mkdir(parents=True,exist_ok=True)
         self.file=self.data_dir/'state.json';self.lock=threading.RLock();self.backend=backend;self.error='';self.pending=None;self.was_playing=False
-        self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'skipSeconds':15,'folders':[],'language':'en'}
+        self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'audioEnhancement':{'bass':0,'body':0,'clarity':0,'treble':0},'skipSeconds':15,'folders':[],'language':'en'}
         if self.file.exists():
             try:
                 from profile_backup import FORMAT,_read,_validate
@@ -62,7 +85,7 @@ class Player:
         self.sleep_at_end=False;self.loop_a=None;self.loop_b=None;self.loop_track=None;self.loop_seek_at=0
         self.seek_target=None
         self.paths={};self.tracks=[];self.library_revision=0;self.choose_folder=None;self.show_window=None;self.hide_window=None
-        self.saved.setdefault('folders',[]);self.saved.setdefault('skipSeconds',15)
+        self.saved.setdefault('folders',[]);self.saved.setdefault('skipSeconds',15);self.saved.setdefault('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0})
         selected=self.root or (pathlib.Path(self.saved['libraryRoot']) if self.saved.get('libraryRoot') else None)
         if selected:
             self.root=selected.resolve()
@@ -148,6 +171,7 @@ class Player:
         try:
             self.backend.load(self.paths[ident]);self.active=ident
             self.pending={'position':start,'autoplay':autoplay,'started':time.monotonic()}
+            if hasattr(self.backend,'audio_settings'):self.backend.audio_settings(self.saved.get('audioEnhancement',{}))
             self.backend.volume(0);self.backend.play()
         except Exception as error:
             self.fail_load(str(error));self.persist();raise
@@ -288,6 +312,13 @@ class Player:
                 self.saved['speed']=value;self.saved['miniSpeedCycleIndex']=None
                 ident=self.saved['currentId']
                 if ident:self.saved['tracks'].setdefault(ident,{})['speed']=value
+            elif op=='audio_enhancement':
+                settings=data.get('value',{})
+                if not isinstance(settings,dict):raise ValueError('Audio settings must be an object.')
+                clean={name:float(settings.get(name,0)) for name in ('bass','body','clarity','treble')}
+                if any(not math.isfinite(v) or not -6<=v<=6 for v in clean.values()):raise ValueError('Audio controls must be between -6 and +6 dB.')
+                if hasattr(self.backend,'audio_settings'):self.backend.audio_settings(clean)
+                self.saved['audioEnhancement']=clean
             elif op=='volume':
                 value=float(data['value'])
                 if not 0<=value<=1:raise ValueError('Invalid volume.')

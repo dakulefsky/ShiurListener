@@ -570,10 +570,43 @@ class PlayerWindow:
   global_keys=tk.BooleanVar(value=self.player.saved.get('globalShortcuts',False));SoftToggle(pop,text='Enable shortcuts while using other apps',variable=global_keys,command=lambda:self.safe(lambda:self.shortcuts(global_keys.get()))).pack(anchor='w',fill='x',padx=24,pady=12)
   self.label(pop,'Space: play/pause  ·  Left / Right: skip\nCtrl+F: search  ·  Ctrl+O: folder  ·  Ctrl+B: bookmark\nCtrl+J: jump to time  ·  Ctrl+M: mini player\nIn the list: Ctrl+Q: add to queue\nCustomize global keys below; they also work in other apps.',10,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
   self.button(pop,'Customize keyboard shortcuts…',lambda:(pop.destroy(),self.edit_shortcuts())).pack(anchor='w',padx=24,pady=(0,4))
+  self.button(pop,'Audio enhancements…',lambda:(pop.destroy(),self.audio_settings())).pack(anchor='w',padx=24,pady=(10,0))
   self.label(pop,'LISTENING BACKUP',9,MUTED).pack(anchor='w',padx=24,pady=(18,8))
   row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24)
   self.button(row,'Export backup…',self.export_backup).pack(side='left');self.button(row,'Restore backup…',self.restore_backup).pack(side='left',padx=8)
   self.label(pop,'Includes positions, collections and bookmarks. Audio stays in its folder.',9,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
+ def audio_settings(self):
+  pop=tk.Toplevel(self.root);pop.title('Audio enhancements');pop.geometry('600x610');pop.minsize(560,570);pop.configure(bg=BG);pop.transient(self.root)
+  self.label(pop,'Make speech easier to hear',20).pack(anchor='w',padx=24,pady=(18,4))
+  self.label(pop,'Adjust the sound for quiet, muffled shiurim. Changes apply immediately and are saved automatically.',10,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(0,12))
+  initial=self.player.saved.get('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0})
+  values={name:tk.DoubleVar(pop,value=float(initial.get(name,0))) for name in ('bass','body','clarity','treble')}
+  labels={'bass':'Reduce rumble / boost low end','body':'Voice body','clarity':'Speech presence','treble':'High-frequency detail'}
+  scales={}
+  def apply():
+   config={name:round(var.get(),1) for name,var in values.items()}
+   self.safe(lambda:self.command('audio_enhancement',value=config))
+   for name,var in values.items():readouts[name].configure(text=f'{var.get():+.1f} dB')
+  def set_preset(name):
+   presets={'Off':(0,0,0,0),'Speech clarity':(-2,-1,3,1),'Strong speech':(-3,-1,5,2),'Warm voice':(-1,2,1,-1)}
+   for key,value in zip(values,presets[name]):values[key].set(value)
+   apply()
+  presetrow=tk.Frame(pop,bg=BG);presetrow.pack(fill='x',padx=24,pady=(0,12))
+  self.label(presetrow,'START WITH A PRESET',9,MUTED).pack(anchor='w',pady=(0,6))
+  buttons=tk.Frame(presetrow,bg=BG);buttons.pack(anchor='w')
+  for name in ('Off','Speech clarity','Strong speech','Warm voice'):self.button(buttons,name,lambda n=name:set_preset(n),primary=(name=='Speech clarity')).pack(side='left',padx=(0,6))
+  self.label(pop,'FINE-TUNE THE SOUND',9,MUTED).pack(anchor='w',padx=24,pady=(6,8))
+  readouts={}
+  for name,var in values.items():
+   row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24,pady=5)
+   self.label(row,labels[name],10,INK).pack(side='left')
+   readouts[name]=self.label(row,f'{var.get():+.1f} dB',10,MUTED);readouts[name].pack(side='right')
+   scale=ModernScale(pop,from_=-6,to=6,value=var.get(),command=lambda value,n=name:(values[n].set(float(value)),readouts[n].configure(text=f'{float(value):+.1f} dB'),apply()),dark=False)
+   scale.configure(width=500);scale.pack(fill='x',padx=24,pady=(0,4));scales[name]=scale
+  self.label(pop,'Tip: start with Speech clarity. If the voice sounds thin or sharp, lower Speech presence or raise Voice body slightly.',10,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(10,8))
+  self.label(pop,'This equalizer reshapes tone; it does not yet separate a rav’s voice from music or remove noise using AI.',9,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(0,8))
+  self.button(pop,'Done',pop.destroy,True).pack(anchor='e',padx=24,pady=(0,16))
+  self.audio_controls={'popup':pop,'values':values,'scales':scales,'preset':set_preset,'apply':apply}
  def edit_shortcuts(self):
   path=self.player.data_dir/'hotkeys.json'
   draft=hotkeys.load_config(path)

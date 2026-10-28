@@ -17,6 +17,16 @@ class Tests(unittest.TestCase):
   self.tmp=tempfile.TemporaryDirectory();self.root=pathlib.Path(self.tmp.name).resolve();self.audio=self.root/'audio';self.audio.mkdir();(self.audio/'01.wav').write_bytes(b'fake');(self.audio/'02.mp3').write_bytes(b'fake')
   self.backend=Audio();self.player=Player(self.audio,self.root/'data',self.backend);self.library=LibraryController(self.player)
  def tearDown(self):self.tmp.cleanup()
+ def test_audio_enhancement_settings_validate_and_persist(self):
+  settings={'bass':-2,'body':1,'clarity':4,'treble':2}
+  self.player.command({'op':'audio_enhancement','value':settings})
+  self.assertEqual(self.player.saved['audioEnhancement'],settings)
+  restored=Player(None,self.root/'data',Audio())
+  self.assertEqual(restored.saved['audioEnhancement'],settings)
+  with self.assertRaisesRegex(ValueError,'between -6 and \\+6'):
+   self.player.command({'op':'audio_enhancement','value':{'clarity':8}})
+  with self.assertRaisesRegex(ValueError,'object'):
+   self.player.command({'op':'audio_enhancement','value':'loud'})
  def test_next_day_open_and_play_needs_no_connection(self):
   self.library.play();self.player.tick();self.backend.position=65.432;self.player.command({'op':'pause'})
   backend=Audio();restored=Player(None,self.root/'data',backend);view=LibraryController(restored)
