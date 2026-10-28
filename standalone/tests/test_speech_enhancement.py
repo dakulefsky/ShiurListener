@@ -116,12 +116,15 @@ class SpeechEnhancementTests(unittest.TestCase):
             acquired = player.lock.acquire(timeout=0.2)
             if acquired:
                 player.lock.release()
-            self.assertTrue(acquired, "filesystem traversal held the player lock")
-            # A newer scan should complete while the older traversal is blocked.
-            player.scan(second)
-            release.set()
-            worker.join(timeout=5)
+            try:
+                if acquired:
+                    # A newer scan should complete while the older traversal is blocked.
+                    player.scan(second)
+            finally:
+                release.set()
+                worker.join(timeout=5)
 
+        self.assertTrue(acquired, "filesystem traversal held the player lock")
         self.assertFalse(worker.is_alive(), "old scan did not finish after release")
         self.assertEqual(errors, [])
         self.assertEqual(player.root, second.resolve())
