@@ -110,6 +110,20 @@ class Tests(unittest.TestCase):
  def test_rescan_finds_new_files_and_confines_symlinks(self):
   (self.audio/'new.mp3').write_bytes(b'fake');outside=self.root/'outside.wav';outside.write_bytes(b'fake');(self.audio/'escape.wav').symlink_to(outside)
   self.player.scan();self.assertEqual(len(self.player.tracks),3)
+ def test_rescan_preserves_identity_and_progress_after_external_rename(self):
+  ident=self.player.tracks[0]['id'];source=self.player.paths[ident]
+  self.player.saved['tracks'][ident]={'position':37.5,'duration':120,'completed':False}
+  self.player.saved['bookmarks'][ident]=[{'id':'mark-1','name':'Review','position':25}]
+  self.player.saved['queue']=[ident]
+  self.player.persist()
+  renamed=source.with_name('renamed outside.wav');source.rename(renamed)
+  self.player.scan()
+  self.assertIn(ident,self.player.paths)
+  self.assertEqual(self.player.paths[ident],renamed)
+  self.assertEqual(next(t for t in self.player.tracks if t['id']==ident)['name'],'renamed outside.wav')
+  self.assertEqual(self.player.saved['tracks'][ident]['position'],37.5)
+  self.assertEqual(self.player.saved['bookmarks'][ident][0]['position'],25)
+  self.assertIn(ident,self.player.saved['queue'])
  def test_pause_after_auto_next_does_not_reload_the_old_selection(self):
   self.library.play();self.player.tick();first=self.player.saved['currentId'];self.library.selected=first
   self.player.saved['autoNext']=True;self.player.was_playing=True;self.backend.status='ended';self.backend.position=120
