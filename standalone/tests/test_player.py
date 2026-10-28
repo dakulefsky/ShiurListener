@@ -27,6 +27,21 @@ class Tests(unittest.TestCase):
    self.player.command({'op':'audio_enhancement','value':{'clarity':8}})
   with self.assertRaisesRegex(ValueError,'object'):
    self.player.command({'op':'audio_enhancement','value':'loud'})
+ def test_enhanced_cache_is_optional_and_original_is_preserved(self):
+  ident=self.player.tracks[0]['id'];source=self.player.paths[ident];original=source.read_bytes()
+  cache=self.player.speech_cache_path(ident);cache.parent.mkdir(parents=True);cache.write_bytes(b'enhanced copy')
+  self.player.load(ident,autoplay=False)
+  self.assertEqual(pathlib.Path(self.backend.path),source)
+  self.player.command({'op':'speech_enhancement_enabled','value':True})
+  self.assertEqual(pathlib.Path(self.backend.path),cache)
+  self.assertTrue(self.player.saved['speechEnhancementEnabled'])
+  self.assertEqual(source.read_bytes(),original)
+  self.player.command({'op':'speech_enhancement_enabled','value':False})
+  self.assertEqual(pathlib.Path(self.backend.path),source)
+  self.assertFalse(self.player.saved['speechEnhancementEnabled'])
+  restored=Player(None,self.root/'data',Audio())
+  self.assertFalse(restored.saved['speechEnhancementEnabled'])
+
  def test_next_day_open_and_play_needs_no_connection(self):
   self.library.play();self.player.tick();self.backend.position=65.432;self.player.command({'op':'pause'})
   backend=Audio();restored=Player(None,self.root/'data',backend);view=LibraryController(restored)
