@@ -548,7 +548,8 @@ class PlayerWindow:
    def work():
     try:self.requests.put(('update_downloaded',updater.download(value)))
     except Exception as error:self.requests.put(('update_error',str(error)))
-   threading.Thread(target=work,daemon=True).start()
+   job['worker']=threading.Thread(target=work,name=f'speech-enhancement-{ident}',daemon=True)
+   job['worker'].start()
   elif action=='update_downloaded':
    try:
     with self.player.lock:self.player.capture();self.player.persist()
@@ -786,7 +787,7 @@ class PlayerWindow:
   cancel_button=self.button(row,'Close',pop.destroy);cancel_button.pack(side='right',padx=(8,0))
   start_button=self.button(row,'Use enhanced copy' if output and output.is_file() else 'Enhance current shiur',lambda:None,True);start_button.pack(side='left')
   original_button=self.button(row,'Switch back to original',lambda:None);original_button.pack(side='right',padx=(8,0))
-  job={'track_id':ident,'source':pathlib.Path(source),'output':output,'popup':pop,'status':status,'progress':progress,'start_button':start_button,'cancel_button':cancel_button,'original_button':original_button,'scale':scale,'strength_var':strength_var,'strength_label':strength_label,'busy':False,'cancel':None,'start':None,'strength':strength}
+  job={'track_id':ident,'source':pathlib.Path(source),'output':output,'popup':pop,'status':status,'progress':progress,'start_button':start_button,'cancel_button':cancel_button,'original_button':original_button,'scale':scale,'strength_var':strength_var,'strength_label':strength_label,'busy':False,'cancel':None,'start':None,'worker':None,'strength':strength}
   def on_strength(value):
    selected=max(10,min(60,int(round(float(value)))))
    job['strength']=selected;job['output']=self.player.speech_cache_path(ident,selected)
@@ -1102,7 +1103,12 @@ class PlayerWindow:
     self.player.persist()
   except Exception as error:messagebox.showerror('Could not save your place',str(error),parent=self.root);return False
   if self.speech_job and self.speech_job.get('busy'):
-   self.speech_job['cancel'].set()
+   job=self.speech_job
+   job['cancel'].set()
+   worker=job.get('worker')
+   # Cancellation is checked between decode/denoise chunks. Give the worker
+   # time to release its native model/session before tearing down the player.
+   if worker and worker.is_alive():worker.join(timeout=5)
   self.closed=True
   for callback in self.root.tk.call('after','info'):self.root.tk.call('after','cancel',callback)
   self.root.destroy();return True
