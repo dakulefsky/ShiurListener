@@ -110,7 +110,7 @@ def _bind(lib, name, result, args):
     return function
 
 
-def _process_wav(source_path, output_path, library_path, model_path, cancel, progress, strength_db=35.0):
+def _process_wav(source_path, output_path, library_path, model_path, cancel, progress, strength_db=20.0):
     if not _is_supported_wav(source_path):
         raise ValueError("Speech engine input must be uncompressed 16-bit mono 16 kHz WAV.")
     dll_directory = None
