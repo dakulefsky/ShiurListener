@@ -43,7 +43,7 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
     callback_errors = []
     written_samples = [0]
     try:
-        decoder = VLC(options=['--no-clock-synchro'])
+        decoder = VLC()
         lib = decoder.lib
         lib.libvlc_audio_set_callbacks.restype = None
         lib.libvlc_audio_set_callbacks.argtypes = [ctypes.c_void_p] * 7
