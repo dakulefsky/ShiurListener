@@ -81,7 +81,7 @@ def _bind(lib, name, result, args):
     return function
 
 
-def _process_wav(source_path, output_path, library_path, model_path, cancel, progress):
+def _process_wav(source_path, output_path, library_path, model_path, cancel, progress, strength_db=35.0):
     if not _is_supported_wav(source_path):
         raise ValueError("Speech engine input must be uncompressed 16-bit mono 16 kHz WAV.")
     dll_directory = None
@@ -103,7 +103,7 @@ def _process_wav(source_path, output_path, library_path, model_path, cancel, pro
         model = lib.weya_nc_model_load_from_path(os.fsencode(model_path))
         if not model:
             raise RuntimeError("The offline speech model could not be loaded.")
-        session = lib.weya_nc_session_create(model, 16000, ctypes.c_float(35.0))
+        session = lib.weya_nc_session_create(model, 16000, ctypes.c_float(max(10.0, min(60.0, float(strength_db)))))
         if not session:
             raise RuntimeError("The offline speech processor could not start.")
         frame_length = int(lib.weya_nc_get_frame_length(session))
@@ -162,7 +162,7 @@ def _process_wav(source_path, output_path, library_path, model_path, cancel, pro
             dll_directory.close()
 
 
-def enhance_file(source, output, app_dir, cancel=None, progress=None):
+def enhance_file(source, output, app_dir, cancel=None, progress=None, strength_db=35.0):
     """Create a new enhanced WAV; never write to or replace the source recording."""
     source = pathlib.Path(source).resolve()
     output = pathlib.Path(output).resolve()
@@ -183,7 +183,7 @@ def enhance_file(source, output, app_dir, cancel=None, progress=None):
             _convert_to_mono_16k(source, converted, app_dir, cancel, progress)
         _check_cancel(cancel)
         processed = temporary / "enhanced.wav"
-        _process_wav(converted, processed, library, model, cancel, progress)
+        _process_wav(converted, processed, library, model, cancel, progress, strength_db)
         _check_cancel(cancel)
         with wave.open(str(processed), "rb") as result:
             if result.getnframes() <= 0 or result.getframerate() != 16000 or result.getnchannels() != 1:
