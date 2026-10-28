@@ -20,6 +20,9 @@ class FolderMonitor:
     def _snapshot(self, root):
         found = {}
         try:
+            # Normalize both sides before checking containment. Windows temporary
+            # paths and mapped/short path spellings can otherwise compare unequal.
+            root = pathlib.Path(root).resolve()
             for path in root.rglob("*"):
                 if path.suffix.lower() not in EXTENSIONS:
                     continue
