@@ -195,6 +195,36 @@ def main():
             f"by at least 0.5 dB (best gain {best_gain:.2f} dB)."
         )
 
+        # Also test clean speech: a denoiser should not badly damage a
+        # recording that does not need noise removal.
+        clean_source = root / "human-speech-clean-input.wav"
+        write_float(clean_source, clean)
+        clean_gains = []
+        for strength in (20, 35, 50):
+            output = root / f"clean-enhanced-{strength}.wav"
+            started = time.monotonic()
+            speech_enhancement.enhance_file(
+                clean_source, output, app, strength_db=strength
+            )
+            elapsed = time.monotonic() - started
+            processed, params = read_float(output)
+            assert params.nchannels == 1 and params.sampwidth == 2 and params.framerate == 16000
+            assert len(processed) == len(clean), f"clean strength {strength}: frame count changed"
+            assert all(math.isfinite(x) for x in processed), "clean output contains non-finite samples"
+            aligned_clean, aligned_processed, lag = align_for_diagnostic(clean, processed)
+            clean_snr = snr_db(aligned_clean, aligned_processed)
+            clean_gains.append(clean_snr)
+            print(
+                f"CLEAN_SPEECH strength={strength} elapsed={elapsed:.2f}s "
+                f"aligned_snr={clean_snr:.2f}dB estimated_lag={lag}samples",
+                flush=True,
+            )
+        worst_clean_snr = min(clean_gains)
+        assert worst_clean_snr >= 8.0, (
+            f"Enhancement degraded clean speech below the 8 dB SNR guardrail "
+            f"(worst tested result {worst_clean_snr:.2f} dB)."
+        )
+
         # A second noise profile checks that the result is not limited to white
         # noise: combine a low-frequency 60 Hz hum with broadband noise at a
         # comparable input SNR. This remains a controlled lab test, not a real
