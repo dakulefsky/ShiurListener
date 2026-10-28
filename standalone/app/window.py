@@ -664,7 +664,7 @@ class PlayerWindow:
    messagebox.showinfo('Speech enhancement','Play or select a shiur first, then open Audio enhancements.',parent=self.root);return
   strength=int(self.player.saved.get('speechEnhancementStrength',35))
   output=self.player.speech_cache_path(ident,strength)
-  pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry('540x390');pop.minsize(500,360);pop.configure(bg=BG);pop.transient(self.root)
+  pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry('540x410');pop.minsize(500,380);pop.configure(bg=BG);pop.transient(self.root)
   self.label(pop,'Make this shiur easier to hear',18).pack(anchor='w',padx=24,pady=(20,5))
   self.label(pop,f'Current recording: {source.name}',10,INK,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,7))
   self.label(pop,'Creates a separate cleaned copy on this computer. It may reduce hiss, hum and some competing voices; results depend on the recording.',10,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,7))
@@ -677,6 +677,7 @@ class PlayerWindow:
   strength_range=tk.Frame(pop,bg=BG);strength_range.pack(fill='x',padx=24,pady=(0,6))
   self.label(strength_range,'Gentle',9,MUTED).pack(side='left')
   self.label(strength_range,'Strong',9,MUTED).pack(side='right')
+  self.label(pop,'Higher settings suppress more background, but can make the voice sound thinner or less natural.',9,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,6))
   status=self.label(pop,'Enhanced copy is ready for this strength.' if output and output.is_file() else 'Ready to process the current shiur.',10,INK,wraplength=490,justify='left')
   status.pack(anchor='w',padx=24,pady=(16,6))
   progress=ttk.Progressbar(pop,maximum=100,mode='determinate');progress.pack(fill='x',padx=24,pady=(0,12))
