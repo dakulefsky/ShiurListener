@@ -250,6 +250,21 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_soft_button_command_can_be_rebound(self):
+  import tkinter as tk
+  from window import SoftButton
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   calls=[]
+   button=SoftButton(window.root,'Original',lambda:calls.append('old'))
+   button.pack();window.root.update()
+   button.configure(command=lambda:calls.append('new'))
+   button.invoke()
+   self.assertEqual(calls,['new'])
+  finally:
+   if window:window.close()
+   fixture.tearDown()
  def test_space_on_focused_button_does_not_toggle_twice(self):
   import tkinter as tk
   fixture=test_player.Tests();fixture.setUp();window=None
