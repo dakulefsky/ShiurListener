@@ -83,7 +83,7 @@ class SpeechEnhancementTests(unittest.TestCase):
     def tearDown(self):
         self.temporary.cleanup()
 
-    def test_slow_folder_walk_does_not_hold_player_lock_or_overwrite_newer_scan(self):
+    def test_scans_are_serialized_without_holding_player_lock_during_walk(self):
         player = Player(None, self.root / "player-data", backend=object())
         first = self.root / "first-library"
         second = self.root / "second-library"
@@ -91,41 +91,48 @@ class SpeechEnhancementTests(unittest.TestCase):
         second.mkdir()
         (first / "old.mp3").write_bytes(b"old")
         (second / "new.mp3").write_bytes(b"new")
-        entered = threading.Event()
+        first_entered = threading.Event()
+        second_entered = threading.Event()
         release = threading.Event()
         errors = []
         original_rglob = pathlib.Path.rglob
 
-        def slow_rglob(path, pattern):
-            if path.resolve() == first.resolve():
-                entered.set()
+        def blocking_rglob(path, pattern):
+            resolved = path.resolve()
+            if resolved == first.resolve():
+                first_entered.set()
                 if not release.wait(timeout=5):
-                    raise TimeoutError("test did not release blocked scan")
+                    raise TimeoutError("test did not release first scan")
+            elif resolved == second.resolve():
+                second_entered.set()
             return original_rglob(path, pattern)
 
-        with mock.patch.object(pathlib.Path, "rglob", new=slow_rglob):
-            def scan_first():
+        with mock.patch.object(pathlib.Path, "rglob", new=blocking_rglob):
+            def scan(path):
                 try:
-                    player.scan(first)
+                    player.scan(path)
                 except Exception as error:
                     errors.append(error)
 
-            worker = threading.Thread(target=scan_first)
-            worker.start()
-            self.assertTrue(entered.wait(timeout=2), "first scan did not reach filesystem traversal")
+            first_worker = threading.Thread(target=scan, args=(first,))
+            second_worker = threading.Thread(target=scan, args=(second,))
+            first_worker.start()
+            self.assertTrue(first_entered.wait(timeout=2), "first scan did not reach filesystem traversal")
             acquired = player.lock.acquire(timeout=0.2)
             if acquired:
                 player.lock.release()
+            second_worker.start()
             try:
-                if acquired:
-                    # A newer scan should complete while the older traversal is blocked.
-                    player.scan(second)
+                self.assertFalse(second_entered.wait(timeout=0.2), "second scan overlapped the first scan")
             finally:
                 release.set()
-                worker.join(timeout=5)
+                first_worker.join(timeout=5)
+                second_worker.join(timeout=5)
 
         self.assertTrue(acquired, "filesystem traversal held the player lock")
-        self.assertFalse(worker.is_alive(), "old scan did not finish after release")
+        self.assertFalse(first_worker.is_alive(), "first scan did not finish after release")
+        self.assertFalse(second_worker.is_alive(), "second scan did not finish after release")
+        self.assertTrue(second_entered.is_set(), "second scan never started")
         self.assertEqual(errors, [])
         self.assertEqual(player.root, second.resolve())
         self.assertEqual([track["name"] for track in player.tracks], ["new.mp3"])
