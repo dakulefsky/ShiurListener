@@ -27,6 +27,43 @@ def install_assets(app, assets):
         target.write_bytes(data)
 
 
+def process_peak_working_set_mib():
+    """Return the process peak working set on Windows, including native allocations."""
+    if sys.platform != "win32":
+        return None
+    import ctypes
+    from ctypes import wintypes
+
+    class ProcessMemoryCounters(ctypes.Structure):
+        _fields_ = [
+            ("cb", wintypes.DWORD),
+            ("PageFaultCount", wintypes.DWORD),
+            ("PeakWorkingSetSize", ctypes.c_size_t),
+            ("WorkingSetSize", ctypes.c_size_t),
+            ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+            ("QuotaPagedPoolUsage", ctypes.c_size_t),
+            ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+            ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+            ("PagefileUsage", ctypes.c_size_t),
+            ("PeakPagefileUsage", ctypes.c_size_t),
+        ]
+
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    psapi = ctypes.WinDLL("psapi", use_last_error=True)
+    kernel32.GetCurrentProcess.restype = wintypes.HANDLE
+    psapi.GetProcessMemoryInfo.argtypes = [
+        wintypes.HANDLE, ctypes.POINTER(ProcessMemoryCounters), wintypes.DWORD
+    ]
+    psapi.GetProcessMemoryInfo.restype = wintypes.BOOL
+    counters = ProcessMemoryCounters()
+    counters.cb = ctypes.sizeof(counters)
+    if not psapi.GetProcessMemoryInfo(
+        kernel32.GetCurrentProcess(), ctypes.byref(counters), counters.cb
+    ):
+        raise ctypes.WinError(ctypes.get_last_error())
+    return counters.PeakWorkingSetSize / (1024 * 1024)
+
+
 def main():
     import hashlib
     import speech_enhancement as se
@@ -78,6 +115,8 @@ def main():
 
         converted = root / "converted-mono-16k.wav"
         conversion_progress = []
+        pipeline_started = time.monotonic()
+        peak_working_set_before = process_peak_working_set_mib()
         started = time.monotonic()
         se._convert_to_mono_16k(source_path, converted, app, None, conversion_progress.append)
         conversion_seconds = time.monotonic() - started
@@ -90,14 +129,17 @@ def main():
 
         enhanced = root / "enhanced.wav"
         denoise_progress = []
+        stage_timings = {}
         started = time.monotonic()
         se._process_wav(
             converted, enhanced,
             app / "runtime" / "speech" / "weya_nc.dll",
             app / "runtime" / "speech" / "advanced_dfnet16k_model_best_onnx.tar.gz",
-            None, denoise_progress.append, strength_db=20,
+            None, denoise_progress.append, strength_db=20, timings=stage_timings,
         )
         denoise_seconds = time.monotonic() - started
+        pipeline_elapsed = time.monotonic() - pipeline_started
+        peak_working_set_after = process_peak_working_set_mib()
         with wave.open(str(enhanced), "rb") as wav:
             output_params = wav.getparams()
             output_frames = wav.getnframes()
@@ -110,12 +152,21 @@ def main():
 
         total = conversion_seconds + denoise_seconds
         duration = output_frames / 16000
+        compute_seconds = stage_timings.get("denoising_frame_seconds", 0.0)
+        output_write_seconds = stage_timings.get("output_write_seconds", 0.0)
+        memory_report = (
+            f" process_peak_working_set_mib_before={peak_working_set_before:.1f}"
+            f" process_peak_working_set_mib_after={peak_working_set_after:.1f}"
+            if peak_working_set_before is not None and peak_working_set_after is not None
+            else " process_peak_working_set_mib=unavailable"
+        )
         print(
             f"STAGE_PROFILE duration={duration:.1f}s conversion={conversion_seconds:.2f}s "
-            f"denoising={denoise_seconds:.2f}s summed_pipeline={total:.2f}s "
+            f"denoising_wall={denoise_seconds:.2f}s denoising_frame_compute={compute_seconds:.2f}s "
+            f"output_write_frames={output_write_seconds:.2f}s pipeline_elapsed={pipeline_elapsed:.2f}s "
             f"conversion_realtime={duration/max(conversion_seconds, 0.001):.2f}x "
             f"denoising_realtime={duration/max(denoise_seconds, 0.001):.2f}x "
-            f"pipeline_realtime={duration/max(total, 0.001):.2f}x",
+            f"pipeline_realtime={duration/max(pipeline_elapsed, 0.001):.2f}x{memory_report}",
             flush=True,
         )
         assert conversion_seconds < 180, f"60-second VLC conversion too slow: {conversion_seconds:.1f}s"
