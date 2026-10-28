@@ -150,7 +150,7 @@ def main():
         _, source, clean, noisy = make_real_noisy_sample(root)
         source_original = source.read_bytes()
         input_snr = snr_db(clean, noisy)
-        output_snrs = []
+        output_gains = []
         for strength in (20, 35, 50):
             output = root / f"human-enhanced-{strength}.wav"
             progress = []
@@ -179,7 +179,7 @@ def main():
                 aligned_noisy = noisy
             aligned_input_snr = snr_db(aligned_clean, aligned_noisy)
             aligned_output_snr = snr_db(aligned_clean, aligned_processed)
-            output_snrs.append(aligned_output_snr)
+            output_gains.append(aligned_output_snr - aligned_input_snr)
             print(
                 f"REAL_SPEECH strength={strength} duration=12s elapsed={elapsed:.2f}s "
                 f"input_snr={input_snr:.2f}dB raw_output_snr={output_snr:.2f}dB "
@@ -188,7 +188,7 @@ def main():
                 f"input_rms={rms(noisy):.4f} output_rms={rms(processed):.4f} clipped={clipped:.4%}",
                 flush=True,
             )
-        best_gain = max(output_snrs) - aligned_input_snr
+        best_gain = max(output_gains)
         print(f"REAL_SPEECH best_aligned_snr_gain={best_gain:.2f}dB across tested strengths", flush=True)
         assert best_gain >= 0.5, (
             f"Speech enhancement did not improve delay-aligned objective SNR on the pinned human-speech fixture "
