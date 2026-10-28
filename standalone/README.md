@@ -1,8 +1,8 @@
-# Shiur Player 0.9.6
+# Shiur Player 0.9.7
 
 An English-only local Windows x64 desktop player with a light interface, rounded controls, violet accents and a dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
 
-Close the old player and run **shiur-player-setup-0.9.6.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
+Close the old player and run **shiur-player-setup-0.9.7.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
 
 Click **Check for updates** in the app for subsequent releases. Checks run only when requested. The app fetches a small release JSON from this repository, validates its version/URL/size/SHA-256, downloads the installer in a worker thread, saves playback state and starts setup. Setup waits for the old player process to exit before selecting and starting the new version. Program files use separate version directories and an atomic `active.json` pointer, leaving the previous version selected if extraction/activation fails. User data and audio recordings are outside the installation tree. Previous program versions are retained; old portable copies are not removed.
 
@@ -67,7 +67,7 @@ Favorites controls are removed from the interface; existing profile metadata is 
 
 ## Tiny floating player
 
-Click the minus button in the floating mini player to collapse it into a 144 × 44 draggable pill. Play/pause remains available; click the expand arrow to restore the previous mini-player size. Drag the empty left edge to reposition the pill. Collapsing does not pause playback. The collapsed preference and position are saved, and the expanded size is kept separately. Included in 0.9.4; native mouse controls pass on a Windows runner. User-specific display checks remain useful.
+Click the minus button in the floating mini player to collapse it into a 164 × 56 draggable pill. Play/pause remains available; click the expand arrow to restore the previous mini-player size. Drag the empty left edge to reposition the pill. Collapsing does not pause playback. The collapsed preference, size and position are saved separately from the expanded size. Both expanded and collapsed modes can be resized from their edges and corners; the collapsed pill has a 140 × 52 minimum. Expand and close controls are stacked vertically with clear resize gutters. Included in 0.9.4; native mouse controls pass on a Windows runner. User-specific display checks remain useful.
 
 ### Hover controls and individual speeds
 
@@ -113,3 +113,8 @@ Both mini player views include an × close button that hides the panel while aud
 The shiurim list starts higher on the screen, with less unused header space and a shorter expanded player. Main-player cards, buttons, playback icons, toggles and slider knobs now have antialiased edges. Windows DPI awareness improves rendering at the system display scale. The existing Windows styling, playback controls and saved listening positions are preserved.
 
 For the clearest result, launch the app on the display you use for listening. Moving an open window between monitors with different scaling may still let Windows rescale it; reopen it on that monitor if needed.
+
+
+## 0.9.7 collapsed mini-player and branding
+
+The collapsed pill is now resizable, with its own saved dimensions and a 140 × 52 minimum. The expand and close controls are stacked vertically; six-pixel edge gutters remain available for resizing, and hover skip controls fit without overlapping the transport or stacked controls. The sidebar “Shiur Player” product name has flexible width and tighter spacing to prevent clipping. Existing playback positions, collections, bookmarks and per-recording speed preferences are preserved.
