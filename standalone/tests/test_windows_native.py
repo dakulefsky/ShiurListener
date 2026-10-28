@@ -39,7 +39,7 @@ class NativeWindowTests(unittest.TestCase):
    width,height=size();collapsed=bool(fixture.player.saved.get('floatingCollapsed',False))
    hovered=collapsed and width>=HOVER_SIZE[0]
    for leftward in ([False,True] if hovered else [False]):
-    expected=layout(width,height,collapsed,hovered,leftward);matches=True
+    expected=layout(width,height,collapsed,hovered,leftward,player.saved.get('floatingCollapsedSize',list(COLLAPSED_SIZE))[0]);matches=True
     for ident in range(100,109):
      handle=child(bar.hwnd,ident)
      if not handle or bool(visible(handle))!=(ident in expected):matches=False;break
