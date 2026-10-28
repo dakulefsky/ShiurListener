@@ -7,6 +7,39 @@ from controller import LibraryController
 import test_player
 @unittest.skipUnless(os.environ.get('DISPLAY') or sys.platform=='win32','Needs a desktop display')
 class Tests(unittest.TestCase):
+ def test_settings_and_audio_enhancement_dialogs_have_scrollable_content(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   window.settings();window.root.update()
+   settings=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel')
+   self.assertTrue(any(child.winfo_class()=='Canvas' for outer in settings.winfo_children() for child in outer.winfo_children()))
+   settings.destroy()
+   window.audio_settings();window.root.update()
+   audio=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel')
+   canvases=[child for outer in audio.winfo_children() for child in outer.winfo_children() if child.winfo_class()=='Canvas']
+   self.assertTrue(canvases)
+   self.assertTrue(any(child.winfo_class()=='Scrollbar' for outer in audio.winfo_children() for child in outer.winfo_children()))
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+
+ def test_speech_enhancement_accepts_selected_recording_without_playing(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   ident=fixture.player.tracks[0]['id']
+   fixture.player.saved['currentId']=None
+   window.tree.selection_set(ident);window.library.selected=ident
+   window.speech_enhancement_dialog();window.root.update()
+   popups=[child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel']
+   self.assertEqual(len(popups),1)
+   self.assertEqual(popups[0].title(),'Offline speech enhancement')
+   popups[0].destroy()
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+
  def test_hidden_or_cleared_selection_cannot_reset_recordings(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
