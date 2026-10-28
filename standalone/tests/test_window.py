@@ -22,7 +22,7 @@ class Tests(unittest.TestCase):
    audio=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel')
    canvases=[child for outer in audio.winfo_children() for child in outer.winfo_children() if child.winfo_class()=='Canvas']
    self.assertTrue(canvases)
-   self.assertTrue(any(child.winfo_class() in ('Scrollbar','TScrollbar') for outer in audio.winfo_children() for child in outer.winfo_children()))
+   self.assertTrue(any(isinstance(child,window_module.SlimScrollbar) for outer in audio.winfo_children() for child in outer.winfo_children()))
    self.assertFalse(any(isinstance(child,window_module.SoftButton) for child in audio.winfo_children()),
                     'Audio actions must live inside the scrollable content, not float outside it')
    def descendants(widget):
