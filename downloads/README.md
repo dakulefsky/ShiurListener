@@ -4,17 +4,19 @@
 
 [Download plugin](shiur-player-1.5.0.otzplugin). Bundled offline model/runtime; no Python or companion installation. Keeps the five-minute minimum, checks speech/music locally before playback, and preserves saved positions. Filtering is experimental and can make mistakes. [Instructions and limitations](../player/README.md). Install as an update to נגן שיעורים in Otzaria.
 
-## Current standalone: 0.9.16
+## Current standalone: 0.9.20
 
-[Download setup](shiur-player-setup-0.9.16.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.16
+[Download setup](shiur-player-setup-0.9.20.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.20
 
-Improves the offline speech-enhancement workflow. Audio conversion now uses VLC's file-transcoding pipeline instead of normal playback callbacks, avoiding a guaranteed real-time conversion pass before denoising. Actual speed still depends on recording format, recording length, and computer performance.
+Fixes offline speech enhancement conversion by bundling the VLC stream-transcoding, WAV muxing, file-output and PCM codec plugins needed for local conversion. The release pipeline now runs the real VLC conversion smoke test before publishing, so a missing runtime component blocks the release.
+
+Audio conversion uses VLC's file-transcoding pipeline instead of normal playback callbacks, avoiding a guaranteed real-time conversion pass before denoising. Actual processing speed still depends on recording length, format, and computer performance.
 
 Clarifies **Switch back to original**: this restores playback from the untouched source recording; the separate enhanced copy remains cached. Choosing not to switch to the enhanced copy after processing now explicitly returns playback to the original.
 
-Modernizes right-click actions and playback-speed menus with rounded Shiur Player styling, and replaces the dialog scrollbar with a slim, rounded thumb and hover feedback.
+Modernizes right-click actions and playback-speed menus with rounded Shiur Player styling, and replaces the dialog scrollbar with a slim, rounded thumb and hover feedback. Settings remain scrollable, and the collapsed mini-player resize fix is retained.
 
-Retains the mini-player resize fix, scrollable settings dialogs, local-only enhancement, and preservation of listening positions, collections, bookmarks, and original audio files. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
+Listening positions, collections, bookmarks, and original audio files are preserved. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
 
 ## Standalone: 0.8.1
 
