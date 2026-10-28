@@ -336,6 +336,9 @@ class PlayerWindow:
   self.root.bind('<Control-o>',lambda _:self.safe(self.choose_folder));self.root.bind('<Escape>',lambda _:self.root.focus_set())
   self.root.bind('<Unmap>',lambda event:self.root.after(80,self.check_window_state) if event.widget is self.root and not self.closed else None)
   self.root.bind('<Map>',lambda event:self.root.after(80,self.check_window_state) if event.widget is self.root and not self.closed else None)
+  self.folder_monitor_stop=threading.Event()
+  self.folder_monitor=threading.Thread(target=self.monitor_folder,daemon=True,name='ShiurFolderMonitor')
+  self.folder_monitor.start()
   self.refresh()
  def label(self,parent,text,size=10,color=INK,bg=None,**kw):
   background=bg or parent.cget('bg');kw.setdefault('anchor','w')
