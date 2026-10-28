@@ -33,7 +33,7 @@ def layout(width,height,collapsed=False,hovered=False,hover_left=False,collapsed
   # Keep transport large and stable; stack expand/close in a dedicated right rail.
   base_width=collapsed_width if collapsed_width is not None else width-(96 if hovered else 0)
   shift=width-base_width
-  rail_x=base_width-30
+  rail_x=base_width-38
   bounds={102:(10,10,42,max(30,height-20)),108:(rail_x,7,24,18),109:(rail_x,height-25,24,18)}
   if hovered:
    if hover_left:
@@ -313,9 +313,12 @@ class FloatingBar:
       collapsed=not collapsed;hovered=False;hover_origin=None;hover_intent.reset()
       with self.player.lock:self.player.saved['floatingCollapsed']=collapsed;self.player.persist()
       apply_mode(mode_change=True);update();return 0
-     if (wp>>16)==0 and ident==107:
-      point=w.POINT();rect=w.RECT()
-      if getcursor(ctypes.byref(point)) and screenclient(controls[107],ctypes.byref(point)) and clientrect(controls[107],ctypes.byref(rect)) and rect.right>0:
+     if (wp>>16)==0 and ident in (107,110):
+      # Both the normal progress strip and the hover-to-scrub replacement
+      # must respond to a click. Previously ID 110 only worked while dragging
+      # because the timer polled the mouse button; a simple click was ignored.
+      target=controls[ident];point=w.POINT();rect=w.RECT()
+      if getcursor(ctypes.byref(point)) and screenclient(target,ctypes.byref(point)) and clientrect(target,ctypes.byref(rect)) and rect.right>0:
        with self.player.lock:
         state=self.player.snapshot()
         if state.get('currentId') and state.get('duration',0)>0:self.player.command({'op':'seek','value':max(0,min(1,point.x/rect.right))*state['duration']})
