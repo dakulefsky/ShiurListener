@@ -764,7 +764,7 @@ class PlayerWindow:
    messagebox.showinfo('Speech enhancement','Select a shiur in your library first, then open Audio enhancements.',parent=self.root);return
   strength=int(self.player.saved.get('speechEnhancementStrength',35))
   output=self.player.speech_cache_path(ident,strength)
-  pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry(f'540x{max(380,min(560,self.root.winfo_screenheight()-100))}');pop.minsize(440,340);pop.resizable(True,True);pop.configure(bg=BG);pop.transient(self.root)
+  pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry(f'540x{max(380,min(560,self.root.winfo_screenheight()-100))}');pop.minsize(440,340);pop.resizable(True,True);pop.configure(bg=BG)
   body=scrollable_dialog_content(pop)
   self.label(body,'Make this shiur easier to hear',18).pack(anchor='w',padx=24,pady=(20,5))
   self.label(body,f'Current recording: {source.name}',10,INK,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,7))
