@@ -45,6 +45,7 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
     """
     from engine import VLC
     decoder = None
+    duration_seconds = 0.0
     try:
         _check_cancel(cancel)
         decoder = VLC(options=('--aout=dummy',))
@@ -64,6 +65,7 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
             if state["status"] == "stopped" and time.monotonic() - started > 2:
                 raise RuntimeError("VLC stopped before audio conversion finished.")
             duration = state.get("duration", 0)
+            duration_seconds = max(duration_seconds, float(duration or 0))
             position = state.get("position", 0)
             if duration > 0 and progress:
                 _report(progress, min(9, round(9 * position / duration)))
@@ -77,6 +79,28 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
         raise RuntimeError("VLC could not create the converted WAV for speech enhancement.")
     if not _is_supported_wav(output):
         raise RuntimeError("VLC conversion did not produce the expected 16 kHz mono WAV.")
+    # Some VLC muxers close a few milliseconds before the source duration.
+    # Pad a short tail with silence rather than silently trimming the shiur.
+    target_frames = round(duration_seconds * 16000)
+    if target_frames > 0:
+        with wave.open(str(output), "rb") as converted:
+            params = converted.getparams()
+            actual_frames = params.nframes
+        missing = target_frames - actual_frames
+        if 0 < missing <= 16000:
+            padded = output.with_name(output.name + ".padded")
+            with wave.open(str(output), "rb") as source_wav, wave.open(str(padded), "wb") as target_wav:
+                target_wav.setnchannels(source_wav.getnchannels())
+                target_wav.setsampwidth(source_wav.getsampwidth())
+                target_wav.setframerate(source_wav.getframerate())
+                remaining = actual_frames
+                while remaining:
+                    _check_cancel(cancel)
+                    chunk = min(32768, remaining)
+                    target_wav.writeframesraw(source_wav.readframes(chunk))
+                    remaining -= chunk
+                target_wav.writeframesraw(b"\\x00" * missing * params.nchannels * params.sampwidth)
+            os.replace(padded, output)
     _report(progress, 10)
 
 def _bind(lib, name, result, args):
