@@ -956,6 +956,8 @@ class PlayerWindow:
     if self.root.state()=='normal':self.player.saved['windowSize']=[self.root.winfo_width(),self.root.winfo_height()]
     self.player.persist()
   except Exception as error:messagebox.showerror('Could not save your place',str(error),parent=self.root);return False
+  if self.speech_job and self.speech_job.get('busy'):
+   self.speech_job['cancel'].set()
   self.closed=True
   for callback in self.root.tk.call('after','info'):self.root.tk.call('after','cancel',callback)
   self.root.destroy();return True
