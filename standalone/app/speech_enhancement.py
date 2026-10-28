@@ -69,18 +69,14 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
         lib.libvlc_audio_set_callbacks(decoder.player, play_fn, None, None, None, None, None)
         lib.libvlc_audio_set_format(decoder.player, b'S16N', 16000, 1)
         decoder.play()
-        started = time.monotonic();rate_attempted=False
+        started = time.monotonic()
         while True:
             _check_cancel(cancel)
             if callback_errors:
                 raise RuntimeError("VLC failed while decoding audio for speech enhancement.") from callback_errors[0]
             state = decoder.state()
-            if state['status']=='playing' and not rate_attempted:
-                rate_attempted=True
-                try:decoder.speed(4.0)
-                except RuntimeError:
-                    try:decoder.speed(2.0)
-                    except RuntimeError:pass
+            # Keep normal playback speed: changing VLC rate shortens the PCM stream
+            # and would silently truncate/alter the recording before denoising.
             if state["status"] == "ended":
                 break
             if state["status"] == "error":
