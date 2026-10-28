@@ -94,7 +94,9 @@ def build():
  with zipfile.ZipFile(base) as old,zipfile.ZipFile(output,'w',zipfile.ZIP_DEFLATED) as bundle:
   assert old.testzip() is None
   retained=[]
+  overrides={prefix+name for name in hush_assets}
   for name in old.namelist():
+   if name in overrides:continue
    relative=name.removeprefix(prefix)
    if relative.startswith('runtime/') or relative in ('THIRD-PARTY-NOTICES.txt','GO-LICENSE.txt','TK-RUNTIME-NOTICE.txt'):
     bundle.writestr(name,old.read(name));retained.append(name)
