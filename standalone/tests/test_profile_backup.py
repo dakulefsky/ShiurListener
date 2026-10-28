@@ -58,6 +58,13 @@ class Tests(unittest.TestCase):
         reopened = Player(None, self.player.data_dir, test_player.Audio())
         self.assertEqual(reopened.saved['tracks'][self.ids[1]]['position'], 19.375)
 
+    def test_restore_preserves_language_from_backup(self):
+        state = copy.deepcopy(self.player.saved)
+        state['language'] = 'he'
+        self.write_payload(state)
+        import_profile(self.player, self.backup)
+        self.assertEqual(self.player.saved['language'], 'he')
+
     def test_restore_keeps_current_library_and_native_window_preferences(self):
         state = copy.deepcopy(self.player.saved)
         state.update(libraryRoot='Z:/different-machine/audio', globalShortcuts=True,
