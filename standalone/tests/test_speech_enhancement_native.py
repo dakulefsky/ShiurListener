@@ -195,6 +195,42 @@ def main():
             f"by at least 0.5 dB (best gain {best_gain:.2f} dB)."
         )
 
+        # Measure a milder 10 dB input-noise condition too. This is
+        # diagnostic rather than a pass/fail improvement gate: when a recording
+        # is already fairly clean, denoising artifacts can outweigh noise removal.
+        mild_source = root / "human-speech-mild-noise.wav"
+        rng = random.Random(20261031)
+        raw_mild_noise = [rng.gauss(0, 1) for _ in clean]
+        mild_noise_scale = rms(clean) / (10 ** (10 / 20)) / max(rms(raw_mild_noise), 1e-12)
+        mild_noisy = [max(-0.98, min(0.98, x + mild_noise_scale * n))
+                      for x, n in zip(clean, raw_mild_noise)]
+        write_float(mild_source, mild_noisy)
+        mild_input_snr = snr_db(clean, mild_noisy)
+        for strength in (20, 35, 50):
+            output = root / f"mild-enhanced-{strength}.wav"
+            started = time.monotonic()
+            speech_enhancement.enhance_file(
+                mild_source, output, app, strength_db=strength
+            )
+            elapsed = time.monotonic() - started
+            processed, params = read_float(output)
+            assert params.nchannels == 1 and params.sampwidth == 2 and params.framerate == 16000
+            assert len(processed) == len(clean), f"mild-noise strength {strength}: frame count changed"
+            assert all(math.isfinite(x) for x in processed), "mild-noise output contains non-finite samples"
+            aligned_clean, aligned_processed, lag = align_for_diagnostic(clean, processed)
+            aligned_noisy = mild_noisy[-lag:] if lag < 0 else (
+                mild_noisy[:-lag] if lag > 0 else mild_noisy
+            )
+            aligned_input_snr = snr_db(aligned_clean, aligned_noisy)
+            aligned_output_snr = snr_db(aligned_clean, aligned_processed)
+            print(
+                f"MILD_NOISE strength={strength} elapsed={elapsed:.2f}s "
+                f"input_snr={mild_input_snr:.2f}dB aligned_input_snr={aligned_input_snr:.2f}dB "
+                f"aligned_output_snr={aligned_output_snr:.2f}dB "
+                f"gain={aligned_output_snr-aligned_input_snr:.2f}dB estimated_lag={lag}samples",
+                flush=True,
+            )
+
         # Also test clean speech: a denoiser should not badly damage a
         # recording that does not need noise removal.
         clean_source = root / "human-speech-clean-input.wav"
