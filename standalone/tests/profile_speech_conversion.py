@@ -37,7 +37,7 @@ def main():
 
     with urllib.request.urlopen(SAMPLE_URL, timeout=60) as response:
         payload = response.read()
-    blob = hashlib.sha1(f"blob {len(payload)}\\0".encode() + payload).hexdigest()
+    blob = hashlib.sha1(f"blob {len(payload)}\0".encode() + payload).hexdigest()
     assert len(payload) == SAMPLE_BYTES and blob == SAMPLE_GIT_BLOB_SHA, "Speech fixture checksum mismatch"
 
     with tempfile.TemporaryDirectory(prefix="shiur-stage-profile-", ignore_cleanup_errors=True) as directory:
@@ -57,7 +57,8 @@ def main():
             if sys.byteorder != "little":
                 raw.byteswap()
         assert params.nchannels == 1 and params.sampwidth == 2 and params.framerate == 16000
-        source_samples = [value / 32768.0 for value in raw]\n        source_samples = source_samples + source_samples
+        source_samples = [value / 32768.0 for value in raw]
+        source_samples = source_samples + source_samples
         wanted_frames = 60 * 44100
         stereo = array.array("h")
         for index in range(wanted_frames):
