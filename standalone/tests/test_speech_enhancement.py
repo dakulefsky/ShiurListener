@@ -91,6 +91,7 @@ class SpeechEnhancementTests(unittest.TestCase):
         second.mkdir()
         (first / "old.mp3").write_bytes(b"old")
         (second / "new.mp3").write_bytes(b"new")
+        player.scan(first)
         first_entered = threading.Event()
         second_entered = threading.Event()
         release = threading.Event()
@@ -108,13 +109,19 @@ class SpeechEnhancementTests(unittest.TestCase):
             return original_rglob(path, pattern)
 
         with mock.patch.object(pathlib.Path, "rglob", new=blocking_rglob):
+            def rescan_current():
+                try:
+                    player.command({"op": "rescan"})
+                except Exception as error:
+                    errors.append(error)
+
             def scan(path):
                 try:
                     player.scan(path)
                 except Exception as error:
                     errors.append(error)
 
-            first_worker = threading.Thread(target=scan, args=(first,))
+            first_worker = threading.Thread(target=rescan_current)
             second_worker = threading.Thread(target=scan, args=(second,))
             first_worker.start()
             self.assertTrue(first_entered.wait(timeout=2), "first scan did not reach filesystem traversal")
