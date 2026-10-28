@@ -1,5 +1,5 @@
 """Local desktop library. UI work stays on the Tk thread; audio runs independently."""
-import queue,sys,threading,pathlib
+import json,queue,sys,threading,pathlib,time
 from rendering import rounded_png,icon_png
 from version import APP_VERSION
 import updater,profile_backup,hotkeys,speech_enhancement
@@ -1055,9 +1055,44 @@ class PlayerWindow:
     b=self.button(self.nav,folder['name'],lambda i=folder['id']:self.navigate(i),anchor='w');b.configure(bg=TINT if folder['id']==self.library.view else SIDEBAR);b.pack(fill='x',pady=2)
    self.button(self.nav,'+ New collection',self.new_collection,anchor='w').pack(fill='x',pady=(4,12))
    for widget in self.nav.winfo_children():widget.bind('<MouseWheel>',lambda e:self.nav_canvas.yview_scroll(-int(e.delta/120),'units'))
+ def monitor_folder(self):
+  # Periodically rescan off the UI thread. The engine reconciles stable file
+  # identities so external renames do not reset listening progress.
+  while not self.folder_monitor_stop.wait(4.0):
+   try:
+    with self.player.lock:root=self.player.root
+    if root is None:continue
+    if not root.is_dir():
+     with self.player.lock:self.player.error='Recordings folder is disconnected. Reconnect it to keep the library up to date.'
+     continue
+    self.player.scan(root)
+   except Exception as error:
+    with self.player.lock:self.player.error='Folder monitor: '+str(error)
+ def process_open_request(self):
+  request=self.player.data_dir/'open-request.json'
+  try:
+   data=json.loads(request.read_text(encoding='utf-8'))
+   request.unlink(missing_ok=True)
+  except (FileNotFoundError,OSError,ValueError,TypeError):return
+  try:
+   target=pathlib.Path(data.get('path','')).expanduser().resolve()
+   from engine import EXTENSIONS
+   if not target.is_file() or target.suffix.lower() not in EXTENSIONS:return
+   with self.player.lock:root=self.player.root;paths=dict(self.player.paths)
+   if root is None or target.parent.resolve()!=root.resolve() or not any(p.resolve()==target for p in paths.values()):
+    self.player.scan(target.parent)
+   with self.player.lock:ident=next((i for i,p in self.player.paths.items() if p.resolve()==target),None)
+   if not ident:return
+   self.library.view='all';self.library.selected=ident
+   self.player.load(ident,autoplay=True)
+   self.update_rows()
+   if self.tree.exists(ident):self.tree.selection_set(ident);self.tree.see(ident)
+  except Exception as error:
+   with self.player.lock:self.player.error='Could not open the selected audio file: '+str(error)
  def refresh(self):
   if self.closed:return
   try:
+   self.process_open_request()
    self.check_window_state()
    while not self.requests.empty():
     action=self.requests.get_nowait()
@@ -1104,6 +1139,7 @@ class PlayerWindow:
   if self.speech_job and self.speech_job.get('busy'):
    self.speech_job['cancel'].set()
   self.closed=True
+  self.folder_monitor_stop.set()
   for callback in self.root.tk.call('after','info'):self.root.tk.call('after','cancel',callback)
   self.root.destroy();return True
  def run(self):self.root.mainloop()
