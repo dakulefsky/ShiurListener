@@ -167,15 +167,21 @@ def _process_wav(source_path, output_path, library_path, model_path, cancel, pro
                     if not valid:
                         break
                     samples.extend([0] * (frame_length - valid))
-                    for i, sample in enumerate(samples):
-                        input_buffer[i] = sample / 32768.0
+                    # Convert to native float storage once, then copy the whole
+                    # frame into ctypes in one operation. Per-sample ctypes
+                    # assignments were expensive on long shiurim.
+                    floats = array.array("f", (sample / 32768.0 for sample in samples))
+                    if floats.itemsize != ctypes.sizeof(ctypes.c_float):
+                        raise RuntimeError("This system does not support the expected 32-bit float audio buffer.")
+                    ctypes.memmove(input_buffer, floats.buffer_info()[0], frame_length * ctypes.sizeof(ctypes.c_float))
                     lib.weya_nc_process_frame(session, input_buffer, output_buffer)
-                    cleaned = array.array("h")
-                    for value in output_buffer[:valid]:
-                        value = float(value)
-                        if not math.isfinite(value):
-                            value = 0.0
-                        cleaned.append(max(-32768, min(32767, round(max(-1.0, min(1.0, value)) * 32768))))
+                    # array.array builds the output buffer more efficiently than
+                    # repeated Python-level append calls, while preserving the
+                    # same clipping, finite-value handling and PCM output.
+                    cleaned = array.array("h", (
+                        max(-32768, min(32767, round(max(-1.0, min(1.0, float(value) if math.isfinite(value) else 0.0)) * 32768)))
+                        for value in output_buffer[:valid]
+                    ))
                     if sys.byteorder != "little":
                         cleaned.byteswap()
                     dst.writeframesraw(cleaned.tobytes())
