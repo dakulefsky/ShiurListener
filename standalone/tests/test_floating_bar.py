@@ -9,7 +9,7 @@ class Function:
  def __call__(self,*args):return self.fn(*args)
 class TestBar(unittest.TestCase):
  def test_responsive_controls_fit_compact_and_large_clients(self):
-  for width,height in [(284,100),(344,110),(600,240)]:
+  for width,height in [(250,112),(344,140),(600,240)]:
    bounds=module.layout(width,height)
    for ident,(x,y,w,h) in bounds.items():
     self.assertGreater(w,0);self.assertGreater(h,0);self.assertGreaterEqual(x,0);self.assertGreaterEqual(y,0)
@@ -18,6 +18,14 @@ class TestBar(unittest.TestCase):
    for left,right in zip(controls,controls[1:]):self.assertLess(left[0]+left[2],right[0])
    self.assertLessEqual(controls[0][1]+controls[0][3],bounds[104][1])
    self.assertLessEqual(bounds[104][1]+bounds[104][3],bounds[107][1])
+ def test_controls_reflow_when_expanded_window_changes_size(self):
+  small=module.layout(300,140)
+  large=module.layout(520,220)
+  self.assertNotEqual(small[102][2],large[102][2])
+  self.assertNotEqual(small[106][0],large[106][0])
+  self.assertNotEqual(small[104][2],large[104][2])
+  self.assertNotEqual(small[107][1],large[107][1])
+
  def test_expanded_bar_can_shrink_and_keeps_resize_borders_clear(self):
   self.assertEqual(module.MIN_SIZE,(250,112))
   bounds=module.layout(*module.MIN_SIZE)
