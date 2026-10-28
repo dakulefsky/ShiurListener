@@ -22,9 +22,11 @@ class TestBar(unittest.TestCase):
   self.assertFalse(module.FRAMELESS_STYLE & 0x00C00000)
   for point,target in [((1,1),13),((359,1),14),((1,149),16),((359,149),17),((1,50),10),((359,50),11),((80,1),12),((80,149),15),((80,20),2)]:
    self.assertEqual(module.hit_test(*point,360,150),target)
-  self.assertEqual(module.hit_test(1,1,144,44,collapsed=True),2)
+  self.assertEqual(module.hit_test(1,1,164,56,collapsed=True),13)
+  self.assertEqual(module.hit_test(163,28,164,56,collapsed=True),11)
+  self.assertEqual(module.hit_test(80,55,164,56,collapsed=True),15)
  def test_buttons_are_client_targets_not_window_drag_targets(self):
-  for width,height,collapsed,hovered in [(360,150,False,False),(144,44,True,False),(252,44,True,True)]:
+  for width,height,collapsed,hovered in [(360,150,False,False),(164,56,True,False),(260,56,True,True)]:
    for ident,(x,y,w,h) in module.layout(width,height,collapsed,hovered).items():
     if ident in (101,102,103,105,106,107,108,109):
      self.assertEqual(module.hit_test(x+w//2,y+h//2,width,height,collapsed,hovered),1,f'Control {ident} must receive clicks')
@@ -50,8 +52,8 @@ class TestBar(unittest.TestCase):
   self.assertTrue(intent.update(False,5))
   self.assertFalse(intent.update(False,5.5))
  def test_leftward_hover_preserves_original_button_screen_positions(self):
-  original=module.layout(144,44,True,False)
-  expanded=module.layout(252,44,True,True,True)
+  original=module.layout(164,56,True,False,False,164)
+  expanded=module.layout(260,56,True,True,True,164)
   shift=module.HOVER_SIZE[0]-module.COLLAPSED_SIZE[0]
   for ident in (102,108,109):
    self.assertEqual(expanded[ident][0]-shift,original[ident][0])
