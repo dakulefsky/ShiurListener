@@ -442,4 +442,19 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_modern_popup_menu_uses_app_buttons_and_runs_action(self):
+  fixture=test_player.Tests();fixture.setUp();window=None;calls=[]
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   popup=window_module.ModernPopupMenu(window.root,40,40,[('Rename recording…',lambda:calls.append('rename')),None,('Play next',lambda:calls.append('next'))])
+   window.root.update()
+   self.assertTrue(popup.popup.overrideredirect())
+   buttons=[w for w in popup.popup.winfo_children()[0].winfo_children() if isinstance(w,window_module.SoftButton)]
+   self.assertEqual(len(buttons),2)
+   buttons[0].invoke();window.root.update()
+   self.assertEqual(calls,['rename'])
+   self.assertFalse(popup.popup.winfo_exists())
+  finally:
+   if window:window.close()
+   fixture.tearDown()
 if __name__=='__main__':unittest.main(verbosity=2)
