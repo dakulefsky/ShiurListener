@@ -43,8 +43,9 @@ class TestBar(unittest.TestCase):
   self.assertLess(expand[0]+expand[2],width)
   self.assertLess(close[0]+close[2],width)
   hovered=module.layout(module.HOVER_SIZE[0],module.HOVER_SIZE[1],True,True,False,width)
-  self.assertLessEqual(hovered[101][0]+hovered[101][2],hovered[103][0])
-  self.assertLessEqual(hovered[103][0]+hovered[103][2],hovered[108][0])
+  for first,second in ((101,103),(101,108),(101,109),(103,108),(103,109),(102,101),(102,103),(102,108),(102,109),(108,109)):
+   x,y,w,h=hovered[first];u,v,a,b=hovered[second]
+   self.assertTrue(x+w<=u or u+a<=x or y+h<=v or v+b<=y,f'Controls {first} and {second} overlap')
 
  def test_hover_waits_for_intent_and_ignores_brief_crossings(self):
   intent=module.HoverIntent()
