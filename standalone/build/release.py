@@ -140,8 +140,14 @@ def stage():
  shutil.copy2(ROOT/'build/release-metadata.json',qa/setup.replace('.exe','.json'))
  git('add','--sparse','-f',f'downloads/qa/{setup}',f'downloads/qa/{setup.replace(".exe",".json")}')
  git('commit','-m',f'Stage standalone {VERSION} installer for native Windows verification')
+ # Building the candidate leaves local generated files; stash them while rebasing
+ # the staging commit, then restore them for the install and publish steps.
+ before=subprocess.run(['git','rev-parse','-q','--verify','refs/stash'],cwd=REPO,text=True,capture_output=True).stdout.strip()
+ git('stash','push','--include-untracked','-m','Preserve standalone release candidate outputs')
+ after=subprocess.run(['git','rev-parse','-q','--verify','refs/stash'],cwd=REPO,text=True,capture_output=True).stdout.strip()
  git('fetch','origin','main')
  git('rebase','origin/main')
+ if after and after!=before:git('stash','pop')
  git('push','origin','HEAD:main')
 def publish():
  metadata=json.loads((ROOT/'build/release-metadata.json').read_text(encoding='utf-8'))
