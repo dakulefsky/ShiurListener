@@ -1,7 +1,7 @@
 """Exercise the real desktop toolkit, including persistence across a new window."""
 import os,pathlib,sys,unittest
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/'app'))
-from window import PlayerWindow
+import window as window_module\nfrom window import PlayerWindow
 from engine import Player
 from controller import LibraryController
 import test_player
@@ -400,3 +400,33 @@ class Tests(unittest.TestCase):
    fixture.tearDown()
 if __name__=='__main__':unittest.main(verbosity=2)
 
+
+ def test_settings_audio_enhancement_buttons_open_and_respond(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   ident=fixture.player.tracks[0]['id']
+   window.tree.selection_set(ident);window.tree.focus(ident);window.select();window.root.update()
+   def descendants(widget):
+    for child in widget.winfo_children():
+     yield child
+     yield from descendants(child)
+   window.settings();window.root.update()
+   settings=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel')
+   audio_entry=next(w for w in descendants(settings) if isinstance(w,window_module.SoftButton) and w.cget('text')=='Audio enhancements…')
+   audio_entry.invoke();window.root.update()
+   audio=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel')
+   self.assertEqual(audio.title(),'Audio enhancements')
+   preset=next(w for w in descendants(audio) if isinstance(w,window_module.SoftButton) and w.cget('text')=='Strong speech')
+   preset.invoke();window.root.update()
+   self.assertEqual({name:var.get() for name,var in window.audio_controls['values'].items()},{'bass':-3.0,'body':-1.0,'clarity':5.0,'treble':2.0})
+   entry=next(w for w in descendants(audio) if isinstance(w,window_module.SoftButton) and w.cget('text')=='Enhance current shiur…')
+   entry.invoke();window.root.update()
+   speech=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel' and child.title()=='Offline speech enhancement')
+   original=next(w for w in descendants(speech) if isinstance(w,window_module.SoftButton) and w.cget('text')=='Use original audio')
+   original.invoke();window.root.update()
+   self.assertEqual(fixture.player.saved['speechEnhancementEnabled'],False)
+   self.assertEqual(next(w for w in descendants(speech) if isinstance(w,window_module.tk.Label) and w.cget('text')=='Original audio is active.').cget('text'),'Original audio is active.')
+  finally:
+   if window:window.close()
+   fixture.tearDown()
