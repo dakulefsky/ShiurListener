@@ -588,10 +588,10 @@ class PlayerWindow:
   tree.heading('action',text='When you press it');tree.heading('shortcut',text='Current key combination')
   tree.column('action',width=280);tree.column('shortcut',width=280)
   scrollbar=SlimScrollbar(frame,tree.yview);tree.configure(yscrollcommand=scrollbar.set);scrollbar.pack(side='right',fill='y');tree.pack(fill='both',expand=True)
-  labels={'toggle':'Play or pause','back':'Skip backward','forward':'Skip forward','slower':'Decrease playback speed','faster':'Increase playback speed','previous':'Previous recording','next':'Next recording','skip10':'Set skip length to 10 seconds','skip15':'Set skip length to 15 seconds','skip60':'Set skip length to 60 seconds','stop':'Stop playback','floating':'Show or hide mini player'}
+  labels={'toggle':'Play or pause','back':'Skip backward','forward':'Skip forward','slower':'Decrease playback speed','faster':'Increase playback speed','previous':'Previous recording','next':'Next recording','skip10':'Set skip length to 10 seconds','skip15':'Set skip length to 15 seconds','skip60':'Set skip length to 60 seconds','stop':'Stop playback','floating':'Show or hide mini player','media_toggle':'Headphones: play / pause','media_back':'Headphones: skip backward','media_forward':'Headphones: skip forward'}
   selected=[None];variables={name:tk.BooleanVar(pop) for name in hotkeys.MODS};key=tk.StringVar(pop);disabled=tk.BooleanVar(pop)
   self.label(pop,'2. SET THE KEY COMBINATION',9,MUTED).pack(anchor='w',padx=20,pady=(2,4))
-  self.label(pop,'Select the modifier keys to hold, then choose the main key. Ctrl, Alt, or Win is required.',10,MUTED,wraplength=670,justify='left').pack(anchor='w',padx=20,pady=(0,6))
+  self.label(pop,'Select the modifier keys to hold, then choose the main key. Regular keys need Ctrl, Alt, or Win. Media keys work on their own.',10,MUTED,wraplength=670,justify='left').pack(anchor='w',padx=20,pady=(0,6))
   row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=20,pady=4)
   for name,var in variables.items():tk.Checkbutton(row,text=name.title(),variable=var,bg=BG,activebackground=BG).pack(side='left',padx=(0,10))
   self.label(row,'Main key',9,MUTED).pack(side='left',padx=(8,4))
