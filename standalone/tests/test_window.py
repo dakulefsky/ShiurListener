@@ -15,12 +15,26 @@ class Tests(unittest.TestCase):
    window.settings();window.root.update()
    settings=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel')
    self.assertTrue(any(child.winfo_class()=='Canvas' for outer in settings.winfo_children() for child in outer.winfo_children()))
+   self.assertFalse(any(isinstance(child,window_module.SoftButton) for child in settings.winfo_children()),
+                    'Settings actions must live inside the scrollable content, not float outside it')
    settings.destroy()
    window.audio_settings();window.root.update()
    audio=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel')
    canvases=[child for outer in audio.winfo_children() for child in outer.winfo_children() if child.winfo_class()=='Canvas']
    self.assertTrue(canvases)
    self.assertTrue(any(child.winfo_class() in ('Scrollbar','TScrollbar') for outer in audio.winfo_children() for child in outer.winfo_children()))
+   self.assertFalse(any(isinstance(child,window_module.SoftButton) for child in audio.winfo_children()),
+                    'Audio actions must live inside the scrollable content, not float outside it')
+   def descendants(widget):
+    for child in widget.winfo_children():
+     yield child
+     yield from descendants(child)
+   description=next(w for w in descendants(audio) if isinstance(w,window_module.tk.Label) and w.cget('text').startswith('Adjust the sound'))
+   preferred=int(description.cget('wraplength'))
+   audio.geometry('480x420');window.root.update()
+   self.assertLessEqual(int(description.cget('wraplength')),max(180,description.master.master.winfo_width()-48))
+   audio.geometry('640x700');window.root.update()
+   self.assertGreaterEqual(int(description.cget('wraplength')),min(preferred,description.master.master.winfo_width()-48))
   finally:
    if window:window.close()
    fixture.tearDown()
