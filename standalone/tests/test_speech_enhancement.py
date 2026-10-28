@@ -16,6 +16,7 @@ from unittest import mock
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "app"))
 import speech_enhancement as enhancement
+from engine import Player
 
 
 class FakeFunction:
@@ -81,6 +82,15 @@ class SpeechEnhancementTests(unittest.TestCase):
 
     def tearDown(self):
         self.temporary.cleanup()
+
+    def test_player_default_speech_strength_matches_dialog_default(self):
+        player = Player(None, self.root / "player-data", backend=object())
+        self.assertEqual(player.saved["speechEnhancementStrength"], 20)
+
+    def test_conversion_profiler_is_valid_python_source(self):
+        profiler = pathlib.Path(__file__).with_name("profile_speech_conversion.py")
+        source = profiler.read_text(encoding="utf-8")
+        compile(source, str(profiler), "exec")
 
     def test_wav_validation_accepts_only_mono_16bit_16khz_pcm(self):
         write_wav(self.source, [100, -100])
