@@ -76,12 +76,52 @@ class Player:
         self.file=self.data_dir/'state.json';self.lock=threading.RLock();self.backend=backend;self.error='';self.pending=None;self.was_playing=False
         self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'audioEnhancement':{'bass':0,'body':0,'clarity':0,'treble':0},'speechEnhancementEnabled':False,'speechEnhancementStrength':35,'skipSeconds':15,'folders':[],'language':'en'}
         if self.file.exists():
+            from profile_backup import FORMAT,_read,_validate
             try:
-                from profile_backup import FORMAT,_read,_validate
                 stored=_read(self.file)
                 if not isinstance(stored,dict):raise ValueError('Saved state must be an object.')
                 self.saved=_validate({'format':FORMAT,'version':1,'state':{**self.saved,**stored}})
-            except (ValueError,OSError):raise RuntimeError('Cannot read saved player state. Back up state.json before resetting it.')
+            except (ValueError,OSError) as original_error:
+                # Never overwrite a state file that this build cannot read. Keep a
+                # byte-for-byte recovery copy before attempting a conservative repair.
+                import datetime,shutil
+                stamp=datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+                backup=self.data_dir/f'state.json.recovery-{stamp}.bak'
+                try:
+                    shutil.copy2(self.file,backup)
+                except OSError as backup_error:
+                    raise RuntimeError(f'Cannot read saved player state ({original_error}). The automatic backup failed ({backup_error}); your original state.json was not changed.') from original_error
+                try:
+                    raw=json.loads(self.file.read_text(encoding='utf-8'))
+                    if not isinstance(raw,dict):raise ValueError('Saved state is not a JSON object.')
+                    defaults=dict(self.saved)
+                    # Recover each recording independently so one malformed entry
+                    # cannot discard the positions for every other shiur.
+                    tracks=raw.get('tracks',{})
+                    recovered_tracks={}
+                    if isinstance(tracks,dict):
+                        for ident,track in tracks.items():
+                            candidate={**defaults,'tracks':{ident:track}}
+                            try:_validate({'format':FORMAT,'version':1,'state':candidate})
+                            except (ValueError,TypeError):continue
+                            recovered_tracks[ident]=track
+                    raw['tracks']=recovered_tracks
+                    # Keep only individually valid top-level settings; malformed
+                    # optional settings are dropped, not the user's whole library.
+                    recovered=dict(defaults)
+                    for key,value in raw.items():
+                        candidate={**recovered,'tracks':recovered_tracks,key:value}
+                        try:_validate({'format':FORMAT,'version':1,'state':candidate})
+                        except (ValueError,TypeError):continue
+                        recovered[key]=value
+                    recovered['tracks']=recovered_tracks
+                    self.saved=_validate({'format':FORMAT,'version':1,'state':recovered})
+                    self.error=f'Saved state was repaired. Original preserved as {backup.name}. Please export a fresh backup from Settings.'
+                except (ValueError,OSError,TypeError,RecursionError) as recovery_error:
+                    # If JSON itself is truncated, open with a clean profile only
+                    # after preserving the complete original bytes above.
+                    self.saved=dict(self.saved)
+                    self.error=f'The saved state could not be repaired automatically. Original preserved as {backup.name}; playback positions may need manual recovery.'
         self.active=None;self.last_save=0;self.previous_status='stopped';self.hotkey_status=[];self.floating_bar=None;self.sleep_deadline=None;self.sleep_minutes=0;self.sleep_paused=False
         self.sleep_at_end=False;self.loop_a=None;self.loop_b=None;self.loop_track=None;self.loop_seek_at=0
         self.seek_target=None
