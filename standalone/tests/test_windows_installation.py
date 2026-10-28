@@ -13,7 +13,7 @@ def run():
  with urllib.request.urlopen(origin+f'shiur-player-setup-{version}.json?check={time.time_ns()}',timeout=30) as response:metadata=json.load(response)
  assert metadata['version']==version and re.fullmatch(r'[0-9a-f]{64}',metadata['sha256'])
  url=origin+f'shiur-player-setup-{version}.exe?sha256='+metadata['sha256']
- with urllib.request.urlopen(url,timeout=60) as response:payload=response.read(50*1024*1024)
+ with urllib.request.urlopen(url,timeout=120) as response:payload=response.read()  # Installer is larger than 50 MiB; read the complete checksum-bound payload.
  assert len(payload)==metadata['size'] and hashlib.sha256(payload).hexdigest()==metadata['sha256']
  from ctypes import wintypes as w
  user=ctypes.WinDLL('user32',use_last_error=True);kernel=ctypes.WinDLL('kernel32',use_last_error=True)
