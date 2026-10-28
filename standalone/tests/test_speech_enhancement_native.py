@@ -11,6 +11,7 @@ import math
 import pathlib
 import random
 import runpy
+import shutil
 import sys
 import tempfile
 import time
@@ -346,6 +347,25 @@ def main():
             f"60-second human-speech enhancement did not improve delay-aligned SNR "
             f"by at least 0.5 dB (gain {long_gain:.2f} dB)."
         )
+        # Export a small comparison set from passing runs so a human can
+        # listen for intelligibility/artifacts; objective SNR is not enough.
+        artifact_dir = ROOT / "test-results" / "speech-enhancement"
+        shutil.rmtree(artifact_dir, ignore_errors=True)
+        artifact_dir.mkdir(parents=True, exist_ok=True)
+        listening_samples = [
+            clean_source, source,
+            root / "human-enhanced-20.wav", root / "human-enhanced-35.wav",
+            root / "human-enhanced-50.wav",
+            mild_source, root / "mild-enhanced-20.wav",
+            root / "mild-enhanced-35.wav", root / "mild-enhanced-50.wav",
+            hum_source, root / "human-hum-enhanced-20.wav",
+            root / "human-hum-enhanced-35.wav", root / "human-hum-enhanced-50.wav",
+            long_source, long_output,
+        ]
+        for sample in listening_samples:
+            if sample.is_file():
+                shutil.copy2(sample, artifact_dir / sample.name)
+        print(f"Listening comparison WAVs saved to {artifact_dir}", flush=True)
         print("Native enhancement quality and long-file benchmark completed.", flush=True)
 
 
