@@ -74,7 +74,7 @@ class VLC:
 class Player:
     def __init__(self,root,data_dir,backend):
         self.root=pathlib.Path(root).resolve() if root else None;self.data_dir=pathlib.Path(data_dir);self.data_dir.mkdir(parents=True,exist_ok=True)
-        self.file=self.data_dir/'state.json';self.lock=threading.RLock();self.scan_generation=0;self.backend=backend;self.error='';self.pending=None;self.was_playing=False
+        self.file=self.data_dir/'state.json';self.lock=threading.RLock();self.scan_lock=threading.Lock();self.backend=backend;self.error='';self.pending=None;self.was_playing=False
         self.saved={'tracks':{},'currentId':None,'queue':[],'autoNext':False,'speed':1,'volume':1,'audioEnhancement':{'bass':0,'body':0,'clarity':0,'treble':0},'speechEnhancementEnabled':False,'speechEnhancementStrength':20,'skipSeconds':15,'folders':[],'language':'en'}
         if self.file.exists():
             from profile_backup import FORMAT,_read,_validate
@@ -142,13 +142,14 @@ class Player:
         strength=max(10,min(60,int(round(float(strength)))))
         return self.data_dir/'speech-cache'/f'{ident}-{stat.st_size}-{stat.st_mtime_ns}-hush-v1.0.0-s{strength}.wav'
     def scan(self,root=None):
-        # Only snapshot/update player state under the library lock. Walking a
-        # large or network-backed folder can take seconds, and must not block
-        # playback controls or the Tk UI for the duration of the filesystem walk.
+        # Serialize manual and background scans without holding the playback lock
+        # while traversing the filesystem.
+        with self.scan_lock:
+            return self._scan_serial(root)
+
+    def _scan_serial(self,root=None):
         with self.lock:
             selected=pathlib.Path(root).resolve() if root else self.root
-            self.scan_generation+=1
-            generation=self.scan_generation
         if selected is None:raise ValueError('Choose a recordings folder first.')
         if not selected.is_dir():raise ValueError('The recordings folder is missing or disconnected.')
         paths={};tracks=[]
@@ -161,9 +162,6 @@ class Player:
             ident=hashlib.sha256((str(selected)+'/'+relative).encode()).hexdigest()[:24]
             paths[ident]=path;tracks.append({'id':ident,'name':path.name,'source':relative})
         with self.lock:
-            # If another scan started while this one walked the filesystem,
-            # discard this stale snapshot rather than reverting the newer root.
-            if generation!=self.scan_generation:return self.snapshot()
             if not selected.is_dir():raise ValueError('The recordings folder is missing or disconnected.')
             self.capture()
             if self.active and self.active not in paths:self.backend.stop();self.active=None;self.pending=None;self.clear_loop()
