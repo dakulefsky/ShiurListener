@@ -25,7 +25,7 @@ def download_hush_assets():
   assets[target]=data
  print('Verified pinned Hush native runtime, model, license and dataset notice.',flush=True)
  return assets
-def smoke_test_hush(assets,test_conversion=False):
+def smoke_test_hush(assets,test_conversion=False,base_runtime=None):
  with tempfile.TemporaryDirectory(prefix='shiur-hush-smoke-',ignore_cleanup_errors=True) as directory:
   directory=pathlib.Path(directory);app=directory/'app';speech=app/'runtime'/'speech';speech.mkdir(parents=True)
   library=speech/'weya_nc.dll';model=speech/'advanced_dfnet16k_model_best_onnx.tar.gz'
@@ -34,6 +34,13 @@ def smoke_test_hush(assets,test_conversion=False):
   source=directory/'input.wav';output=directory/'output.wav'
   if test_conversion:
    vlc_source=ROOT/'app'/'runtime'/'vlc'
+   if base_runtime is not None:
+    prefix='Shiur Player/runtime/vlc/'
+    with zipfile.ZipFile(base_runtime) as bundle:
+     for name in bundle.namelist():
+      if name.startswith(prefix) and not name.endswith('/'):
+       target=vlc_source/name.removeprefix(prefix)
+       target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(bundle.read(name))
    if not (vlc_source/'libvlc.dll').is_file():raise ValueError('Verified VLC test runtime is missing libvlc.dll.')
    for rel,data in assets.items():
     if rel.startswith('runtime/vlc/'):
@@ -98,7 +105,7 @@ def build():
  assert digest(base)==BASE_SHA256,'Prior runtime checksum mismatch'
  hush_assets=download_hush_assets()
  hush_assets.update(download_vlc_callback_assets())
- smoke_test_hush(hush_assets,True)
+ smoke_test_hush(hush_assets,True,base)
  env={**os.environ,'GOOS':'windows','GOARCH':'amd64','CGO_ENABLED':'0','GO111MODULE':'off','GOTOOLCHAIN':'local'}
  subprocess.run(['go','build','-trimpath','-ldflags=-s -w -H windowsgui','-o',str(ROOT/'build/Shiur Player.exe'),str(ROOT/'build/launcher.go')],env=env,check=True)
  prefix='Shiur Player/'
