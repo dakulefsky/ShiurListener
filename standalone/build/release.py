@@ -34,6 +34,10 @@ def smoke_test_hush(assets,test_conversion=False):
   if test_conversion:
    vlc_source=ROOT/'app'/'runtime'/'vlc'
    if not (vlc_source/'libvlc.dll').is_file():raise ValueError('Verified VLC test runtime is missing libvlc.dll.')
+   for rel,data in assets.items():
+    if rel.startswith('runtime/vlc/'):
+     target=vlc_source/rel.removeprefix('runtime/vlc/')
+     target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
    for folder in ('audio_output','stream_out','mux','access_output'):
     directory=vlc_source/'plugins'/folder
     print(f'VLC {folder} plugins: {[path.name for path in directory.glob("*.dll")]}',flush=True)
@@ -56,6 +60,22 @@ def smoke_test_hush(assets,test_conversion=False):
    if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or abs(audio.getnframes()-16000*(10 if test_conversion else 2))>320:
     raise ValueError('Hush native runtime smoke test produced invalid audio.')
  print('Hush native runtime loaded the model and processed audio successfully.',flush=True)
+VLC_PLUGIN_URL='https://download.videolan.org/pub/videolan/vlc/3.0.24/win64/vlc-3.0.24-win64.zip'
+VLC_PLUGIN_SIZE=82765861
+VLC_PLUGIN_SHA256='93d34578352c50936da35c01e7f358a9b36395b350ee44096f2d3837f42a08a9'
+def download_vlc_callback_assets():
+ with urllib.request.urlopen(VLC_PLUGIN_URL,timeout=180) as response:payload=response.read()
+ if len(payload)!=VLC_PLUGIN_SIZE or hashlib.sha256(payload).hexdigest()!=VLC_PLUGIN_SHA256:
+  raise ValueError('Official VideoLAN VLC 3.0.24 archive checksum mismatch.')
+ files={
+  'runtime/vlc/libvlc.dll':'vlc-3.0.24/libvlc.dll',
+  'runtime/vlc/libvlccore.dll':'vlc-3.0.24/libvlccore.dll',
+  'runtime/vlc/plugins/audio_output/libamem_plugin.dll':'vlc-3.0.24/plugins/audio_output/libamem_plugin.dll',
+ }
+ with zipfile.ZipFile(__import__('io').BytesIO(payload)) as archive:
+  assets={target:archive.read(source) for target,source in files.items()}
+ print('Verified official VLC 3.0.24 core and audio-memory callback plugin.',flush=True)
+ return assets
 def git(*args):subprocess.run(['git',*args],cwd=REPO,check=True)
 def build():
  if not re.fullmatch(r'\d+\.\d+\.\d+',VERSION):raise ValueError('Invalid version')
@@ -65,6 +85,7 @@ def build():
  urllib.request.urlretrieve(url,base)
  assert digest(base)==BASE_SHA256,'Prior runtime checksum mismatch'
  hush_assets=download_hush_assets()
+ hush_assets.update(download_vlc_callback_assets())
  smoke_test_hush(hush_assets)
  env={**os.environ,'GOOS':'windows','GOARCH':'amd64','CGO_ENABLED':'0','GO111MODULE':'off','GOTOOLCHAIN':'local'}
  subprocess.run(['go','build','-trimpath','-ldflags=-s -w -H windowsgui','-o',str(ROOT/'build/Shiur Player.exe'),str(ROOT/'build/launcher.go')],env=env,check=True)
