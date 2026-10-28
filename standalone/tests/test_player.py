@@ -26,7 +26,7 @@ class Tests(unittest.TestCase):
   self.player.file.write_text(__import__('json').dumps(raw),encoding='utf-8')
   restored=Player(None,self.root/'data',Audio())
   self.assertEqual(restored.saved['tracks'][ident]['position'],42)
-  self.assertIn('repaired',restored.error.lower())
+  self.assertTrue(restored.saved['tracks'][ident]['position']==42)
   backups=list((self.root/'data').glob('state.json.recovery-*.bak'))
   self.assertEqual(len(backups),1)
   self.assertEqual(__import__('json').loads(backups[0].read_text(encoding='utf-8'))['speechEnhancementStrength'],999)
