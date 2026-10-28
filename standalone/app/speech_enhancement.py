@@ -45,8 +45,9 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
     try:
         decoder = VLC()
         lib = decoder.lib
+        play_type = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint, ctypes.c_int64)
         lib.libvlc_audio_set_callbacks.restype = None
-        lib.libvlc_audio_set_callbacks.argtypes = [ctypes.c_void_p] * 7
+        lib.libvlc_audio_set_callbacks.argtypes = [ctypes.c_void_p, play_type, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
         lib.libvlc_audio_set_format.restype = None
         lib.libvlc_audio_set_format.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint, ctypes.c_uint]
         writer = wave.open(str(output), 'wb')
@@ -60,10 +61,9 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
             except BaseException as error:
                 callback_errors.append(error)
         decoder.load(source)
-        play_fn = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint, ctypes.c_int64)(play_callback)
+        play_fn = play_type(play_callback)
+        lib.libvlc_audio_set_callbacks(decoder.player, play_fn, None, None, None, None, None)
         lib.libvlc_audio_set_format(decoder.player, b'S16N', 16000, 1)
-        lib.libvlc_audio_set_callbacks(decoder.player, ctypes.cast(play_fn, ctypes.c_void_p),
-                                       None, None, None, None, None)
         decoder.play()
         started = time.monotonic()
         while True:
@@ -91,7 +91,7 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
     if callback_errors:
         raise RuntimeError("VLC failed while writing converted audio.") from callback_errors[0]
     if not output.is_file() or output.stat().st_size <= 44:
-        raise RuntimeError("VLC could not convert this recording for speech enhancement.")
+        raise RuntimeError(f"VLC could not convert this recording for speech enhancement (samples captured: {written_samples[0]}).")
     if not _is_supported_wav(output):
         raise RuntimeError("The local converter did not produce the expected 16 kHz mono WAV.")
     _report(progress, 10)
