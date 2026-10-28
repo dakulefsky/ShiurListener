@@ -380,14 +380,12 @@ class FloatingBar:
    if not isinstance(size,list) or len(size)!=2 or not all(isinstance(v,int) for v in size):size=list(DEFAULT_SIZE)
    bar_width=max(MIN_SIZE[0],size[0]);bar_height=max(MIN_SIZE[1],size[1])
    expanded_size=[bar_width,bar_height]
-   if collapsed:bar_width,bar_height=COLLAPSED_SIZE
+   if collapsed:bar_width,bar_height=collapsed_size
    left,top,width,height=work_area((x,y))
    if width>0 and height>0:
     bar_width=min(bar_width,max(1,width));bar_height=min(bar_height,max(1,height))
     x=max(left,min(x,left+max(0,width-bar_width)));y=max(top,min(y,top+max(0,height-bar_height)))
    # Frameless popup: custom hit targets retain resizing without a Windows title bar.
-   if collapsed:
-    bar_width,bar_height=collapsed_size
    # Keep WS_THICKFRAME in both modes; custom hit testing supplies the resize edges.
    self.hwnd=create(0x08000088,name,'Shiur Player Mini',FRAMELESS_STYLE,x,y,bar_width,bar_height,None,None,instance,None)
    if not self.hwnd:raise OSError(ctypes.get_last_error(),'Could not create floating bar.')
