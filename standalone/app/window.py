@@ -2,7 +2,7 @@
 import queue,sys,threading,pathlib
 from rendering import rounded_png,icon_png
 from version import APP_VERSION
-import updater,profile_backup,hotkeys
+import updater,profile_backup,hotkeys,speech_enhancement
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from controller import clock
@@ -213,7 +213,7 @@ class SoftButton(tk.Canvas):
 
 class PlayerWindow:
  def __init__(self,player,library,shortcuts):
-  self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False;self.update_busy=False;self.queue_window=None;self.tools_window=None;self.last_volume=1;self.dock_collapsed=bool(player.saved.get('mainDockCollapsed',False))
+  self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False;self.update_busy=False;self.speech_job=None;self.queue_window=None;self.tools_window=None;self.last_volume=1;self.dock_collapsed=bool(player.saved.get('mainDockCollapsed',False))
   global FONT
   self.root=tk.Tk();self.root.title(TITLE);self.root.configure(bg=BG)
   if sys.platform=='win32':
@@ -576,7 +576,7 @@ class PlayerWindow:
   self.button(row,'Export backup…',self.export_backup).pack(side='left');self.button(row,'Restore backup…',self.restore_backup).pack(side='left',padx=8)
   self.label(pop,'Includes positions, collections and bookmarks. Audio stays in its folder.',9,MUTED,justify='left').pack(anchor='w',fill='x',padx=24,pady=12)
  def audio_settings(self):
-  pop=tk.Toplevel(self.root);pop.title('Audio enhancements');pop.geometry('600x610');pop.minsize(560,570);pop.configure(bg=BG);pop.transient(self.root)
+  pop=tk.Toplevel(self.root);pop.title('Audio enhancements');pop.geometry('600x720');pop.minsize(560,680);pop.configure(bg=BG);pop.transient(self.root)
   self.label(pop,'Make speech easier to hear',20).pack(anchor='w',padx=24,pady=(18,4))
   self.label(pop,'Adjust the sound for quiet, muffled shiurim. Changes apply immediately and are saved automatically.',10,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(0,12))
   initial=self.player.saved.get('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0})
@@ -604,9 +604,60 @@ class PlayerWindow:
    scale=ModernScale(pop,from_=-6,to=6,value=var.get(),command=lambda value,n=name:(values[n].set(float(value)),readouts[n].configure(text=f'{float(value):+.1f} dB'),apply()),dark=False)
    scale.configure(width=500);scale.pack(fill='x',padx=24,pady=(0,4));scales[name]=scale
   self.label(pop,'Tip: start with Speech clarity. If the voice sounds thin or sharp, lower Speech presence or raise Voice body slightly.',10,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(10,8))
-  self.label(pop,'This equalizer reshapes tone; it does not yet separate a rav’s voice from music or remove noise using AI.',9,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(0,8))
+  self.label(pop,'The equalizer reshapes tone; it does not remove noise or separate competing voices.',9,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(0,12))
+  self.label(pop,'OFFLINE SPEECH ENHANCEMENT',9,MUTED).pack(anchor='w',padx=24,pady=(2,6))
+  self.label(pop,'Create a cleaned copy using the local speech model. It can reduce background noise and some competing voices. Your original recording is never changed.',10,MUTED,wraplength=540,justify='left').pack(anchor='w',padx=24,pady=(0,8))
+  self.button(pop,'Enhance current shiur…',lambda:(pop.destroy(),self.speech_enhancement_dialog())).pack(anchor='w',padx=24,pady=(0,10))
   self.button(pop,'Done',pop.destroy,True).pack(anchor='e',padx=24,pady=(0,16))
   self.audio_controls={'popup':pop,'values':values,'scales':scales,'preset':set_preset,'apply':apply}
+ def speech_enhancement_dialog(self):
+  if self.speech_job and self.speech_job.get('busy'):
+   messagebox.showinfo('Speech enhancement','An enhancement is already running. Cancel or wait for it to finish.',parent=self.root);return
+  ident=self.player.saved.get('currentId')
+  source=self.player.paths.get(ident)
+  if not ident or source is None:
+   messagebox.showinfo('Speech enhancement','Play or select a shiur first, then open Audio enhancements.',parent=self.root);return
+  output=self.player.speech_cache_path(ident)
+  pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry('540x300');pop.minsize(500,280);pop.configure(bg=BG);pop.transient(self.root)
+  self.label(pop,'Make this shiur easier to hear',18).pack(anchor='w',padx=24,pady=(22,6))
+  self.label(pop,'The player processes a separate copy on this computer. It may reduce hiss, hum and some background voices; results depend on the recording.',10,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,12))
+  self.label(pop,'Original audio is never overwritten. Processing can take a while for long recordings.',9,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,12))
+  status=self.label(pop,'Enhanced copy is ready.' if output and output.is_file() else 'Ready to process the current shiur.',10,INK,wraplength=490,justify='left');status.pack(anchor='w',padx=24,pady=(0,8))
+  progress=ttk.Progressbar(pop,maximum=100,mode='determinate');progress.pack(fill='x',padx=24,pady=(0,14))
+  row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=24,pady=(0,18))
+  cancel_button=self.button(row,'Close',pop.destroy);cancel_button.pack(side='right',padx=(8,0))
+  self.button(row,'Use original audio',lambda:self.safe(lambda:(self.command('speech_enhancement_enabled',value=False),status.configure(text='Original audio is active.')))).pack(side='right',padx=(8,0))
+  start_button=self.button(row,'Use enhanced copy' if output and output.is_file() else 'Enhance current shiur',lambda:None,True);start_button.pack(side='left')
+  job={'track_id':ident,'source':pathlib.Path(source),'output':output,'popup':pop,'status':status,'progress':progress,'start_button':start_button,'cancel_button':cancel_button,'busy':False,'cancel':None,'start':None}
+  def use_enhanced():
+   self.safe(lambda:self.command('speech_enhancement_enabled',value=True))
+   if pop.winfo_exists():status.configure(text='Enhanced audio is enabled when a processed copy is available.')
+  def cancel_or_close():
+   current=self.speech_job
+   if current is job and job['busy']:
+    job['cancel'].set();status.configure(text='Cancelling…');cancel_button.configure(state='disabled')
+   else:
+    pop.destroy()
+  def start():
+   if job['busy']:return
+   if job['output'] and job['output'].is_file():
+    use_enhanced();return
+   job['busy']=True;job['cancel']=threading.Event();self.speech_job=job
+   start_button.configure(state='disabled',text='Enhancing…')
+   cancel_button.configure(text='Cancel',command=cancel_or_close,state='normal')
+   progress['value']=0;status.configure(text='Preparing audio locally…')
+   def work():
+    try:
+     speech_enhancement.enhance_file(job['source'],job['output'],pathlib.Path(__file__).resolve().parent,job['cancel'],lambda value:self.requests.put(('speech_progress',value)))
+     self.requests.put(('speech_done',(job['track_id'],str(job['output']))))
+    except speech_enhancement.EnhancementCancelled:
+     self.requests.put(('speech_cancelled',None))
+    except Exception as error:
+     self.requests.put(('speech_error',str(error)))
+   threading.Thread(target=work,daemon=True).start()
+  job['start']=start;start_button.configure(command=start);cancel_button.configure(command=cancel_or_close)
+  pop.protocol('WM_DELETE_WINDOW',cancel_or_close)
+  if self.speech_job is None:self.speech_job=job
  def edit_shortcuts(self):
   path=self.player.data_dir/'hotkeys.json'
   draft=hotkeys.load_config(path)
