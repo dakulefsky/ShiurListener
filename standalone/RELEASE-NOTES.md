@@ -2,4 +2,8 @@
 
 Fixes startup when an existing saved profile contains a setting or value the current build cannot validate. Before attempting recovery, the app makes a byte-for-byte backup named `state.json.recovery-YYYYMMDD-HHMMSS.bak` beside the original profile. It then recovers individually valid settings and shiur positions, leaving malformed entries out rather than resetting the entire library. If the JSON itself is damaged, the complete original remains in the recovery backup.
 
-Existing listening positions and settings are preserved wherever they can be safely validated. This release does not delete or overwrite the original recovery copy.
+Adds optional **offline speech enhancement**. From Settings → Audio enhancements, choose **Enhance current shiur** to create a separate cleaned copy using a local CPU model. Choose a suppression strength from gentle to strong. Processing runs in the background, shows progress, can be cancelled, and works without a cloud service or runtime model download. Enhanced copies are cached separately; the original recording is never overwritten, and **Use original audio** switches back while preserving the listening position.
+
+The enhancement can reduce hiss, hum, and some competing voices, but results depend on the recording. It is not guaranteed vocal/music separation and cannot restore speech that was not captured. Existing EQ presets remain available. The optional model/runtime and its license/dataset notices are bundled with the installer.
+
+Includes the mini-player resizing, responsive controls, and hover-to-scrub improvements. Existing listening positions, collections, bookmarks and audio files are preserved.
