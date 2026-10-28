@@ -154,6 +154,8 @@ class Tests(unittest.TestCase):
                 import_profile(self.player, self.backup)
         self.assertEqual(self.player.saved, before)
         self.assertEqual(json.loads(self.player.file.read_text()), before)
+        self.assertEqual(self.player.active, active_before)
+        self.assertEqual(self.backend.status, 'playing')
         self.assertEqual(len(list(self.player.data_dir.glob('state-before-restore-*.json'))), 1)
 
 
