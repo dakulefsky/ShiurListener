@@ -78,10 +78,15 @@ def download_vlc_callback_assets():
   'runtime/vlc/libvlc.dll':'vlc-3.0.24/libvlc.dll',
   'runtime/vlc/libvlccore.dll':'vlc-3.0.24/libvlccore.dll',
   'runtime/vlc/plugins/audio_output/libamem_plugin.dll':'vlc-3.0.24/plugins/audio_output/libamem_plugin.dll',
+  'runtime/vlc/plugins/stream_out/libstream_out_transcode_plugin.dll':'vlc-3.0.24/plugins/stream_out/libstream_out_transcode_plugin.dll',
+  'runtime/vlc/plugins/stream_out/libstream_out_standard_plugin.dll':'vlc-3.0.24/plugins/stream_out/libstream_out_standard_plugin.dll',
+  'runtime/vlc/plugins/mux/libmux_wav_plugin.dll':'vlc-3.0.24/plugins/mux/libmux_wav_plugin.dll',
+  'runtime/vlc/plugins/access_output/libaccess_output_file_plugin.dll':'vlc-3.0.24/plugins/access_output/libaccess_output_file_plugin.dll',
+  'runtime/vlc/plugins/codec/libaraw_plugin.dll':'vlc-3.0.24/plugins/codec/libaraw_plugin.dll',
  }
  with zipfile.ZipFile(__import__('io').BytesIO(payload)) as archive:
   assets={target:archive.read(source) for target,source in files.items()}
- print('Verified official VLC 3.0.24 core and audio-memory callback plugin.',flush=True)
+ print('Verified official VLC 3.0.24 core, audio-memory, and offline-transcode plugins.',flush=True)
  return assets
 def git(*args):subprocess.run(['git',*args],cwd=REPO,check=True)
 def build():
