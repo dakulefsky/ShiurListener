@@ -195,6 +195,59 @@ def main():
             f"by at least 0.5 dB (best gain {best_gain:.2f} dB)."
         )
 
+        # A second noise profile checks that the result is not limited to white
+        # noise: combine a low-frequency 60 Hz hum with broadband noise at a
+        # comparable input SNR. This remains a controlled lab test, not a real
+        # room recording or a substitute for listening to shiurim.
+        hum_source = root / "human-speech-hum-noisy.wav"
+        rng = random.Random(20261030)
+        raw_noise = [
+            0.7 * math.sin(2 * math.pi * 60 * i / 16000) + 0.7 * rng.gauss(0, 1)
+            for i in range(len(clean))
+        ]
+        noise_rms = rms(raw_noise)
+        clean_rms = rms(clean)
+        noise_scale = clean_rms / (10 ** (1.5 / 20)) / max(noise_rms, 1e-12)
+        hum_noisy = [max(-0.98, min(0.98, x + noise_scale * n))
+                     for x, n in zip(clean, raw_noise)]
+        write_float(hum_source, hum_noisy)
+        hum_input_snr = snr_db(clean, hum_noisy)
+        hum_gains = []
+        hum_original = hum_source.read_bytes()
+        for strength in (20, 35, 50):
+            output = root / f"human-hum-enhanced-{strength}.wav"
+            started = time.monotonic()
+            speech_enhancement.enhance_file(
+                hum_source, output, app, strength_db=strength
+            )
+            elapsed = time.monotonic() - started
+            processed, params = read_float(output)
+            assert params.nchannels == 1 and params.sampwidth == 2 and params.framerate == 16000
+            assert len(processed) == len(clean), f"hum strength {strength}: frame count changed"
+            assert hum_source.read_bytes() == hum_original, "hum-noisy source recording was modified"
+            assert all(math.isfinite(x) for x in processed), "hum output contains non-finite samples"
+            aligned_clean, aligned_processed, lag = align_for_diagnostic(clean, processed)
+            aligned_noisy = hum_noisy[-lag:] if lag < 0 else (
+                hum_noisy[:-lag] if lag > 0 else hum_noisy
+            )
+            aligned_input_snr = snr_db(aligned_clean, aligned_noisy)
+            aligned_output_snr = snr_db(aligned_clean, aligned_processed)
+            gain = aligned_output_snr - aligned_input_snr
+            hum_gains.append(gain)
+            print(
+                f"HUM_SPEECH strength={strength} elapsed={elapsed:.2f}s "
+                f"input_snr={hum_input_snr:.2f}dB aligned_input_snr={aligned_input_snr:.2f}dB "
+                f"aligned_output_snr={aligned_output_snr:.2f}dB gain={gain:.2f}dB "
+                f"estimated_lag={lag}samples",
+                flush=True,
+            )
+        best_hum_gain = max(hum_gains)
+        print(f"HUM_SPEECH best_aligned_snr_gain={best_hum_gain:.2f}dB", flush=True)
+        assert best_hum_gain >= 0.5, (
+            f"Speech enhancement did not improve delay-aligned SNR with hum plus broadband noise "
+            f"by at least 0.5 dB (best gain {best_hum_gain:.2f} dB)."
+        )
+
         long_source = root / "long-synthetic.wav"
         long_clean, long_noisy = make_synthetic_signal(long_source, 60)
         long_output = root / "long-enhanced.wav"
