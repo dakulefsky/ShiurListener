@@ -155,7 +155,7 @@ class FloatingBar:
    nonlocal hover_origin,hover_left
    if mode_change:
     # Replacing GWL_STYLE must retain WS_VISIBLE or Windows hides every child.
-    style=(0x82000000 if collapsed else FRAMELESS_STYLE)|(0x10000000 if visible else 0)
+    style=FRAMELESS_STYLE|(0x10000000 if visible else 0)
     setstyle(self.hwnd,-16,ctypes.c_int32(style).value)
    hover_size=collapsed_hover_size()
    size=(hover_size if hovered else collapsed_size) if collapsed else expanded_size
