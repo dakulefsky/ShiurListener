@@ -60,13 +60,13 @@ def smoke_test_hush(assets,test_conversion=False):
    if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or abs(audio.getnframes()-16000*(10 if test_conversion else 2))>320:
     raise ValueError('Hush native runtime smoke test produced invalid audio.')
  print('Hush native runtime loaded the model and processed audio successfully.',flush=True)
-VLC_PLUGIN_URL='https://download.videolan.org/pub/videolan/vlc/3.0.24/win64/vlc-3.0.24-win64.zip'
+VLC_PLUGIN_URL='https://get.videolan.org/vlc/3.0.24/win64/vlc-3.0.24-win64.zip'
 VLC_PLUGIN_SIZE=82765861
 VLC_PLUGIN_SHA256='93d34578352c50936da35c01e7f358a9b36395b350ee44096f2d3837f42a08a9'
 def download_vlc_callback_assets():
  with urllib.request.urlopen(VLC_PLUGIN_URL,timeout=180) as response:payload=response.read()
  if len(payload)!=VLC_PLUGIN_SIZE or hashlib.sha256(payload).hexdigest()!=VLC_PLUGIN_SHA256:
-  raise ValueError('Official VideoLAN VLC 3.0.24 archive checksum mismatch.')
+  raise ValueError(f'Official VideoLAN VLC 3.0.24 archive checksum mismatch: bytes={len(payload)}, sha256={hashlib.sha256(payload).hexdigest()}.')
  files={
   'runtime/vlc/libvlc.dll':'vlc-3.0.24/libvlc.dll',
   'runtime/vlc/libvlccore.dll':'vlc-3.0.24/libvlccore.dll',
