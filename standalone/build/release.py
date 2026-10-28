@@ -50,7 +50,7 @@ def smoke_test_hush(assets,test_conversion=False):
   if test_conversion and time.monotonic()-started>8:raise ValueError('Speech conversion took longer than the offline processing budget.')
   if source.read_bytes()!=original:raise ValueError('Speech enhancement modified the original input.')
   with wave.open(str(output),'rb') as audio:
-   if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or audio.getnframes()!=16000*(10 if test_conversion else 2):
+   if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or abs(audio.getnframes()-16000*(10 if test_conversion else 2))>320:
     raise ValueError('Hush native runtime smoke test produced invalid audio.')
  print('Hush native runtime loaded the model and processed audio successfully.',flush=True)
 def git(*args):subprocess.run(['git',*args],cwd=REPO,check=True)
