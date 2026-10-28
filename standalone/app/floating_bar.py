@@ -1,7 +1,7 @@
 """Compact, resizable Win32 transport; only changed controls are repainted."""
 import ctypes,sys,threading,pathlib,time
 
-MIN_SIZE=(300,140)
+MIN_SIZE=(250,112)
 FRAMELESS_STYLE=0x82040000 # popup, clip children, resize frame; no caption
 DEFAULT_SIZE=(360,150)
 COLLAPSED_SIZE=(164,56)
@@ -27,7 +27,7 @@ def color(value,fallback):
  except ValueError:return color(fallback,fallback)
  return r|(g<<8)|(b<<16)
 
-def layout(width,height,collapsed=False,hovered=False,hover_left=False,collapsed_width=None):
+def layout(width,height,collapsed=False,hovered=False,hover_left=False,collapsed_width=None,seek_hovered=False):
  """Client coordinates; title, transport, timing and a clickable progress strip."""
  if collapsed:
   # Keep transport large and stable; stack expand/close in a dedicated right rail.
@@ -41,18 +41,18 @@ def layout(width,height,collapsed=False,hovered=False,hover_left=False,collapsed
     bounds.update({101:(10,10,44,max(30,height-20)),103:(58,10,44,max(30,height-20))})
    else:bounds.update({101:(base_width+4,10,40,max(30,height-20)),103:(base_width+50,10,40,max(30,height-20))})
   return bounds
- width=max(270,width);height=max(96,height);pad=14;gap=8
+ width=max(250,width);height=max(112,height);pad=14;gap=8
  available=width-2*pad-3*gap;back=int(available*.19);play=int(available*.32);speed=available-2*back-play
- row_height=max(26,min(44,height-74));bottom=height-34
- return {100:(pad,6,width-148,22),108:(width-112,4,30,24),105:(width-76,4,30,24),109:(width-40,4,30,24),
+ row_height=max(26,min(44,height-74));bottom=height-38
+ return {100:(pad,6,width-148,22),108:(width-112,8,30,22),105:(width-76,8,30,22),109:(width-40,8,30,22),
          101:(pad,34,back,row_height),102:(pad+back+gap,34,play,row_height),
          103:(pad+back+play+2*gap,34,back,row_height),106:(width-pad-speed,34,speed,row_height),
-         104:(pad,bottom,width-2*pad,20),107:(pad,height-10,width-2*pad,8)}
+         104:(pad,bottom,width-2*pad,20),107:(pad,height-16,width-2*pad,8)} | ({110:(pad,bottom,width-2*pad,20)} if seek_hovered else {})
 
-def hit_test(x,y,width,height,collapsed=False,hovered=False,hover_left=False,collapsed_width=None):
+def hit_test(x,y,width,height,collapsed=False,hovered=False,hover_left=False,collapsed_width=None,seek_hovered=False):
  """Return HTCLIENT over controls so Windows can route clicks to child buttons."""
- for ident,(left,top,w,h) in layout(width,height,collapsed,hovered,hover_left,collapsed_width).items():
-  if ident in (101,102,103,105,106,107,108,109) and left<=x<left+w and top<=y<top+h:return 1
+ for ident,(left,top,w,h) in layout(width,height,collapsed,hovered,hover_left,collapsed_width,seek_hovered).items():
+  if ident in (101,102,103,105,106,107,108,109,110) and left<=x<left+w and top<=y<top+h:return 1
  left=x<6;right=x>=width-6;top=y<6;bottom=y>=height-6
  if top and left:return 13
  if top and right:return 14
@@ -146,7 +146,7 @@ class FloatingBar:
   controls={};labels={101:'−15',102:'Play',103:'+15',105:'Open',106:'1x',108:'−',109:'Close mini player'};palette={};resources=[];font=None
   progress_ratio=0.;last_progress=None;hot_control=None
   texts={};enabled={};visible=self.player.saved.get('floatingVisible',False)
-  collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE);hovered=False;hover_intent=HoverIntent();sizing=False;hover_origin=None;last_layout=None;hover_left=False
+  collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE);hovered=False;seek_hovered=False;hover_intent=HoverIntent();sizing=False;hover_origin=None;last_layout=None;hover_left=False
   collapsed_size=self.player.saved.get('floatingCollapsedSize',list(COLLAPSED_SIZE))
   if not isinstance(collapsed_size,list) or len(collapsed_size)!=2 or not all(isinstance(v,int) for v in collapsed_size):collapsed_size=list(COLLAPSED_SIZE)
   collapsed_size=[max(COLLAPSED_MIN_SIZE[i],min(collapsed_size[i],2000)) for i in range(2)]
@@ -174,11 +174,11 @@ class FloatingBar:
    nonlocal last_progress,last_layout
    if not self.hwnd:return
    rect=w.RECT();clientrect(self.hwnd,ctypes.byref(rect))
-   signature=(rect.right,rect.bottom,collapsed,hovered,hover_left)
+   signature=(rect.right,rect.bottom,collapsed,hovered,hover_left,seek_hovered)
    if signature==last_layout:return
    last_layout=signature
-   bounds=layout(rect.right,rect.bottom,collapsed,hovered,hover_left,collapsed_size[0])
-   for ident,handle in controls.items():show(handle,5 if ident in bounds else 0)
+   bounds=layout(rect.right,rect.bottom,collapsed,hovered,hover_left,collapsed_size[0],seek_hovered)
+   for ident,handle in controls.items():show(handle,0 if ident==104 and seek_hovered else 5 if ident in bounds else 0)
    for ident,(x,y,width,height) in bounds.items():
     if ident in controls:move(controls[ident],x,y,width,height,True)
    # Windows 11 supplies antialiased corners; older Windows gets a rounded region.
@@ -189,7 +189,7 @@ class FloatingBar:
     if clip and not setregion(self.hwnd,clip,True):delete(clip)
    last_progress=None
   def update():
-   nonlocal palette,font,current_family,progress_ratio,last_progress,hot_control
+   nonlocal palette,font,current_family,progress_ratio,last_progress,hot_control,seek_hovered
    with self.player.lock:state=self.player.snapshot();tracks=self.player.tracks;desired_palette=dict(self.player.saved.get('floatingTheme',{}))
    next_hot=None
    if visible:
@@ -198,8 +198,20 @@ class FloatingBar:
      local=w.POINT(point.x,point.y)
      if screenclient(self.hwnd,ctypes.byref(local)):
       rect=w.RECT();clientrect(self.hwnd,ctypes.byref(rect))
-      for ident,(x,y,width,height) in layout(rect.right,rect.bottom,collapsed,hovered,hover_left).items():
+      current_layout=layout(rect.right,rect.bottom,collapsed,hovered,hover_left,collapsed_size[0],seek_hovered)
+      time_bounds=current_layout.get(104)
+      next_seek=bool(not collapsed and time_bounds and time_bounds[0]<=local.x<time_bounds[0]+time_bounds[2] and time_bounds[1]<=local.y<time_bounds[1]+time_bounds[3])
+      if next_seek!=seek_hovered:
+       seek_hovered=next_seek;resize()
+       current_layout=layout(rect.right,rect.bottom,collapsed,hovered,hover_left,collapsed_size[0],seek_hovered)
+      for ident,(x,y,width,height) in current_layout.items():
        if ident in labels and x<=local.x<x+width and y<=local.y<y+height:next_hot=ident;break
+      scrub=current_layout.get(110)
+      if not collapsed and scrub and scrub[0]<=local.x<scrub[0]+scrub[2] and scrub[1]<=local.y<scrub[1]+scrub[3] and (keystate(1)&0x8000):
+       with self.player.lock:
+        seek_state=self.player.snapshot()
+        if seek_state.get('currentId') and seek_state.get('duration',0)>0:
+         self.player.command({'op':'seek','value':max(0,min(1,(local.x-scrub[0])/max(1,scrub[2])))*seek_state['duration']})
    if next_hot!=hot_control:
     for ident in (hot_control,next_hot):
      if ident in controls:invalidate(controls[ident],None,False)
@@ -244,7 +256,7 @@ class FloatingBar:
      rect=w.RECT();getrect(hwnd,ctypes.byref(rect))
      x=ctypes.c_short(lp&0xffff).value-rect.left;y=ctypes.c_short((lp>>16)&0xffff).value-rect.top
      client=w.RECT();clientrect(hwnd,ctypes.byref(client))
-     return hit_test(x,y,client.right,client.bottom,collapsed,hovered,hover_left,collapsed_size[0])
+     return hit_test(x,y,client.right,client.bottom,collapsed,hovered,hover_left,collapsed_size[0],seek_hovered)
     if msg==0x0005:resize();return 0
     if msg==0x0231:sizing=True;return 0
     if msg==0x0232:
@@ -321,14 +333,21 @@ class FloatingBar:
      setbg(wp,1);setcolor(wp,color(palette.get('onSurface'),'#242332'));return resources[0] if resources else 0
     if msg==0x002B:
      item=ctypes.cast(lp,ctypes.POINTER(DRAWITEM)).contents;primary=item.id==102
-     if item.id==107:
+     if item.id in (107,110):
       if resources:fill(item.dc,ctypes.byref(item.rect),resources[0])
       middle=(item.rect.top+item.rect.bottom)//2
-      track=w.RECT(item.rect.left,middle-2,item.rect.right,middle+2)
+      thickness=4 if item.id==110 else 2
+      track=w.RECT(item.rect.left+2,middle-thickness//2,item.rect.right-2,middle+(thickness+1)//2)
       background=brush(color(palette.get('surfaceContainer'),'#E9EAF0'));fill(item.dc,ctypes.byref(track),background);delete(background)
+      track_width=max(0,track.right-track.left)
       if progress_ratio>0:
-       track.right=track.left+round((track.right-track.left)*progress_ratio)
+       track.right=track.left+round(track_width*progress_ratio)
        foreground=brush(color(palette.get('primary'),'#6558D3'));fill(item.dc,ctypes.byref(track),foreground);delete(foreground)
+      if item.id==110:
+       center=item.rect.left+2+round(track_width*progress_ratio)
+       thumb_color=color(palette.get('primary'),'#6558D3');thumb=brush(thumb_color);pen=penfn(0,1,thumb_color);oldb=select(item.dc,thumb);oldp=select(item.dc,pen)
+       roundrect(item.dc,center-4,middle-7,center+4,middle+7,8,8)
+       select(item.dc,oldp);select(item.dc,oldb);delete(pen);delete(thumb)
       return 1
      active=item.id==hot_control or bool(item.state&1)
      shade=color(palette.get('primary') if primary else palette.get('surfaceContainer' if active else 'surface'),'#6558D3' if primary else '#E9EAF0' if active else '#F7F7FA')
@@ -392,6 +411,7 @@ class FloatingBar:
    for ident in (100,104):controls[ident]=create(0,'STATIC','',0x50004000,0,0,1,1,self.hwnd,ident,instance,None)
    # SS_OWNERDRAW | SS_NOTIFY: clickable, without claiming a keyboard tab stop.
    controls[107]=create(0,'STATIC','Seek position',0x5000010D,0,0,1,1,self.hwnd,107,instance,None)
+   controls[110]=create(0,'STATIC','Scrub position',0x5000010D,0,0,1,1,self.hwnd,110,instance,None)
    for ident,text in labels.items():controls[ident]=create(0,'BUTTON',text,0x5001000B,0,0,1,1,self.hwnd,ident,instance,None)
    if not all(controls.values()):raise RuntimeError('Could not create floating controls.')
    for handle in controls.values():send(handle,0x0030,font,1)
