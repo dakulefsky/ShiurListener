@@ -43,7 +43,7 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
     callback_errors = []
     written_samples = [0]
     try:
-        decoder = VLC(options=['--aout=dummy'])
+        decoder = VLC()
         lib = decoder.lib
         lib.libvlc_audio_set_callbacks.restype = None
         lib.libvlc_audio_set_callbacks.argtypes = [ctypes.c_void_p] * 7
@@ -61,9 +61,9 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
                 callback_errors.append(error)
         decoder.load(source)
         play_fn = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint, ctypes.c_int64)(play_callback)
+        lib.libvlc_audio_set_format(decoder.player, b'S16N', 16000, 1)
         lib.libvlc_audio_set_callbacks(decoder.player, ctypes.cast(play_fn, ctypes.c_void_p),
                                        None, None, None, None, None)
-        lib.libvlc_audio_set_format(decoder.player, b'S16N', 16000, 1)
         decoder.play()
         started = time.monotonic()
         while True:
