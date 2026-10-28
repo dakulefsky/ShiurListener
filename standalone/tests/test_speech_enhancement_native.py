@@ -101,6 +101,34 @@ def rms(values):
     return math.sqrt(sum(x*x for x in values) / max(1, len(values)))
 
 
+def align_for_diagnostic(reference, observed, max_lag=5120, stride=16):
+    """Estimate coarse global delay so a buffering offset is not mistaken for noise."""
+    ref = reference[::stride]
+    obs = observed[::stride]
+    radius = max_lag // stride
+    best_lag, best_score = 0, float("-inf")
+    for lag in range(-radius, radius + 1):
+        if lag < 0:
+            left, right = ref[-lag:], obs[:len(obs) + lag]
+        elif lag > 0:
+            left, right = ref[:-lag], obs[lag:]
+        else:
+            left, right = ref, obs
+        n = min(len(left), len(right))
+        if n < len(ref) // 2:
+            continue
+        score = sum(left[i] * right[i] for i in range(n))
+        if score > best_score:
+            best_lag, best_score = lag, score
+    lag_samples = best_lag * stride
+    if lag_samples < 0:
+        return reference[-lag_samples:], observed[:len(observed) + lag_samples], lag_samples
+    if lag_samples > 0:
+        return reference[:-lag_samples], observed[lag_samples:], lag_samples
+    n = min(len(reference), len(observed))
+    return reference[:n], observed[:n], 0
+
+
 def main():
     release = runpy.run_path(str(ROOT / "build" / "release.py"))
     assets = release["download_hush_assets"]()
@@ -142,10 +170,13 @@ def main():
             assert clipped < 0.01, f"unexpected clipping at strength {strength}: {clipped:.2%}"
             assert rms(processed) > 0.001, f"output unexpectedly silent at strength {strength}"
             output_snr = snr_db(clean, processed)
+            aligned_clean, aligned_processed, lag = align_for_diagnostic(clean, processed)
+            aligned_snr = snr_db(aligned_clean, aligned_processed)
             output_snrs.append(output_snr)
             print(
                 f"REAL_SPEECH strength={strength} duration=12s elapsed={elapsed:.2f}s "
                 f"input_snr={input_snr:.2f}dB output_snr={output_snr:.2f}dB "
+                f"aligned_snr={aligned_snr:.2f}dB estimated_lag={lag}samples "
                 f"input_rms={rms(noisy):.4f} output_rms={rms(processed):.4f} clipped={clipped:.4%}",
                 flush=True,
             )
