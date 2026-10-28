@@ -19,7 +19,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,6 +46,9 @@ jobs:
       - name: Measure native speech enhancement quality and long-file performance
         if: runner.os == 'Windows'
         run: python standalone/tests/test_speech_enhancement_native.py
+      - name: Profile VLC conversion versus native denoising on a 60-second source
+        if: runner.os == 'Windows'
+        run: python standalone/tests/profile_speech_conversion.py
       - name: Upload speech enhancement listening samples
         if: runner.os == 'Windows' && always()
         uses: actions/upload-artifact@v4
