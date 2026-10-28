@@ -662,6 +662,7 @@ class PlayerWindow:
   output=self.player.speech_cache_path(ident)
   pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry('540x300');pop.minsize(500,280);pop.configure(bg=BG);pop.transient(self.root)
   self.label(pop,'Make this shiur easier to hear',18).pack(anchor='w',padx=24,pady=(22,6))
+  self.label(pop,f'Current recording: {source.name}',10,INK,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,8))
   self.label(pop,'The player processes a separate copy on this computer. It may reduce hiss, hum and some background voices; results depend on the recording.',10,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,12))
   self.label(pop,'Original audio is never overwritten. Processing can take a while for long recordings.',9,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,12))
   status=self.label(pop,'Enhanced copy is ready.' if output and output.is_file() else 'Ready to process the current shiur.',10,INK,wraplength=490,justify='left');status.pack(anchor='w',padx=24,pady=(0,8))
