@@ -1,5 +1,5 @@
 """Build, stage and publish a standalone release using the verified prior runtime."""
-import argparse,array,hashlib,json,math,os,pathlib,re,runpy,shutil,subprocess,sys,tempfile,urllib.request,wave,zipfile
+import argparse,array,hashlib,json,math,os,pathlib,re,runpy,shutil,subprocess,sys,tempfile,time,urllib.request,wave,zipfile
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 REPO=ROOT.parent
 VERSION=runpy.run_path(str(ROOT/'app/version.py'))['APP_VERSION']
@@ -35,7 +35,7 @@ def smoke_test_hush(assets,test_conversion=False):
    vlc_source=ROOT/'app'/'runtime'/'vlc'
    if not (vlc_source/'libvlc.dll').is_file():raise ValueError('Verified VLC test runtime is missing libvlc.dll.')
    shutil.copytree(vlc_source,app/'runtime'/'vlc')
-   frames=44100*2
+   frames=44100*10
    samples=array.array('h',(round(4500*math.sin(2*math.pi*220*(i//2)/44100)) for i in range(frames*2)))
    rate=44100;channels=2
   else:
@@ -46,8 +46,9 @@ def smoke_test_hush(assets,test_conversion=False):
    audio.setnchannels(channels);audio.setsampwidth(2);audio.setframerate(rate);audio.writeframes(samples.tobytes())
   sys.path.insert(0,str(ROOT/'app'))
   from speech_enhancement import enhance_file
-  original=source.read_bytes()
+  original=source.read_bytes();started=time.monotonic()
   enhance_file(source,output,app)
+  if test_conversion and time.monotonic()-started>8:raise ValueError('Speech conversion took longer than the offline processing budget.')
   if source.read_bytes()!=original:raise ValueError('Speech enhancement modified the original input.')
   with wave.open(str(output),'rb') as audio:
    if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or audio.getnframes()!=32000:
