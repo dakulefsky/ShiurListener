@@ -38,8 +38,9 @@ def _is_supported_wav(path):
 
 def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
     from engine import VLC
-    destination = pathlib.Path(output).resolve().as_posix().replace('"', r'\\"')
-    sout = f'#transcode{{acodec=s16l,channels=1,samplerate=16000}}:std{{access=file,mux=wav,dst="{destination}"}}'
+    raw_output = pathlib.Path(output).with_suffix(".pcm")
+    destination = raw_output.resolve().as_posix().replace('"', r'\\"')
+    sout = f'#transcode{{acodec=s16l,channels=1,samplerate=16000}}:std{{access=file,mux=raw,dst="{destination}"}}'
     decoder = None
     try:
         decoder = VLC(options=['--aout=dummy'])
@@ -58,8 +59,8 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
             duration = state.get("duration", 0)
             if duration > 0 and progress:
                 try:
-                    written = output.stat().st_size if output.exists() else 0
-                    expected = max(1, round(duration * 16000 * 2) + 44)
+                    written = raw_output.stat().st_size if raw_output.exists() else 0
+                    expected = max(1, round(duration * 16000 * 2))
                     _report(progress, min(9, round(9 * written / expected)))
                 except OSError:
                     pass
@@ -67,8 +68,15 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
     finally:
         if decoder:
             decoder.close()
-    if not output.is_file() or output.stat().st_size <= 44:
+    if not raw_output.is_file() or raw_output.stat().st_size <= 0 or raw_output.stat().st_size % 2:
         raise RuntimeError("VLC could not convert this recording for speech enhancement.")
+    with raw_output.open('rb') as raw, wave.open(str(output), 'wb') as converted:
+        converted.setnchannels(1);converted.setsampwidth(2);converted.setframerate(16000)
+        while True:
+            chunk=raw.read(1024*1024)
+            if not chunk:break
+            converted.writeframesraw(chunk)
+    raw_output.unlink(missing_ok=True)
     if not _is_supported_wav(output):
         raise RuntimeError("The local converter did not produce the expected 16 kHz mono WAV.")
     _report(progress, 10)
