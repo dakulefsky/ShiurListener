@@ -19,7 +19,7 @@ def download_hush_assets():
   url=f'https://raw.githubusercontent.com/pulp-vision/Hush/{HUSH_TAG}/{source}'
   with urllib.request.urlopen(url,timeout=90) as response:data=response.read()
   if len(data)!=size:raise ValueError(f'Unexpected Hush asset size: {source}')
-  blob=hashlib.sha1(f'blob {len(data)}\\0'.encode()+data).hexdigest()
+  blob=hashlib.sha1(f'blob {len(data)}\0'.encode()+data).hexdigest()
   if blob!=expected_blob:raise ValueError(f'Hush asset identity mismatch: {source}')
   assets[target]=data
  print('Verified pinned Hush native runtime, model, license and dataset notice.',flush=True)
