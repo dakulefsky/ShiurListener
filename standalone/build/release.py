@@ -26,7 +26,8 @@ def download_hush_assets():
  return assets
 def smoke_test_hush(assets):
  with tempfile.TemporaryDirectory(prefix='shiur-hush-smoke-') as directory:
-  directory=pathlib.Path(directory);library=directory/'weya_nc.dll';model=directory/'model.tar.gz'
+  directory=pathlib.Path(directory);app=directory/'app';speech=app/'runtime'/'speech';speech.mkdir(parents=True)
+  library=speech/'weya_nc.dll';model=speech/'advanced_dfnet16k_model_best_onnx.tar.gz'
   library.write_bytes(assets['runtime/speech/weya_nc.dll'])
   model.write_bytes(assets['runtime/speech/advanced_dfnet16k_model_best_onnx.tar.gz'])
   source=directory/'input.wav';output=directory/'output.wav'
@@ -34,8 +35,10 @@ def smoke_test_hush(assets):
   with wave.open(str(source),'wb') as audio:
    audio.setnchannels(1);audio.setsampwidth(2);audio.setframerate(16000);audio.writeframes(samples.tobytes())
   sys.path.insert(0,str(ROOT/'app'))
-  from speech_enhancement import _process_wav
-  _process_wav(source,output,library,model,None,None)
+  from speech_enhancement import enhance_file
+  original=source.read_bytes()
+  enhance_file(source,output,app)
+  if source.read_bytes()!=original:raise ValueError('Speech enhancement modified the original input.')
   with wave.open(str(output),'rb') as audio:
    if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or audio.getnframes()!=len(samples):
     raise ValueError('Hush native runtime smoke test produced invalid audio.')
