@@ -18,6 +18,24 @@ class TestBar(unittest.TestCase):
    for left,right in zip(controls,controls[1:]):self.assertLess(left[0]+left[2],right[0])
    self.assertLessEqual(controls[0][1]+controls[0][3],bounds[104][1])
    self.assertLessEqual(bounds[104][1]+bounds[104][3],bounds[107][1])
+ def test_expanded_bar_can_shrink_and_keeps_resize_borders_clear(self):
+  self.assertEqual(module.MIN_SIZE,(250,112))
+  bounds=module.layout(*module.MIN_SIZE)
+  for ident,(x,y,w,h) in bounds.items():
+   self.assertGreater(w,0);self.assertGreater(h,0)
+   self.assertGreaterEqual(x,6);self.assertLessEqual(x+w,module.MIN_SIZE[0]-6)
+   self.assertGreaterEqual(y,6);self.assertLessEqual(y+h,module.MIN_SIZE[1]-6)
+  for point,target in [((125,1),12),((125,110),15),((1,56),10),((248,56),11)]:
+   self.assertEqual(module.hit_test(*point,*module.MIN_SIZE),target)
+
+ def test_hovering_time_replaces_it_with_a_drag_scrubber(self):
+  normal=module.layout(360,150)
+  hovered=module.layout(360,150,seek_hovered=True)
+  self.assertNotIn(110,normal)
+  self.assertEqual(hovered[110],normal[104])
+  x,y,w,h=hovered[110]
+  self.assertEqual(module.hit_test(x+w//2,y+h//2,360,150,seek_hovered=True),1)
+
  def test_frameless_edges_resize_and_empty_surface_drags(self):
   self.assertFalse(module.FRAMELESS_STYLE & 0x00C00000)
   for point,target in [((1,1),13),((359,1),14),((1,149),16),((359,149),17),((1,50),10),((359,50),11),((80,1),12),((80,149),15),((80,20),2)]:
