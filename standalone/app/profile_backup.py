@@ -48,7 +48,7 @@ def _validate(payload):
     state = payload.get('state')
     _require(isinstance(state, dict), 'saved profile is missing.')
     allowed = {'tracks', 'folders', 'bookmarks', 'currentId', 'queue', 'autoNext',
-               'speed', 'volume', 'skipSeconds', 'language', 'libraryRoot', 'audioEnhancement',
+               'speed', 'volume', 'skipSeconds', 'language', 'libraryRoot', 'audioEnhancement', 'speechEnhancementEnabled',
                'librarySort', 'librarySortDescending', 'floatingVisible', 'floatingCollapsed', 'mainDockCollapsed',
                'floatingPosition', 'floatingSize', 'windowSize', 'floatingTheme',
                'halfSpeedCycleMigration', 'miniOnMinimize', 'globalShortcuts', 'miniSpeedMiddle', 'miniSpeedCycleIndex'}
@@ -100,7 +100,7 @@ def _validate(payload):
         _require(_number(state['volume']) and state['volume'] <= 1, 'invalid volume.')
     if 'skipSeconds' in state:
         _require(type(state['skipSeconds']) is int and state['skipSeconds'] in (10, 15, 60), 'invalid skip interval.')
-    for key in ('autoNext', 'librarySortDescending', 'floatingVisible', 'floatingCollapsed', 'mainDockCollapsed', 'miniOnMinimize', 'globalShortcuts'):
+    for key in ('autoNext', 'librarySortDescending', 'floatingVisible', 'floatingCollapsed', 'mainDockCollapsed', 'miniOnMinimize', 'globalShortcuts', 'speechEnhancementEnabled'):
         if key in state:
             _require(type(state[key]) is bool, 'invalid ' + key + '.')
     for key in ('floatingPosition', 'floatingSize', 'windowSize'):
