@@ -435,7 +435,7 @@ class Tests(unittest.TestCase):
    entry=next(w for w in descendants(audio) if isinstance(w,window_module.SoftButton) and w.cget('text')=='Enhance current shiur…')
    entry.invoke();window.root.update()
    speech=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel' and child.title()=='Offline speech enhancement')
-   original=next(w for w in descendants(speech) if isinstance(w,window_module.SoftButton) and w.cget('text')=='Use original audio')
+   original=next(w for w in descendants(speech) if isinstance(w,window_module.SoftButton) and w.cget('text')=='Switch back to original')
    original.invoke();window.root.update()
    self.assertEqual(fixture.player.saved['speechEnhancementEnabled'],False)
    self.assertEqual(next(w for w in descendants(speech) if isinstance(w,window_module.tk.Label) and w.cget('text')=='Original audio is active.').cget('text'),'Original audio is active.')
