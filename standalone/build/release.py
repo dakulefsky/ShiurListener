@@ -139,6 +139,8 @@ def stage():
  shutil.copy2(ROOT/'build/release-metadata.json',qa/setup.replace('.exe','.json'))
  git('add','--sparse','-f',f'downloads/qa/{setup}',f'downloads/qa/{setup.replace(".exe",".json")}')
  git('commit','-m',f'Stage standalone {VERSION} installer for native Windows verification')
+ git('fetch','origin','main')
+ git('rebase','origin/main')
  git('push','origin','HEAD:main')
 def publish():
  metadata=json.loads((ROOT/'build/release-metadata.json').read_text(encoding='utf-8'))
