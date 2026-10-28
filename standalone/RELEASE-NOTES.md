@@ -1,7 +1,7 @@
-# Shiur Player 0.9.21
+# Shiur Player 0.9.22
 
-Fixes mini-player seek behavior so both the normal progress strip and the hover-to-scrub control respond to a click, not only a drag. Moves the collapsed mini-player's stacked expand/close controls farther from the right edge so they no longer block resizing from that side.
+Hardens the standalone player after a whole-app reliability audit. Fixes background updater download startup, preserves the language preference on startup and profile import, and makes profile restore safer so a failed profile write does not stop current playback.
 
-Fixes the Settings → Audio enhancements transition by opening the next dialog after the current click callback completes. Long settings labels now wrap responsively instead of being clipped in narrower windows. Mouse clicks no longer leave persistent keyboard-focus rings around custom buttons, switches, and sliders; keyboard navigation remains supported.
+Improves folder monitoring so a scan cannot switch the library back to an outdated folder after the user manually changes it. Normalizes natural-sort keys and adds regression coverage for these fixes.
 
-Existing listening positions, collections, bookmarks and original recordings are preserved. Offline speech enhancement remains optional and runs locally.
+Speech enhancement remains optional and runs locally. Existing listening positions, collections, bookmarks and original recordings are preserved.
