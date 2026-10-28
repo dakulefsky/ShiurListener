@@ -135,7 +135,7 @@ def _process_wav(source_path, output_path, library_path, model_path, cancel, pro
                         value = float(value)
                         if not math.isfinite(value):
                             value = 0.0
-                        cleaned.append(max(-32768, min(32767, round(max(-1.0, min(1.0, value)) * 32768)))
+                        cleaned.append(max(-32768, min(32767, round(max(-1.0, min(1.0, value)) * 32768))))
                     if sys.byteorder != "little":
                         cleaned.byteswap()
                     dst.writeframesraw(cleaned.tobytes())
