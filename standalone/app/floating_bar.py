@@ -178,7 +178,7 @@ class FloatingBar:
    if signature==last_layout:return
    last_layout=signature
    bounds=layout(rect.right,rect.bottom,collapsed,hovered,hover_left,collapsed_size[0],seek_hovered)
-   for ident,handle in controls.items():show(handle,5 if ident in bounds else 0)
+   for ident,handle in controls.items():show(handle,0 if ident==104 and seek_hovered else 5 if ident in bounds else 0)
    for ident,(x,y,width,height) in bounds.items():
     if ident in controls:move(controls[ident],x,y,width,height,True)
    # Windows 11 supplies antialiased corners; older Windows gets a rounded region.
