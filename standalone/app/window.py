@@ -669,7 +669,7 @@ class PlayerWindow:
   self.label(pop,f'Current recording: {source.name}',10,INK,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,7))
   self.label(pop,'Creates a separate cleaned copy on this computer. It may reduce hiss, hum and some competing voices; results depend on the recording.',10,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,7))
   self.label(pop,'Original audio is never overwritten. Processing can take a while for long recordings.',9,MUTED,wraplength=490,justify='left').pack(anchor='w',padx=24,pady=(0,8))
-  strength_var=tk.IntVar(value=strength)
+  strength_var=tk.DoubleVar(value=strength)
   strength_label=self.label(pop,f'Suppression strength: {strength}',10,INK)
   strength_label.pack(anchor='w',padx=24,pady=(0,2))
   scale=ttk.Scale(pop,from_=10,to=60,orient='horizontal',variable=strength_var)
