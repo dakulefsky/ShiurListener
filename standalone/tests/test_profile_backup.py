@@ -80,7 +80,7 @@ class Tests(unittest.TestCase):
         invalid = [
             {'tracks': []}, {'folders': {}}, {'speed': True}, {'volume': float('nan')},
             {'currentId': []}, {'queue': ['missing', 'missing']}, {'windowSize': [True, 700]},
-            {'floatingTheme': {'primary': 'purple'}}, {'globalShortcuts': 'yes'},
+            {'floatingTheme': {'primary': 'purple'}}, {'globalShortcuts': 'yes'}, {'speechEnhancementEnabled': 'yes'}, {'speechEnhancementStrength': 5},
             {'tracks': {self.ids[0]: {'position': -1}}},
             {'tracks': {self.ids[0]: {'duration': float('inf')}}},
             {'tracks': {self.ids[0]: {'position': 10 ** 400}}},
