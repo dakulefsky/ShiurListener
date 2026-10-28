@@ -21,6 +21,11 @@ func fail(message string) {
 	os.Exit(1)
 }
 func main() {
+	// A file-open request must reach the Python app even if another instance
+	// exists; its single-instance handoff forwards the file to the live window.
+	openFile := false
+	for _, arg := range os.Args[1:] { if arg == "--open-file" { openFile = true; break } }
+	if !openFile {
 	for _, title := range []string{"Shiur Player", "Shiur Player — Your listening library"} {
 		className := ptr(title)
 		existing, _, _ := user.NewProc("FindWindowW").Call(0, uintptr(unsafe.Pointer(className)))
@@ -30,6 +35,7 @@ func main() {
 			user.NewProc("SetForegroundWindow").Call(existing)
 			return
 		}
+	}
 	}
 	executable, err := os.Executable()
 	if err != nil {
