@@ -42,6 +42,13 @@ class Tests(unittest.TestCase):
   restored=Player(None,self.root/'data',Audio())
   self.assertFalse(restored.saved['speechEnhancementEnabled'])
 
+ def test_speech_suppression_strength_is_persisted_and_separates_cache(self):
+  ident=self.player.tracks[0]['id'];balanced=self.player.speech_cache_path(ident)
+  self.player.saved['speechEnhancementStrength']=50;self.player.persist()
+  strong=self.player.speech_cache_path(ident)
+  self.assertNotEqual(balanced,strong)
+  restored=Player(None,self.root/'data',Audio())
+  self.assertEqual(restored.saved['speechEnhancementStrength'],50)
  def test_next_day_open_and_play_needs_no_connection(self):
   self.library.play();self.player.tick();self.backend.position=65.432;self.player.command({'op':'pause'})
   backend=Audio();restored=Player(None,self.root/'data',backend);view=LibraryController(restored)
