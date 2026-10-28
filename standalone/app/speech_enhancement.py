@@ -38,17 +38,38 @@ def _is_supported_wav(path):
 
 def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
     from engine import VLC
-    raw_output = pathlib.Path(output).with_suffix(".pcm")
-    destination = raw_output.resolve().as_posix().replace('"', r'\\"')
-    sout = f'#transcode{{acodec=s16l,channels=1,samplerate=16000}}:std{{access=file,mux=raw,dst="{destination}"}}'
     decoder = None
+    writer = None
+    callback_errors = []
+    written_samples = [0]
     try:
-        decoder = VLC(options=['--aout=dummy'])
-        decoder.load(source, options=[f':sout={sout}', ':sout-keep'])
+        decoder = VLC(options=['--aout=dummy', '--no-clock-synchro'])
+        lib = decoder.lib
+        lib.libvlc_audio_set_callbacks.restype = None
+        lib.libvlc_audio_set_callbacks.argtypes = [ctypes.c_void_p] * 7
+        lib.libvlc_audio_set_format.restype = None
+        lib.libvlc_audio_set_format.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint, ctypes.c_uint]
+        writer = wave.open(str(output), 'wb')
+        writer.setnchannels(1);writer.setsampwidth(2);writer.setframerate(16000)
+        def play_callback(opaque, samples, count, pts):
+            try:
+                count = int(count)
+                if count <= 0 or not samples:return
+                writer.writeframesraw(ctypes.string_at(samples, count * 2))
+                written_samples[0] += count
+            except BaseException as error:
+                callback_errors.append(error)
+        play_fn = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint, ctypes.c_int64)(play_callback)
+        lib.libvlc_audio_set_callbacks(decoder.player, ctypes.cast(play_fn, ctypes.c_void_p),
+                                       None, None, None, None, None)
+        lib.libvlc_audio_set_format(decoder.player, b'S16N', 16000, 1)
+        decoder.load(source)
         decoder.play()
         started = time.monotonic()
         while True:
             _check_cancel(cancel)
+            if callback_errors:
+                raise RuntimeError("VLC failed while decoding audio for speech enhancement.") from callback_errors[0]
             state = decoder.state()
             if state["status"] == "ended":
                 break
@@ -58,25 +79,19 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
                 raise RuntimeError("VLC stopped before audio conversion finished.")
             duration = state.get("duration", 0)
             if duration > 0 and progress:
-                try:
-                    written = raw_output.stat().st_size if raw_output.exists() else 0
-                    expected = max(1, round(duration * 16000 * 2))
-                    _report(progress, min(9, round(9 * written / expected)))
-                except OSError:
-                    pass
-            time.sleep(.08)
+                _report(progress, min(9, round(9 * written_samples[0] / max(1, duration * 16000))))
+            time.sleep(.03)
     finally:
         if decoder:
             decoder.close()
-    if not raw_output.is_file() or raw_output.stat().st_size <= 0 or raw_output.stat().st_size % 2:
+            if getattr(decoder, 'dll_directory', None):
+                decoder.dll_directory.close();decoder.dll_directory=None
+        if writer:
+            writer.close()
+    if callback_errors:
+        raise RuntimeError("VLC failed while writing converted audio.") from callback_errors[0]
+    if not output.is_file() or output.stat().st_size <= 44:
         raise RuntimeError("VLC could not convert this recording for speech enhancement.")
-    with raw_output.open('rb') as raw, wave.open(str(output), 'wb') as converted:
-        converted.setnchannels(1);converted.setsampwidth(2);converted.setframerate(16000)
-        while True:
-            chunk=raw.read(1024*1024)
-            if not chunk:break
-            converted.writeframesraw(chunk)
-    raw_output.unlink(missing_ok=True)
     if not _is_supported_wav(output):
         raise RuntimeError("The local converter did not produce the expected 16 kHz mono WAV.")
     _report(progress, 10)
