@@ -687,9 +687,15 @@ class PlayerWindow:
   if self.speech_job and self.speech_job.get('busy'):
    messagebox.showinfo('Speech enhancement','An enhancement is already running. Cancel or wait for it to finish.',parent=self.root);return
   ident=self.player.saved.get('currentId')
-  source=self.player.paths.get(ident)
+  source=self.player.paths.get(ident) if ident else None
+  # A selected library item is a valid target even if playback has not started.
+  if source is None:
+   selected=self.selected_ids() if hasattr(self,'tree') else []
+   if not selected and getattr(self.library,'selected',None):selected=[self.library.selected]
+   ident=selected[0] if selected else None
+   source=self.player.paths.get(ident) if ident else None
   if not ident or source is None:
-   messagebox.showinfo('Speech enhancement','Play or select a shiur first, then open Audio enhancements.',parent=self.root);return
+   messagebox.showinfo('Speech enhancement','Select a shiur in your library first, then open Audio enhancements.',parent=self.root);return
   strength=int(self.player.saved.get('speechEnhancementStrength',35))
   output=self.player.speech_cache_path(ident,strength)
   pop=tk.Toplevel(self.root);pop.title('Offline speech enhancement');pop.geometry(f'540x{max(380,min(560,self.root.winfo_screenheight()-100))}');pop.minsize(440,340);pop.resizable(True,True);pop.configure(bg=BG);pop.transient(self.root)
