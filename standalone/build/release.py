@@ -1,11 +1,87 @@
 """Build, stage and publish a standalone release using the verified prior runtime."""
-import argparse,hashlib,json,os,pathlib,re,runpy,shutil,subprocess,urllib.request,zipfile
+import argparse,array,hashlib,json,math,os,pathlib,re,runpy,shutil,subprocess,sys,tempfile,time,urllib.request,wave,zipfile
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 REPO=ROOT.parent
 VERSION=runpy.run_path(str(ROOT/'app/version.py'))['APP_VERSION']
 BASE_VERSION='0.9.4'
 BASE_SHA256='d1bc031c8b59fc05796b1ba00933500fc4b39c1604f1599cc68d904d007fabc4'
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+HUSH_TAG='v1.0.0'
+HUSH_ASSETS=[
+ ('runtime/speech/weya_nc.dll','deployment/lib/weya_nc.dll',22464512,'688bd35590ff29f922579d6567d1b4a3f0709d17'),
+ ('runtime/speech/advanced_dfnet16k_model_best_onnx.tar.gz','deployment/models/advanced_dfnet16k_model_best_onnx.tar.gz',8558968,'2838b4a4ec8ed2cb7bff4cd4e89f8bff828e3db0'),
+ ('runtime/speech/LICENSE','LICENSE',8549,'1c714550021949d38379ad619f5034caeeb4d843'),
+ ('runtime/speech/DATASETS.md','DATASETS.md',3606,'486d7ccbec16a48f431e98feff7d1b42da1e57ad'),
+]
+def download_hush_assets():
+ assets={}
+ for target,source,size,expected_blob in HUSH_ASSETS:
+  url=f'https://raw.githubusercontent.com/pulp-vision/Hush/{HUSH_TAG}/{source}'
+  with urllib.request.urlopen(url,timeout=90) as response:data=response.read()
+  if len(data)!=size:raise ValueError(f'Unexpected Hush asset size: {source}')
+  blob=hashlib.sha1(f'blob {len(data)}\0'.encode()+data).hexdigest()
+  if blob!=expected_blob:raise ValueError(f'Hush asset identity mismatch: {source}')
+  assets[target]=data
+ print('Verified pinned Hush native runtime, model, license and dataset notice.',flush=True)
+ return assets
+def smoke_test_hush(assets,test_conversion=False):
+ with tempfile.TemporaryDirectory(prefix='shiur-hush-smoke-',ignore_cleanup_errors=True) as directory:
+  directory=pathlib.Path(directory);app=directory/'app';speech=app/'runtime'/'speech';speech.mkdir(parents=True)
+  library=speech/'weya_nc.dll';model=speech/'advanced_dfnet16k_model_best_onnx.tar.gz'
+  library.write_bytes(assets['runtime/speech/weya_nc.dll'])
+  model.write_bytes(assets['runtime/speech/advanced_dfnet16k_model_best_onnx.tar.gz'])
+  source=directory/'input.wav';output=directory/'output.wav'
+  if test_conversion:
+   vlc_source=ROOT/'app'/'runtime'/'vlc'
+   if not (vlc_source/'libvlc.dll').is_file():raise ValueError('Verified VLC test runtime is missing libvlc.dll.')
+   for rel,data in assets.items():
+    if rel.startswith('runtime/vlc/'):
+     target=vlc_source/rel.removeprefix('runtime/vlc/')
+     target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+   for folder in ('audio_output','stream_out','mux','access_output'):
+    directory=vlc_source/'plugins'/folder
+    print(f'VLC {folder} plugins: {[path.name for path in directory.glob("*.dll")]}',flush=True)
+   frames=44100*10
+   samples=array.array('h',(round(4500*math.sin(2*math.pi*220*(i//2)/44100)) for i in range(frames*2)))
+   rate=44100;channels=2
+  else:
+   frames=16000*2
+   samples=array.array('h',(round(5000*math.sin(2*math.pi*220*i/16000)+350*math.sin(2*math.pi*1100*i/16000)) for i in range(frames)))
+   rate=16000;channels=1
+  with wave.open(str(source),'wb') as audio:
+   audio.setnchannels(channels);audio.setsampwidth(2);audio.setframerate(rate);audio.writeframes(samples.tobytes())
+  sys.path.insert(0,str(ROOT/'app'))
+  from speech_enhancement import enhance_file
+  original=source.read_bytes();started=time.monotonic()
+  enhance_file(source,output,app)
+  if test_conversion and time.monotonic()-started>15:raise ValueError('Speech conversion took longer than the offline processing budget.')
+  if source.read_bytes()!=original:raise ValueError('Speech enhancement modified the original input.')
+  with wave.open(str(output),'rb') as audio:
+   actual=(audio.getnchannels(),audio.getsampwidth(),audio.getframerate(),audio.getnframes())
+   expected_frames=16000*(10 if test_conversion else 2)
+   if actual[:3]!=(1,2,16000) or abs(actual[3]-expected_frames)>320:
+    raise ValueError(f'Hush native runtime smoke test produced invalid audio: channels={actual[0]}, sample_width={actual[1]}, rate={actual[2]}, frames={actual[3]}, expected_frames={expected_frames}.')
+ print('Hush native runtime loaded the model and processed audio successfully.',flush=True)
+VLC_PLUGIN_URL='https://mirrors.ocf.berkeley.edu/videolan-ftp/vlc/3.0.24/win64/vlc-3.0.24-win64.zip'
+VLC_PLUGIN_SIZE=82765861
+VLC_PLUGIN_SHA256='fcf30850371ad10c9373cc4f0f4501e7dee49e3e9ae9f20c72fb2661a1ca6323'
+def download_vlc_callback_assets():
+ with urllib.request.urlopen(VLC_PLUGIN_URL,timeout=180) as response:payload=response.read()
+ with urllib.request.urlopen('https://get.videolan.org/vlc/3.0.24/win64/vlc-3.0.24-win64.zip.sha256',timeout=60) as response:
+  checksum_text=response.read().decode('ascii','replace').lower()
+ published=re.findall(r'\b[0-9a-f]{64}\b',checksum_text)
+ actual=hashlib.sha256(payload).hexdigest()
+ if len(payload)!=VLC_PLUGIN_SIZE or not published or actual!=published[0] or actual!=VLC_PLUGIN_SHA256:
+  raise ValueError(f'Official VLC archive verification failed: bytes={len(payload)}, actual={actual}, published={published[0] if published else "missing"}, pinned={VLC_PLUGIN_SHA256}.')
+ files={
+  'runtime/vlc/libvlc.dll':'vlc-3.0.24/libvlc.dll',
+  'runtime/vlc/libvlccore.dll':'vlc-3.0.24/libvlccore.dll',
+  'runtime/vlc/plugins/audio_output/libamem_plugin.dll':'vlc-3.0.24/plugins/audio_output/libamem_plugin.dll',
+ }
+ with zipfile.ZipFile(__import__('io').BytesIO(payload)) as archive:
+  assets={target:archive.read(source) for target,source in files.items()}
+ print('Verified official VLC 3.0.24 core and audio-memory callback plugin.',flush=True)
+ return assets
 def git(*args):subprocess.run(['git',*args],cwd=REPO,check=True)
 def build():
  if not re.fullmatch(r'\d+\.\d+\.\d+',VERSION):raise ValueError('Invalid version')
@@ -14,6 +90,9 @@ def build():
  url=f'https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-windows-x64-{BASE_VERSION}.zip'
  urllib.request.urlretrieve(url,base)
  assert digest(base)==BASE_SHA256,'Prior runtime checksum mismatch'
+ hush_assets=download_hush_assets()
+ hush_assets.update(download_vlc_callback_assets())
+ smoke_test_hush(hush_assets)
  env={**os.environ,'GOOS':'windows','GOARCH':'amd64','CGO_ENABLED':'0','GO111MODULE':'off','GOTOOLCHAIN':'local'}
  subprocess.run(['go','build','-trimpath','-ldflags=-s -w -H windowsgui','-o',str(ROOT/'build/Shiur Player.exe'),str(ROOT/'build/launcher.go')],env=env,check=True)
  prefix='Shiur Player/'
@@ -21,7 +100,9 @@ def build():
  with zipfile.ZipFile(base) as old,zipfile.ZipFile(output,'w',zipfile.ZIP_DEFLATED) as bundle:
   assert old.testzip() is None
   retained=[]
+  overrides={prefix+name for name in hush_assets}
   for name in old.namelist():
+   if name in overrides:continue
    relative=name.removeprefix(prefix)
    if relative.startswith('runtime/') or relative in ('THIRD-PARTY-NOTICES.txt','GO-LICENSE.txt','TK-RUNTIME-NOTICE.txt'):
     bundle.writestr(name,old.read(name));retained.append(name)
@@ -30,8 +111,10 @@ def build():
     bundle.write(path,prefix+path.relative_to(ROOT/'app').as_posix())
   bundle.write(ROOT/'build/Shiur Player.exe',prefix+'Shiur Player.exe')
   bundle.write(ROOT/'READ ME FIRST.txt',prefix+'READ ME FIRST.txt')
+  bundle.write(ROOT/'THIRD-PARTY-SPEECH-NOTICE.txt',prefix+'THIRD-PARTY-SPEECH-NOTICE.txt')
+  for name,data in hush_assets.items():bundle.writestr(prefix+name,data)
   info=json.loads(old.read(prefix+'BUILD-INFO.json'))
-  info.update(version=VERSION,baseStandaloneVersion=BASE_VERSION,baseStandaloneSha256=BASE_SHA256)
+  info.update(version=VERSION,baseStandaloneVersion=BASE_VERSION,baseStandaloneSha256=BASE_SHA256,bundledVlcVersion='3.0.24',speechEnhancementRuntime='Hush / DeepFilterNet-SE v1.0.0',speechEnhancementValidation='Native Windows smoke and local audio conversion are tested in CI; real shiur listening quality has not been independently evaluated.')
   bundle.writestr(prefix+'BUILD-INFO.json',json.dumps(info,indent=2)+'\n')
  with zipfile.ZipFile(output) as bundle,zipfile.ZipFile(base) as old:
   assert bundle.testzip() is None
@@ -39,7 +122,9 @@ def build():
   for path in (ROOT/'app').rglob('*'):
    if path.is_file() and '__pycache__' not in path.parts and path.relative_to(ROOT/'app').parts[0]!='runtime':
     assert bundle.read(prefix+path.relative_to(ROOT/'app').as_posix())==path.read_bytes()
-  for name in ('runtime/python/pythonw.exe','runtime/python/_tkinter.pyd','runtime/tcl/tk8.6/tk.tcl','runtime/vlc/libvlc.dll'):
+  for name,data in hush_assets.items():assert bundle.read(prefix+name)==data
+  assert bundle.read(prefix+'THIRD-PARTY-SPEECH-NOTICE.txt')==(ROOT/'THIRD-PARTY-SPEECH-NOTICE.txt').read_bytes()
+  for name in ('runtime/python/pythonw.exe','runtime/python/_tkinter.pyd','runtime/tcl/tk8.6/tk.tcl','runtime/vlc/libvlc.dll','runtime/speech/weya_nc.dll','runtime/speech/advanced_dfnet16k_model_best_onnx.tar.gz','runtime/speech/LICENSE','runtime/speech/DATASETS.md'):
    assert bundle.read(prefix+name)
  subprocess.run([os.sys.executable,str(ROOT/'build/build_installer.py')],check=True)
  # Keep the public channel unchanged until the actual candidate passes installation.
