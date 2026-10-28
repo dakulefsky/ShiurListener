@@ -48,7 +48,7 @@ def _validate(payload):
     state = payload.get('state')
     _require(isinstance(state, dict), 'saved profile is missing.')
     allowed = {'tracks', 'folders', 'bookmarks', 'currentId', 'queue', 'autoNext',
-               'speed', 'volume', 'skipSeconds', 'language', 'libraryRoot',
+               'speed', 'volume', 'skipSeconds', 'language', 'libraryRoot', 'audioEnhancement',
                'librarySort', 'librarySortDescending', 'floatingVisible', 'floatingCollapsed', 'mainDockCollapsed',
                'floatingPosition', 'floatingSize', 'windowSize', 'floatingTheme',
                'halfSpeedCycleMigration', 'miniOnMinimize', 'globalShortcuts', 'miniSpeedMiddle', 'miniSpeedCycleIndex'}
@@ -120,6 +120,13 @@ def _validate(payload):
     if 'miniSpeedCycleIndex' in state:
         value = state['miniSpeedCycleIndex']
         _require(value is None or (type(value) is int and 0 <= value < 4), 'invalid speed cycle.')
+    if 'audioEnhancement' in state:
+        audio = state['audioEnhancement']
+        _require(isinstance(audio, dict) and set(audio) <= {'bass', 'body', 'clarity', 'treble'},
+                 'invalid audio enhancement settings.')
+        for name, value in audio.items():
+            _require(type(value) in (int, float) and math.isfinite(value) and -6 <= value <= 6,
+                     'audio enhancement values must be between -6 and +6 dB.')
     if 'floatingTheme' in state:
         theme = state['floatingTheme']
         colors = ('primary', 'onPrimary', 'surface', 'onSurface', 'surfaceContainer')
