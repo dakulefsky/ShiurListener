@@ -108,7 +108,7 @@ def build():
   bundle.write(ROOT/'THIRD-PARTY-SPEECH-NOTICE.txt',prefix+'THIRD-PARTY-SPEECH-NOTICE.txt')
   for name,data in hush_assets.items():bundle.writestr(prefix+name,data)
   info=json.loads(old.read(prefix+'BUILD-INFO.json'))
-  info.update(version=VERSION,baseStandaloneVersion=BASE_VERSION,baseStandaloneSha256=BASE_SHA256)
+  info.update(version=VERSION,baseStandaloneVersion=BASE_VERSION,baseStandaloneSha256=BASE_SHA256,bundledVlcVersion='3.0.24',speechEnhancementRuntime='Hush / DeepFilterNet-SE v1.0.0',speechEnhancementValidation='Native Windows smoke and local audio conversion are tested in CI; real shiur listening quality has not been independently evaluated.')
   bundle.writestr(prefix+'BUILD-INFO.json',json.dumps(info,indent=2)+'\n')
  with zipfile.ZipFile(output) as bundle,zipfile.ZipFile(base) as old:
   assert bundle.testzip() is None
