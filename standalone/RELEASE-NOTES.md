@@ -1,4 +1,4 @@
-# Shiur Player 0.9.18
+# Shiur Player 0.9.19
 
 Fixes offline speech enhancement conversion by bundling the VLC stream-transcoding, WAV muxing, file-output and PCM codec plugins needed for local conversion. The release pipeline now runs the real VLC conversion smoke test before publishing, so a missing runtime component blocks the release.
 
