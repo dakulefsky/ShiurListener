@@ -1058,16 +1058,17 @@ class PlayerWindow:
  def monitor_folder(self):
   # Periodically rescan off the UI thread. The engine reconciles stable file
   # identities so external renames do not reset listening progress.
-  while not self.folder_monitor_stop.wait(4.0):
-   try:
-    with self.player.lock:root=self.player.root
-    if root is None:continue
-    if not root.is_dir():
-     with self.player.lock:self.player.error='Recordings folder is disconnected. Reconnect it to keep the library up to date.'
-     continue
-    self.player.scan(root)
-   except Exception as error:
-    with self.player.lock:self.player.error='Folder monitor: '+str(error)
+  while not self.folder_monitor_stop.wait(4.0):self.monitor_folder_once()
+ def monitor_folder_once(self):
+  try:
+   with self.player.lock:root=self.player.root
+   if root is None:return
+   if not root.is_dir():
+    with self.player.lock:self.player.error='Recordings folder is disconnected. Reconnect it to keep the library up to date.'
+    return
+   self.player.scan(root)
+  except Exception as error:
+   with self.player.lock:self.player.error='Folder monitor: '+str(error)
  def process_open_request(self):
   request=self.player.data_dir/'open-request.json'
   try:
