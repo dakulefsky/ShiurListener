@@ -43,14 +43,17 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
     destination = output.resolve().as_posix().replace('"', r'\"')
     sout = f'#transcode{{acodec=s16l,channels=1,samplerate=16000}}:std{{access=file,mux=wav,dst="{destination}"}}'
     command = [
-        str(vlc), "-I", "dummy", "--no-one-instance", "--no-video",
-        "--no-video-title-show", "--no-metadata-network-access", "--play-and-exit",
-        f"--sout={sout}", str(pathlib.Path(source).resolve()),
+        str(vlc), "-I", "dummy", "--ignore-config", "--no-plugins-cache",
+        "--no-one-instance", "--no-video", "--no-video-title-show",
+        "--no-metadata-network-access", "--play-and-exit", f"--sout={sout}",
+        str(pathlib.Path(source).resolve()),
     ]
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0) if sys.platform == "win32" else 0
+    environment = os.environ.copy()
+    environment["VLC_PLUGIN_PATH"] = str(vlc.parent / "plugins")
     process = subprocess.Popen(command, stdin=subprocess.DEVNULL,
                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                               creationflags=flags)
+                               creationflags=flags, env=environment)
     try:
         while process.poll() is None:
             _check_cancel(cancel)
