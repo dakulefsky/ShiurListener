@@ -25,7 +25,7 @@ def download_hush_assets():
  print('Verified pinned Hush native runtime, model, license and dataset notice.',flush=True)
  return assets
 def smoke_test_hush(assets):
- with tempfile.TemporaryDirectory(prefix='shiur-hush-smoke-') as directory:
+ with tempfile.TemporaryDirectory(prefix='shiur-hush-smoke-',ignore_cleanup_errors=True) as directory:
   directory=pathlib.Path(directory);app=directory/'app';speech=app/'runtime'/'speech';speech.mkdir(parents=True)
   library=speech/'weya_nc.dll';model=speech/'advanced_dfnet16k_model_best_onnx.tar.gz'
   library.write_bytes(assets['runtime/speech/weya_nc.dll'])
