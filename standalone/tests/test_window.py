@@ -1,7 +1,8 @@
 """Exercise the real desktop toolkit, including persistence across a new window."""
 import os,pathlib,sys,unittest
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/'app'))
-import window as window_module\nfrom window import PlayerWindow
+import window as window_module
+from window import PlayerWindow
 from engine import Player
 from controller import LibraryController
 import test_player
