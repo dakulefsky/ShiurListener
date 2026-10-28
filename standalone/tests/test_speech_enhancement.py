@@ -45,6 +45,29 @@ class Tests(unittest.TestCase):
         self.assertEqual(self.source.read_bytes(), before)
         self.assertFalse((self.root / 'enhanced.wav').exists())
 
+    def test_failed_processing_preserves_source_and_previous_cache(self):
+        import speech_enhancement
+        app = self.root / 'app'
+        runtime = app / 'runtime' / 'speech'
+        runtime.mkdir(parents=True)
+        (runtime / 'weya_nc.dll').write_bytes(b'test runtime placeholder')
+        (runtime / 'advanced_dfnet16k_model_best_onnx.tar.gz').write_bytes(b'test model placeholder')
+        output = self.root / 'cached-enhanced.wav'
+        output.write_bytes(b'previous valid cache')
+        source_before = self.source.read_bytes()
+        output_before = output.read_bytes()
+        original_processor = speech_enhancement._process_wav
+        def fail_processing(*args, **kwargs):
+            raise RuntimeError('simulated processing failure')
+        speech_enhancement._process_wav = fail_processing
+        try:
+            with self.assertRaisesRegex(RuntimeError, 'simulated processing failure'):
+                enhance_file(self.source, output, app)
+        finally:
+            speech_enhancement._process_wav = original_processor
+        self.assertEqual(self.source.read_bytes(), source_before)
+        self.assertEqual(output.read_bytes(), output_before)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
