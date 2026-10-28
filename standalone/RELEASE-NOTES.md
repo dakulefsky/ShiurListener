@@ -1,6 +1,6 @@
-# Shiur Player 0.9.11
+# Shiur Player 0.9.12
 
-Fixes startup when an existing saved profile contains a setting or value the current build cannot validate. Before attempting recovery, the app makes a byte-for-byte backup named `state.json.recovery-YYYYMMDD-HHMMSS.bak` beside the original profile. It then recovers individually valid settings and shiur positions, leaving malformed entries out rather than resetting the entire library. If the JSON itself is damaged, the complete original remains in the recovery backup.
+Fixes Windows installer verification so the complete installer is downloaded before checksum validation. Fixes startup when an existing saved profile contains a setting or value the current build cannot validate. Before attempting recovery, the app makes a byte-for-byte backup named `state.json.recovery-YYYYMMDD-HHMMSS.bak` beside the original profile. It then recovers individually valid settings and shiur positions, leaving malformed entries out rather than resetting the entire library. If the JSON itself is damaged, the complete original remains in the recovery backup.
 
 Adds optional **offline speech enhancement**. From Settings → Audio enhancements, choose **Enhance current shiur** to create a separate cleaned copy using a local CPU model. Choose a suppression strength from gentle to strong. Processing runs in the background, shows progress, can be cancelled, and works without a cloud service or runtime model download. Enhanced copies are cached separately; the original recording is never overwritten, and **Use original audio** switches back while preserving the listening position.
 
