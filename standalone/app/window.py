@@ -498,6 +498,8 @@ class PlayerWindow:
      job['cancel_button'].configure(text='Done',state='normal',command=job['popup'].destroy)
      if messagebox.askyesno('Enhanced audio ready','Use the enhanced copy now? The original remains unchanged.',parent=job['popup']):
       job['use_enhanced']()
+     else:
+      job['use_original']()
   elif action=='speech_cancelled':
    job=self.speech_job
    if job:
@@ -763,7 +765,7 @@ class PlayerWindow:
   row=tk.Frame(body,bg=BG);row.pack(fill='x',padx=24,pady=(0,16))
   cancel_button=self.button(row,'Close',pop.destroy);cancel_button.pack(side='right',padx=(8,0))
   start_button=self.button(row,'Use enhanced copy' if output and output.is_file() else 'Enhance current shiur',lambda:None,True);start_button.pack(side='left')
-  original_button=self.button(row,'Use original audio',lambda:None);original_button.pack(side='right',padx=(8,0))
+  original_button=self.button(row,'Switch back to original',lambda:None);original_button.pack(side='right',padx=(8,0))
   job={'track_id':ident,'source':pathlib.Path(source),'output':output,'popup':pop,'status':status,'progress':progress,'start_button':start_button,'cancel_button':cancel_button,'original_button':original_button,'scale':scale,'strength_var':strength_var,'strength_label':strength_label,'busy':False,'cancel':None,'start':None,'strength':strength}
   def on_strength(value):
    selected=max(10,min(60,int(round(float(value)))))
@@ -818,7 +820,7 @@ class PlayerWindow:
     except Exception as error:
      self.requests.put(('speech_error',str(error)))
    threading.Thread(target=work,daemon=True).start()
-  job['start']=start;job['use_enhanced']=use_enhanced;scale.configure(command=on_strength)
+  job['start']=start;job['use_enhanced']=use_enhanced;job['use_original']=use_original;scale.configure(command=on_strength)
   start_button.configure(command=lambda:self.safe(start));original_button.configure(command=use_original)
   cancel_button.configure(command=cancel_or_close)
   pop.protocol('WM_DELETE_WINDOW',cancel_or_close)
