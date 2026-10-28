@@ -50,6 +50,7 @@ class Tests(unittest.TestCase):
    popups=[child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel']
    self.assertEqual(len(popups),1)
    self.assertEqual(popups[0].title(),'Offline speech enhancement')
+   self.assertFalse(popups[0].transient(), 'The enhancement window must remain independently minimizable on Windows.')
    popups[0].destroy()
   finally:
    if window:window.close()
