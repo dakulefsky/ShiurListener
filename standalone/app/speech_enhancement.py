@@ -61,6 +61,10 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
             except BaseException as error:
                 callback_errors.append(error)
         decoder.load(source)
+        lib.libvlc_audio_output_set.restype = ctypes.c_int
+        lib.libvlc_audio_output_set.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+        if lib.libvlc_audio_output_set(decoder.player, b'amem') < 0:
+            raise RuntimeError('The bundled VLC audio-memory output plugin could not be selected.')
         play_fn = play_type(play_callback)
         lib.libvlc_audio_set_callbacks(decoder.player, play_fn, None, None, None, None, None)
         lib.libvlc_audio_set_format(decoder.player, b'S16N', 16000, 1)
