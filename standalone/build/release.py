@@ -1,4 +1,5 @@
 """Build, stage and publish a standalone release using the verified prior runtime."""
+# Release 0.9.14 includes scrollable settings and the selected-track enhancement fix.
 import argparse,array,hashlib,json,math,os,pathlib,re,runpy,shutil,subprocess,sys,tempfile,time,urllib.request,wave,zipfile
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 REPO=ROOT.parent
