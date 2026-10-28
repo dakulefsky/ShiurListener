@@ -408,6 +408,7 @@ class PlayerWindow:
    ident,output=value;job=self.speech_job
    if job and job.get('track_id')==ident:
     job['busy']=False;self.speech_job=None
+    job['scale'].configure(state='normal');job['original_button'].configure(state='normal')
     try:
      visible=bool(job['popup'].winfo_exists())
     except tk.TclError:visible=False
@@ -421,6 +422,7 @@ class PlayerWindow:
    job=self.speech_job
    if job:
     job['busy']=False;self.speech_job=None
+    job['scale'].configure(state='normal');job['original_button'].configure(state='normal')
     try:
      if job['popup'].winfo_exists():
       job['status'].configure(text='Cancelled. The original recording is unchanged.')
@@ -431,6 +433,7 @@ class PlayerWindow:
    job=self.speech_job
    if job:
     job['busy']=False;self.speech_job=None
+    job['scale'].configure(state='normal');job['original_button'].configure(state='normal')
     try:
      visible=bool(job['popup'].winfo_exists())
     except tk.TclError:visible=False
@@ -681,7 +684,7 @@ class PlayerWindow:
   cancel_button=self.button(row,'Close',pop.destroy);cancel_button.pack(side='right',padx=(8,0))
   start_button=self.button(row,'Use enhanced copy' if output and output.is_file() else 'Enhance current shiur',lambda:None,True);start_button.pack(side='left')
   original_button=self.button(row,'Use original audio',lambda:None);original_button.pack(side='right',padx=(8,0))
-  job={'track_id':ident,'source':pathlib.Path(source),'output':output,'popup':pop,'status':status,'progress':progress,'start_button':start_button,'cancel_button':cancel_button,'scale':scale,'strength_var':strength_var,'strength_label':strength_label,'busy':False,'cancel':None,'start':None,'strength':strength}
+  job={'track_id':ident,'source':pathlib.Path(source),'output':output,'popup':pop,'status':status,'progress':progress,'start_button':start_button,'cancel_button':cancel_button,'original_button':original_button,'scale':scale,'strength_var':strength_var,'strength_label':strength_label,'busy':False,'cancel':None,'start':None,'strength':strength}
   def on_strength(value):
    selected=max(10,min(60,int(round(float(value)))))
    job['strength']=selected;job['output']=self.player.speech_cache_path(ident,selected)
