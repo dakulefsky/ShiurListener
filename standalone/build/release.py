@@ -57,8 +57,10 @@ def smoke_test_hush(assets,test_conversion=False):
   if test_conversion and time.monotonic()-started>15:raise ValueError('Speech conversion took longer than the offline processing budget.')
   if source.read_bytes()!=original:raise ValueError('Speech enhancement modified the original input.')
   with wave.open(str(output),'rb') as audio:
-   if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or abs(audio.getnframes()-16000*(10 if test_conversion else 2))>320:
-    raise ValueError('Hush native runtime smoke test produced invalid audio.')
+   actual=(audio.getnchannels(),audio.getsampwidth(),audio.getframerate(),audio.getnframes())
+   expected_frames=16000*(10 if test_conversion else 2)
+   if actual[:3]!=(1,2,16000) or abs(actual[3]-expected_frames)>320:
+    raise ValueError(f'Hush native runtime smoke test produced invalid audio: channels={actual[0]}, sample_width={actual[1]}, rate={actual[2]}, frames={actual[3]}, expected_frames={expected_frames}.')
  print('Hush native runtime loaded the model and processed audio successfully.',flush=True)
 VLC_PLUGIN_URL='https://mirrors.ocf.berkeley.edu/videolan-ftp/vlc/3.0.24/win64/vlc-3.0.24-win64.zip'
 VLC_PLUGIN_SIZE=82765861
