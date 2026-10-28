@@ -226,7 +226,7 @@ func makeLink(file, target, working string, ole *syscall.LazyDLL) error {
 // registerOpenWith adds a per-user "Open with Shiur Player" handler without
 // changing Windows' default audio player. It also adds a direct Explorer verb.
 func registerOpenWith(target string) error {
-	command := fmt.Sprintf("\\\"%s\\\" --open-file \\\"%%1\\\"", target)
+	command := fmt.Sprintf("\\"%s\\" --open-file \\"%%1\\"", target)
 	app := `Software\Classes\Applications\Shiur Player.exe`
 	if err := setRegistryString(app, "FriendlyAppName", "Shiur Player"); err != nil { return err }
 	if err := setRegistryString(app+`\DefaultIcon`, "", target+",0"); err != nil { return err }
