@@ -86,11 +86,13 @@ class ReviewTests(unittest.TestCase):
   self.assertEqual(len(restored.tracks),2)
   self.assertEqual(next(t['position'] for t in restored.library() if t['id']==self.player.active),42)
 
- def test_invalid_saved_profile_is_not_overwritten_at_startup(self):
+ def test_invalid_saved_profile_is_backed_up_before_recovery(self):
   for change in [{'speed':'fast'},{'tracks':[]},{'queue':{}},{'volume':float('nan')}]:
    state={**self.player.saved,**change};self.player.file.write_text(json.dumps(state));before=self.player.file.read_bytes()
-   with self.assertRaises(RuntimeError):Player(None,self.root/'data',test_player.Audio())
-   self.assertEqual(self.player.file.read_bytes(),before)
+   Player(None,self.root/'data',test_player.Audio())
+   backups=list((self.root/'data').glob('state.json.recovery-*.bak'))
+   self.assertTrue(backups, 'invalid state must be backed up before recovery')
+   self.assertEqual(backups[-1].read_bytes(),before)
 
  def test_failed_load_does_not_replace_queue(self):
   original=list(self.player.saved['queue'])
