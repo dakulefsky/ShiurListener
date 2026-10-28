@@ -8,7 +8,7 @@ Click **Check for updates** in the app for subsequent releases. Checks run only 
 
 Update downloads are restricted to this repository's versioned raw GitHub installer URLs. TLS and SHA-256 detect transport/content mismatch; this is not code signing. A portable ZIP remains available, with the same in-app update button. Updating a portable copy installs the stable shortcut-based version with the existing standalone profile.
 
-Settings include a tone-shaping equalizer and optional offline speech enhancement. The enhancement processes one shiur at a time on the computer, stores a separate cached copy, and never overwrites the original. Use **Use original audio** to switch back. Noise reduction and competing-voice suppression vary with the recording; this is not guaranteed vocal/music source separation.
+Settings include a tone-shaping equalizer and optional offline speech enhancement with adjustable gentle-to-strong suppression. The enhancement processes one shiur at a time on the computer, stores a separate cached copy, and never overwrites the original. Use **Use original audio** to switch back. Noise reduction and competing-voice suppression vary with the recording; this is not guaranteed vocal/music source separation.
 
 Every recording has its own saved position, shown in the list. **Continue listening** shows unfinished recordings in recent listening order. Switching recordings, pausing and normal closing save progress, alongside periodic checkpoints. Sudden termination can lose the newest interval; seek precision depends on the file. Keep file paths unchanged. Existing standalone 0.1.0/0.2.0/0.3.0/0.4.0 positions are reused automatically.
 
