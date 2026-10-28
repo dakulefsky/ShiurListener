@@ -34,7 +34,6 @@ def smoke_test_hush(assets,test_conversion=False):
   if test_conversion:
    vlc_source=ROOT/'app'/'runtime'/'vlc'
    if not (vlc_source/'libvlc.dll').is_file():raise ValueError('Verified VLC test runtime is missing libvlc.dll.')
-   shutil.copytree(vlc_source,app/'runtime'/'vlc')
    frames=44100*10
    samples=array.array('h',(round(4500*math.sin(2*math.pi*220*(i//2)/44100)) for i in range(frames*2)))
    rate=44100;channels=2
