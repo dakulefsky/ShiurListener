@@ -139,6 +139,8 @@ class Tests(unittest.TestCase):
         active_before = self.player.active
         export_profile(self.player, self.backup)
         self.player.saved['tracks'][self.ids[0]] = {'position': 55.5}
+        self.backend.position = 55.5
+        self.player.capture()
         self.player.persist()
         before = copy.deepcopy(self.player.saved)
         actual_persist = self.player.persist
