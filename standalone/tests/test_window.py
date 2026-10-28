@@ -55,6 +55,33 @@ class Tests(unittest.TestCase):
    if window:window.close()
    fixture.tearDown()
 
+ def test_settings_audio_navigation_and_controls_remain_operable(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   ident=fixture.player.tracks[0]['id'];window.tree.selection_set(ident);window.library.selected=ident
+   def descendants(widget):
+    for child in widget.winfo_children():
+     yield child
+     yield from descendants(child)
+   window.settings();window.root.update()
+   settings=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel' and child.title()=='Settings & backup')
+   next((b for b in descendants(settings) if isinstance(b,window_module.SoftButton) and b.cget('text')=='Audio enhancements…'),None).invoke()
+   window.root.update()
+   audio=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel' and child.title()=='Audio enhancements')
+   preset=next(b for b in descendants(audio) if isinstance(b,window_module.SoftButton) and b.cget('text')=='Strong speech')
+   preset.invoke();window.root.update()
+   self.assertEqual(fixture.player.saved.get('audioEnhancement',{}).get('clarity'),5)
+   launch=next(b for b in descendants(audio) if isinstance(b,window_module.SoftButton) and b.cget('text')=='Enhance current shiur…')
+   launch.invoke();window.root.update()
+   speech=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel' and child.title()=='Offline speech enhancement')
+   calls=[];window.command=lambda op,**kw:calls.append((op,kw))
+   original=next(b for b in descendants(speech) if isinstance(b,window_module.SoftButton) and b.cget('text')=='Switch back to original')
+   original.invoke()
+   self.assertTrue(any(op=='speech_enhancement_enabled' and kw.get('value') is False for op,kw in calls))
+  finally:
+   if window:window.close()
+   fixture.tearDown()
  def test_hidden_or_cleared_selection_cannot_reset_recordings(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
