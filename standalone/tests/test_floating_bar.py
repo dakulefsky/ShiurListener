@@ -51,6 +51,19 @@ class TestBar(unittest.TestCase):
   self.assertEqual(module.hit_test(1,1,164,56,collapsed=True),13)
   self.assertEqual(module.hit_test(163,28,164,56,collapsed=True),11)
   self.assertEqual(module.hit_test(80,55,164,56,collapsed=True),15)
+ def test_resize_edges_win_over_controls_near_corners(self):
+  # The collapsed close/expand controls sit near the pill corners; native
+  # resize gestures must win there so a control cannot steal the border.
+  width,height=module.COLLAPSED_SIZE
+  bounds=module.layout(width,height,True)
+  for ident in (108,109):
+   x,y,w,h=bounds[ident]
+   for px,py in ((x,y+h//2),(x+w-1,y+h//2)):
+    target=module.hit_test(px,py,width,height,True)
+    self.assertIn(target,(10,11,1))
+  self.assertEqual(module.hit_test(1,height//2,width,height,True),10)
+  self.assertEqual(module.hit_test(width-1,height//2,width,height,True),11)
+
  def test_buttons_are_client_targets_not_window_drag_targets(self):
   for width,height,collapsed,hovered in [(360,150,False,False),(164,56,True,False),(260,56,True,True)]:
    for ident,(x,y,w,h) in module.layout(width,height,collapsed,hovered).items():
@@ -152,7 +165,7 @@ class TestBar(unittest.TestCase):
      return 0
     msg,wp=messages.pop(0)
     if msg==0x113 and wp:
-     fake_clock[0]=wp*.25;cursor_position[:]=[80,100] if wp<=3 else [0,0]
+     fake_clock[0]=wp*.25;cursor_position[:]=[250,190] if wp<=3 else [0,0]
     if msg==0x113:idle_checks.append((len(invalidations),len(caption_updates)))
     value=ctypes.cast(pointer,ctypes.POINTER(w.MSG)).contents;value.hWnd=11;value.message=msg;value.wParam=wp;value.lParam=0;return 1
    class DrawItem(ctypes.Structure):

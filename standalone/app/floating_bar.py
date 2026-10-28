@@ -50,10 +50,12 @@ def layout(width,height,collapsed=False,hovered=False,hover_left=False,collapsed
          104:(pad,bottom,width-2*pad,20),107:(pad,height-16,width-2*pad,8)} | ({110:(pad,bottom,width-2*pad,20)} if seek_hovered else {})
 
 def hit_test(x,y,width,height,collapsed=False,hovered=False,hover_left=False,collapsed_width=None,seek_hovered=False):
- """Return HTCLIENT over controls so Windows can route clicks to child buttons."""
- for ident,(left,top,w,h) in layout(width,height,collapsed,hovered,hover_left,collapsed_width,seek_hovered).items():
-  if ident in (101,102,103,105,106,107,108,109,110) and left<=x<left+w and top<=y<top+h:return 1
- left=x<6;right=x>=width-6;top=y<6;bottom=y>=height-6
+ """Prioritize resize borders so edge controls never steal resize gestures."""
+ # Give the native resize frame first refusal. On the collapsed pill the expand
+ # and close buttons sit close to the corners; testing controls first made the
+ # resize hit targets disappear precisely where users expect to grab them.
+ edge=8
+ left=x<edge;right=x>=width-edge;top=y<edge;bottom=y>=height-edge
  if top and left:return 13
  if top and right:return 14
  if bottom and left:return 16
@@ -62,6 +64,8 @@ def hit_test(x,y,width,height,collapsed=False,hovered=False,hover_left=False,col
  if right:return 11
  if top:return 12
  if bottom:return 15
+ for ident,(bx,by,bw,bh) in layout(width,height,collapsed,hovered,hover_left,collapsed_width,seek_hovered).items():
+  if ident in (101,102,103,105,106,107,108,109,110) and bx<=x<bx+bw and by<=y<by+bh:return 1
  return 2 # Only empty surface is draggable.
 
 class HoverIntent:
@@ -291,7 +295,12 @@ class FloatingBar:
       point=w.POINT();rect=w.RECT()
       if getcursor(ctypes.byref(point)) and getrect(hwnd,ctypes.byref(rect)):
        inside=rect.left<=point.x<rect.right and rect.top<=point.y<rect.bottom
-       desired=hover_intent.update(inside,time.monotonic(),blocked=sizing or bool(keystate(1)&0x8000))
+       # Do not grow the pill while the pointer is near its current resize
+       # border. Otherwise the hover expansion moves the edge away from the
+       # pointer, turning a simple resize into a chase-the-corner game.
+       edge=10
+       near_resize_edge=inside and (point.x<rect.left+edge or point.x>=rect.right-edge or point.y<rect.top+edge or point.y>=rect.bottom-edge)
+       desired=hover_intent.update(inside,time.monotonic(),blocked=sizing or near_resize_edge or bool(keystate(1)&0x8000))
        if desired!=hovered:
         if desired:hover_origin=(rect.left,rect.top)
         hovered=desired;apply_mode()
