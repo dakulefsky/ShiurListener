@@ -206,7 +206,6 @@ def import_profile(player, path):
                 state[key] = previous[key]
         if player.root is not None:
             state['libraryRoot'] = str(player.root)
-        state['language'] = 'en'
         state['queue'] = [ident for ident in state['queue'] if ident in player.paths]
         if state['currentId'] not in player.paths:
             state['currentId'] = None
