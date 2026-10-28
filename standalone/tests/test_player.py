@@ -17,6 +17,19 @@ class Tests(unittest.TestCase):
   self.tmp=tempfile.TemporaryDirectory();self.root=pathlib.Path(self.tmp.name).resolve();self.audio=self.root/'audio';self.audio.mkdir();(self.audio/'01.wav').write_bytes(b'fake');(self.audio/'02.mp3').write_bytes(b'fake')
   self.backend=Audio();self.player=Player(self.audio,self.root/'data',self.backend);self.library=LibraryController(self.player)
  def tearDown(self):self.tmp.cleanup()
+ def test_unreadable_saved_state_is_backed_up_and_recovers_positions(self):
+  ident=self.player.tracks[0]['id']
+  self.player.saved['tracks'][ident]={'position':42,'duration':120,'completed':False}
+  self.player.persist()
+  raw=__import__('json').loads(self.player.file.read_text(encoding='utf-8'))
+  raw['speechEnhancementStrength']=999
+  self.player.file.write_text(__import__('json').dumps(raw),encoding='utf-8')
+  restored=Player(None,self.root/'data',Audio())
+  self.assertEqual(restored.saved['tracks'][ident]['position'],42)
+  self.assertIn('repaired',restored.error.lower())
+  backups=list((self.root/'data').glob('state.json.recovery-*.bak'))
+  self.assertEqual(len(backups),1)
+  self.assertEqual(__import__('json').loads(backups[0].read_text(encoding='utf-8'))['speechEnhancementStrength'],999)
  def test_audio_enhancement_settings_validate_and_persist(self):
   settings={'bass':-2,'body':1,'clarity':4,'treble':2}
   self.player.command({'op':'audio_enhancement','value':settings})
