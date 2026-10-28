@@ -38,8 +38,8 @@ def layout(width,height,collapsed=False,hovered=False,hover_left=False,collapsed
   if hovered:
    if hover_left:
     bounds={ident:(x+shift,y,w,h) for ident,(x,y,w,h) in bounds.items()}
-    bounds.update({101:(12,10,46,max(30,height-20)),103:(64,10,46,max(30,height-20))})
-   else:bounds.update({101:(base_width-102,10,46,max(30,height-20)),103:(base_width-50,10,46,max(30,height-20))})
+    bounds.update({101:(10,10,44,max(30,height-20)),103:(58,10,44,max(30,height-20))})
+   else:bounds.update({101:(base_width+4,10,40,max(30,height-20)),103:(base_width+50,10,40,max(30,height-20))})
   return bounds
  width=max(270,width);height=max(96,height);pad=14;gap=8
  available=width-2*pad-3*gap;back=int(available*.19);play=int(available*.32);speed=available-2*back-play
