@@ -19,7 +19,7 @@ class Tests(unittest.TestCase):
    audio=next(child for child in window.root.winfo_children() if child.winfo_class()=='Toplevel')
    canvases=[child for outer in audio.winfo_children() for child in outer.winfo_children() if child.winfo_class()=='Canvas']
    self.assertTrue(canvases)
-   self.assertTrue(any(child.winfo_class()=='Scrollbar' for outer in audio.winfo_children() for child in outer.winfo_children()))
+   self.assertTrue(any(child.winfo_class() in ('Scrollbar','TScrollbar') for outer in audio.winfo_children() for child in outer.winfo_children()))
   finally:
    if window:window.close()
    fixture.tearDown()
