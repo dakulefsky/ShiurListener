@@ -98,7 +98,7 @@ def build():
  assert digest(base)==BASE_SHA256,'Prior runtime checksum mismatch'
  hush_assets=download_hush_assets()
  hush_assets.update(download_vlc_callback_assets())
- smoke_test_hush(hush_assets)
+ smoke_test_hush(hush_assets,True)
  env={**os.environ,'GOOS':'windows','GOARCH':'amd64','CGO_ENABLED':'0','GO111MODULE':'off','GOTOOLCHAIN':'local'}
  subprocess.run(['go','build','-trimpath','-ldflags=-s -w -H windowsgui','-o',str(ROOT/'build/Shiur Player.exe'),str(ROOT/'build/launcher.go')],env=env,check=True)
  prefix='Shiur Player/'
