@@ -1,5 +1,5 @@
 """Build, stage and publish a standalone release using the verified prior runtime."""
-import argparse,hashlib,json,os,pathlib,re,runpy,shutil,subprocess,urllib.request,zipfile
+import argparse,array,hashlib,json,math,os,pathlib,re,runpy,shutil,subprocess,sys,tempfile,urllib.request,wave,zipfile
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 REPO=ROOT.parent
 VERSION=runpy.run_path(str(ROOT/'app/version.py'))['APP_VERSION']
@@ -24,6 +24,22 @@ def download_hush_assets():
   assets[target]=data
  print('Verified pinned Hush native runtime, model, license and dataset notice.',flush=True)
  return assets
+def smoke_test_hush(assets):
+ with tempfile.TemporaryDirectory(prefix='shiur-hush-smoke-') as directory:
+  directory=pathlib.Path(directory);library=directory/'weya_nc.dll';model=directory/'model.tar.gz'
+  library.write_bytes(assets['runtime/speech/weya_nc.dll'])
+  model.write_bytes(assets['runtime/speech/advanced_dfnet16k_model_best_onnx.tar.gz'])
+  source=directory/'input.wav';output=directory/'output.wav'
+  samples=array.array('h',(round(5000*math.sin(2*math.pi*220*i/16000)+350*math.sin(2*math.pi*1100*i/16000)) for i in range(32000)))
+  with wave.open(str(source),'wb') as audio:
+   audio.setnchannels(1);audio.setsampwidth(2);audio.setframerate(16000);audio.writeframes(samples.tobytes())
+  sys.path.insert(0,str(ROOT/'app'))
+  from speech_enhancement import _process_wav
+  _process_wav(source,output,library,model,None,None)
+  with wave.open(str(output),'rb') as audio:
+   if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or audio.getnframes()!=len(samples):
+    raise ValueError('Hush native runtime smoke test produced invalid audio.')
+ print('Hush native runtime loaded the model and processed a WAV successfully.',flush=True)
 def git(*args):subprocess.run(['git',*args],cwd=REPO,check=True)
 def build():
  if not re.fullmatch(r'\d+\.\d+\.\d+',VERSION):raise ValueError('Invalid version')
@@ -33,6 +49,7 @@ def build():
  urllib.request.urlretrieve(url,base)
  assert digest(base)==BASE_SHA256,'Prior runtime checksum mismatch'
  hush_assets=download_hush_assets()
+ smoke_test_hush(hush_assets)
  env={**os.environ,'GOOS':'windows','GOARCH':'amd64','CGO_ENABLED':'0','GO111MODULE':'off','GOTOOLCHAIN':'local'}
  subprocess.run(['go','build','-trimpath','-ldflags=-s -w -H windowsgui','-o',str(ROOT/'build/Shiur Player.exe'),str(ROOT/'build/launcher.go')],env=env,check=True)
  prefix='Shiur Player/'
