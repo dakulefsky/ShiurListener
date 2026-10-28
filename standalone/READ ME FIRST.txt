@@ -56,7 +56,7 @@ and embedded package contents were verified structurally. The actual Windows
 setup UI, shortcuts, restart flow and speaker output remain untested here.
 This is an unsigned per-user installer. Licenses are included with the app.
 
-NEW IN 0.9.8
+NEW IN 0.9.6
 Unplayed and Finished views are in the sidebar. More and right-click
 include Rename recording, Play next and Add to queue. Queue opens the editable play order.
 Listening tools has A-B section repeat, jump to time, skip interval and sleep
@@ -65,7 +65,7 @@ Settings & backup exports/restores positions, collections and bookmarks to JSON.
 Restore pauses audio and keeps a safety backup. Audio files are not included.
 Ctrl+J jumps to time; Ctrl+M toggles mini player; in the list Ctrl+Q adds selected recordings to the queue. Mini progress is clickable.
 
-NEW IN 0.9.8
+NEW IN 0.9.6
 Rounded violet-and-neutral interface throughout the app. Each recording remembers
 its own speed. In the floating player, click minus to collapse to a tiny pill.
 Hover over the pill to reveal skip buttons, or click the expand arrow to restore
