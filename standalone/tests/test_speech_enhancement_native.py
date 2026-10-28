@@ -56,7 +56,7 @@ def make_real_noisy_sample(root):
     assert params.nchannels == 1 and params.sampwidth == 2 and params.framerate == 16000, (
         f"Expected mono 16-bit 16 kHz fixture; got {params}"
     )
-    count = min(12 * 16000, len(clean))
+    count = min(30 * 16000, len(clean))
     clean = clean[:count]
     base_rms = math.sqrt(sum(x*x for x in clean) / max(1, count))
     assert base_rms > 0.005, "Speech fixture unexpectedly silent"
@@ -181,7 +181,7 @@ def main():
             aligned_output_snr = snr_db(aligned_clean, aligned_processed)
             output_gains.append(aligned_output_snr - aligned_input_snr)
             print(
-                f"REAL_SPEECH strength={strength} duration=12s elapsed={elapsed:.2f}s "
+                f"REAL_SPEECH strength={strength} duration=30s elapsed={elapsed:.2f}s "
                 f"input_snr={input_snr:.2f}dB raw_output_snr={output_snr:.2f}dB "
                 f"aligned_input_snr={aligned_input_snr:.2f}dB aligned_output_snr={aligned_output_snr:.2f}dB "
                 f"estimated_lag={lag}samples "
