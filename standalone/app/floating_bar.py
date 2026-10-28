@@ -4,8 +4,9 @@ import ctypes,sys,threading,pathlib,time
 MIN_SIZE=(300,140)
 FRAMELESS_STYLE=0x82040000 # popup, clip children, resize frame; no caption
 DEFAULT_SIZE=(360,150)
-COLLAPSED_SIZE=(144,44)
-HOVER_SIZE=(252,44)
+COLLAPSED_SIZE=(164,56)
+COLLAPSED_MIN_SIZE=(140,52)
+HOVER_SIZE=(260,56)
 
 def display(state,tracks):
  track=next((t for t in tracks if t['id']==state['currentId']),None)
@@ -26,15 +27,19 @@ def color(value,fallback):
  except ValueError:return color(fallback,fallback)
  return r|(g<<8)|(b<<16)
 
-def layout(width,height,collapsed=False,hovered=False,hover_left=False):
+def layout(width,height,collapsed=False,hovered=False,hover_left=False,collapsed_width=None):
  """Client coordinates; title, transport, timing and a clickable progress strip."""
  if collapsed:
-  bounds={102:(16,6,40,32),108:(62,6,30,32),109:(98,6,36,32)}
+  # Keep transport large and stable; stack expand/close in a dedicated right rail.
+  base_width=collapsed_width if collapsed_width is not None else width-(96 if hovered else 0)
+  shift=width-base_width
+  rail_x=base_width-30
+  bounds={102:(10,10,42,max(30,height-20)),108:(rail_x,7,24,18),109:(rail_x,height-25,24,18)}
   if hovered:
    if hover_left:
-    bounds={ident:(x+108,y,w,h) for ident,(x,y,w,h) in bounds.items()}
-    bounds.update({101:(16,6,48,32),103:(70,6,48,32)})
-   else:bounds.update({101:(140,6,48,32),103:(194,6,48,32)})
+    bounds={ident:(x+shift,y,w,h) for ident,(x,y,w,h) in bounds.items()}
+    bounds.update({101:(10,10,44,max(30,height-20)),103:(58,10,44,max(30,height-20))})
+   else:bounds.update({101:(base_width+4,10,40,max(30,height-20)),103:(base_width+50,10,40,max(30,height-20))})
   return bounds
  width=max(270,width);height=max(96,height);pad=14;gap=8
  available=width-2*pad-3*gap;back=int(available*.19);play=int(available*.32);speed=available-2*back-play
@@ -44,20 +49,19 @@ def layout(width,height,collapsed=False,hovered=False,hover_left=False):
          103:(pad+back+play+2*gap,34,back,row_height),106:(width-pad-speed,34,speed,row_height),
          104:(pad,bottom,width-2*pad,20),107:(pad,height-10,width-2*pad,8)}
 
-def hit_test(x,y,width,height,collapsed=False,hovered=False,hover_left=False):
+def hit_test(x,y,width,height,collapsed=False,hovered=False,hover_left=False,collapsed_width=None):
  """Return HTCLIENT over controls so Windows can route clicks to child buttons."""
- for ident,(left,top,w,h) in layout(width,height,collapsed,hovered,hover_left).items():
+ for ident,(left,top,w,h) in layout(width,height,collapsed,hovered,hover_left,collapsed_width).items():
   if ident in (101,102,103,105,106,107,108,109) and left<=x<left+w and top<=y<top+h:return 1
- if not collapsed:
-  left=x<6;right=x>=width-6;top=y<6;bottom=y>=height-6
-  if top and left:return 13
-  if top and right:return 14
-  if bottom and left:return 16
-  if bottom and right:return 17
-  if left:return 10
-  if right:return 11
-  if top:return 12
-  if bottom:return 15
+ left=x<6;right=x>=width-6;top=y<6;bottom=y>=height-6
+ if top and left:return 13
+ if top and right:return 14
+ if bottom and left:return 16
+ if bottom and right:return 17
+ if left:return 10
+ if right:return 11
+ if top:return 12
+ if bottom:return 15
  return 2 # Only empty surface is draggable.
 
 class HoverIntent:
@@ -143,20 +147,25 @@ class FloatingBar:
   progress_ratio=0.;last_progress=None;hot_control=None
   texts={};enabled={};visible=self.player.saved.get('floatingVisible',False)
   collapsed=bool(self.player.saved.get('floatingCollapsed',False));expanded_size=list(DEFAULT_SIZE);hovered=False;hover_intent=HoverIntent();sizing=False;hover_origin=None;last_layout=None;hover_left=False
+  collapsed_size=self.player.saved.get('floatingCollapsedSize',list(COLLAPSED_SIZE))
+  if not isinstance(collapsed_size,list) or len(collapsed_size)!=2 or not all(isinstance(v,int) for v in collapsed_size):collapsed_size=list(COLLAPSED_SIZE)
+  collapsed_size=[max(COLLAPSED_MIN_SIZE[i],min(collapsed_size[i],2000)) for i in range(2)]
+  def collapsed_hover_size():return (max(HOVER_SIZE[0],collapsed_size[0]+96),max(HOVER_SIZE[1],collapsed_size[1]))
   def apply_mode(mode_change=False):
    nonlocal hover_origin,hover_left
    if mode_change:
     # Replacing GWL_STYLE must retain WS_VISIBLE or Windows hides every child.
-    style=(0x82000000 if collapsed else FRAMELESS_STYLE)|(0x10000000 if visible else 0)
+    style=FRAMELESS_STYLE|(0x10000000 if visible else 0)
     setstyle(self.hwnd,-16,ctypes.c_int32(style).value)
-   size=(HOVER_SIZE if hovered else COLLAPSED_SIZE) if collapsed else expanded_size
+   hover_size=collapsed_hover_size()
+   size=(hover_size if hovered else collapsed_size) if collapsed else expanded_size
    rect=w.RECT();getrect(self.hwnd,ctypes.byref(rect))
    # Keep the restored window on screen, even after dragging the pill to an edge.
    origin=hover_origin or (rect.left,rect.top)
    left,top,width,height=work_area(origin)
-   hover_left=bool(collapsed and hovered and origin[0]+HOVER_SIZE[0]>left+width)
+   hover_left=bool(collapsed and hovered and origin[0]+hover_size[0]>left+width)
    size=(min(size[0],max(1,width)),min(size[1],max(1,height)))
-   desired_x=origin[0]-(HOVER_SIZE[0]-COLLAPSED_SIZE[0] if hover_left else 0)
+   desired_x=origin[0]-(hover_size[0]-collapsed_size[0] if hover_left else 0)
    x=max(left,min(desired_x,left+max(0,width-size[0])));y=max(top,min(origin[1],top+max(0,height-size[1])))
    setpos(self.hwnd,None,x,y,*size,0x0034 if mode_change else 0x0014)
    if not hovered:hover_origin=None
@@ -168,7 +177,7 @@ class FloatingBar:
    signature=(rect.right,rect.bottom,collapsed,hovered,hover_left)
    if signature==last_layout:return
    last_layout=signature
-   bounds=layout(rect.right,rect.bottom,collapsed,hovered,hover_left)
+   bounds=layout(rect.right,rect.bottom,collapsed,hovered,hover_left,collapsed_size[0])
    for ident,handle in controls.items():show(handle,5 if ident in bounds else 0)
    for ident,(x,y,width,height) in bounds.items():
     if ident in controls:move(controls[ident],x,y,width,height,True)
@@ -228,13 +237,14 @@ class FloatingBar:
    try:
     if msg==0x0024:
      info=ctypes.cast(lp,ctypes.POINTER(MINMAXINFO)).contents
-     info.minTrackSize.x,info.minTrackSize.y=COLLAPSED_SIZE if collapsed else MIN_SIZE;return 0
+     info.minTrackSize.x=(collapsed_hover_size()[0] if hovered else COLLAPSED_MIN_SIZE[0]) if collapsed else MIN_SIZE[0]
+     info.minTrackSize.y=COLLAPSED_MIN_SIZE[1] if collapsed else MIN_SIZE[1];return 0
     if msg==0x0083:return 0 # Remove the native non-client frame, retaining resize semantics.
     if msg==0x0084:
      rect=w.RECT();getrect(hwnd,ctypes.byref(rect))
      x=ctypes.c_short(lp&0xffff).value-rect.left;y=ctypes.c_short((lp>>16)&0xffff).value-rect.top
      client=w.RECT();clientrect(hwnd,ctypes.byref(client))
-     return hit_test(x,y,client.right,client.bottom,collapsed,hovered,hover_left)
+     return hit_test(x,y,client.right,client.bottom,collapsed,hovered,hover_left,collapsed_size[0])
     if msg==0x0005:resize();return 0
     if msg==0x0231:sizing=True;return 0
     if msg==0x0232:
@@ -242,11 +252,17 @@ class FloatingBar:
      rect=w.RECT()
      if getrect(hwnd,ctypes.byref(rect)):
       with self.player.lock:
-       if collapsed and hovered:hover_origin=(rect.left+(HOVER_SIZE[0]-COLLAPSED_SIZE[0] if hover_left else 0),rect.top)
+       if collapsed and hovered:hover_origin=(rect.left+(collapsed_hover_size()[0]-collapsed_size[0] if hover_left else 0),rect.top)
        self.player.saved['floatingPosition']=list(hover_origin or (rect.left,rect.top))
-       if not collapsed:
+       if collapsed:
+        measured_width=rect.right-rect.left
+        if hovered:measured_width-=collapsed_hover_size()[0]-collapsed_size[0]
+        collapsed_size[:]=[max(COLLAPSED_MIN_SIZE[0],measured_width),max(COLLAPSED_MIN_SIZE[1],rect.bottom-rect.top)]
+        self.player.saved['floatingCollapsedSize']=list(collapsed_size)
+       else:
         expanded_size=[max(MIN_SIZE[0],rect.right-rect.left),max(MIN_SIZE[1],rect.bottom-rect.top)];self.player.saved['floatingSize']=expanded_size
        self.player.persist()
+     if collapsed and hovered:apply_mode()
      return 0
     if msg in (0x0010,0x8001,0x8003):
      visible=bool(wp) if msg==0x8003 else False if msg==0x0010 else not visible;show(hwnd,4 if visible else 0)
@@ -364,13 +380,14 @@ class FloatingBar:
    if not isinstance(size,list) or len(size)!=2 or not all(isinstance(v,int) for v in size):size=list(DEFAULT_SIZE)
    bar_width=max(MIN_SIZE[0],size[0]);bar_height=max(MIN_SIZE[1],size[1])
    expanded_size=[bar_width,bar_height]
-   if collapsed:bar_width,bar_height=COLLAPSED_SIZE
+   if collapsed:bar_width,bar_height=collapsed_size
    left,top,width,height=work_area((x,y))
    if width>0 and height>0:
     bar_width=min(bar_width,max(1,width));bar_height=min(bar_height,max(1,height))
     x=max(left,min(x,left+max(0,width-bar_width)));y=max(top,min(y,top+max(0,height-bar_height)))
    # Frameless popup: custom hit targets retain resizing without a Windows title bar.
-   self.hwnd=create(0x08000088,name,'Shiur Player Mini',(0x82000000 if collapsed else FRAMELESS_STYLE),x,y,bar_width,bar_height,None,None,instance,None)
+   # Keep WS_THICKFRAME in both modes; custom hit testing supplies the resize edges.
+   self.hwnd=create(0x08000088,name,'Shiur Player Mini',FRAMELESS_STYLE,x,y,bar_width,bar_height,None,None,instance,None)
    if not self.hwnd:raise OSError(ctypes.get_last_error(),'Could not create floating bar.')
    for ident in (100,104):controls[ident]=create(0,'STATIC','',0x50004000,0,0,1,1,self.hwnd,ident,instance,None)
    # SS_OWNERDRAW | SS_NOTIFY: clickable, without claiming a keyboard tab stop.
