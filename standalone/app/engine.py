@@ -166,8 +166,9 @@ class Player:
             old_paths=dict(self.paths)
             old_tracks={track['id']:dict(track) for track in self.tracks}
             old_identity={}
-            for ident,key in self.file_ids.items():
-                if key and key[1]:old_identity.setdefault(key,[]).append(ident)
+            if old_root==selected:
+                for ident,key in self.file_ids.items():
+                    if key and key[1]:old_identity.setdefault(key,[]).append(ident)
             used=set()
             paths={};tracks=[];file_ids={}
             for path,relative,device,inode,size,mtime in discovered:
@@ -184,7 +185,8 @@ class Player:
                 paths[ident]=path;file_ids[ident]=(device,inode)
                 tracks.append({'id':ident,'name':path.name,'source':relative})
             changed=(old_root!=selected or old_tracks!={t['id']:t for t in tracks}
-                     or old_paths!={ident:path for ident,path in paths.items()})
+                     or old_paths!={ident:path for ident,path in paths.items()}
+                     or self.file_ids!=file_ids or bool(self.error))
             if not changed:return self.snapshot()
             self.capture()
             if self.active and self.active not in paths:
