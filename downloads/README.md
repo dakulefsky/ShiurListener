@@ -4,15 +4,17 @@
 
 [Download plugin](shiur-player-1.5.0.otzplugin). Bundled offline model/runtime; no Python or companion installation. Keeps the five-minute minimum, checks speech/music locally before playback, and preserves saved positions. Filtering is experimental and can make mistakes. [Instructions and limitations](../player/README.md). Install as an update to נגן שיעורים in Otzaria.
 
-## Current standalone: 0.9.7
+## Current standalone: 0.9.8
 
-[Download setup](shiur-player-setup-0.9.7.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.7
+[Download setup](shiur-player-setup-0.9.8.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.8
 
-The collapsed mini-player pill can now be resized from its edges and corners, with a 140 × 52 minimum. Its size is stored separately from the expanded mini-player size and restored on the next launch. Expand/collapse and close controls are stacked vertically with clean resize gutters; hover skip controls reposition without overlapping the transport or stacked buttons.
+Compatible Bluetooth headphone and keyboard media buttons can now control playback when global shortcuts are enabled: Play/Pause toggles playback, Previous skips backward, and Next skips forward using the configured skip interval. The shortcut editor lists these actions separately and explains how to configure them.
 
-The “Shiur Player” name in the main window's upper-left sidebar now has flexible width and tighter spacing to prevent clipping.
+Keyboard shortcut settings now follow a clearer select, configure, apply, and save flow, with clearer descriptions for global shortcuts and reset behavior.
 
-Playback behavior and existing listening data are preserved, including resume positions, collections, bookmarks, playback speeds, shortcuts and the expanded mini-player's saved dimensions. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
+The 0.9.7 mini-player refinements remain included: the collapsed pill resizes independently, its expand and close controls are stacked, and the Shiur Player name no longer clips in the main sidebar.
+
+Existing playback positions, collections, bookmarks, and saved preferences are preserved. Media-key support is implemented through Windows global media-key registration; physical Bluetooth headset compatibility can vary by device and should be checked on the target Windows system. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
 
 ## Standalone: 0.8.1
 
