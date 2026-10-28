@@ -1,0 +1,9 @@
+Third-party offline speech enhancement runtime
+
+Shiur Player's optional offline speech enhancement uses Hush / DeepFilterNet-SE v1.0.0 from https://github.com/pulp-vision/Hush and the model repository https://huggingface.co/weya-ai/hush.
+
+The upstream project declares Apache License 2.0 for its code and pretrained model. The complete upstream LICENSE and DATASETS.md are bundled beside the runtime under runtime/speech/. Preserve these notices when redistributing the application.
+
+The upstream dataset documentation lists separate licenses for its training data, including ESC-50 under CC BY-NC 3.0. The model author publishes the model under Apache-2.0; this notice records the documented provenance for transparency. Review the upstream model card and dataset terms for your own distribution/use case.
+
+Model/runtime files are pinned to the upstream v1.0.0 Git tree and verified against Git blob hashes during the Windows build. Audio is processed locally; the application does not upload recordings or download a model at runtime.
