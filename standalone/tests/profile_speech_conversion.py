@@ -57,7 +57,7 @@ def main():
             if sys.byteorder != "little":
                 raw.byteswap()
         assert params.nchannels == 1 and params.sampwidth == 2 and params.framerate == 16000
-        source_samples = [value / 32768.0 for value in raw]
+        source_samples = [value / 32768.0 for value in raw]\n        source_samples = source_samples + source_samples
         wanted_frames = 60 * 44100
         stereo = array.array("h")
         for index in range(wanted_frames):
