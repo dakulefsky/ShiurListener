@@ -548,8 +548,7 @@ class PlayerWindow:
    def work():
     try:self.requests.put(('update_downloaded',updater.download(value)))
     except Exception as error:self.requests.put(('update_error',str(error)))
-   job['worker']=threading.Thread(target=work,name=f'speech-enhancement-{ident}',daemon=True)
-   job['worker'].start()
+   threading.Thread(target=work,name='shiur-update-download',daemon=True).start()
   elif action=='update_downloaded':
    try:
     with self.player.lock:self.player.capture();self.player.persist()
@@ -840,7 +839,8 @@ class PlayerWindow:
      self.requests.put(('speech_cancelled',None))
     except Exception as error:
      self.requests.put(('speech_error',str(error)))
-   threading.Thread(target=work,daemon=True).start()
+   job['worker']=threading.Thread(target=work,name=f'speech-enhancement-{ident}',daemon=True)
+   job['worker'].start()
   job['start']=start;job['use_enhanced']=use_enhanced;job['use_original']=use_original;scale.configure(command=on_strength)
   start_button.configure(command=lambda:self.safe(start));original_button.configure(command=use_original)
   cancel_button.configure(command=cancel_or_close)
