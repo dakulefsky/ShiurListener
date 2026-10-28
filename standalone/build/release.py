@@ -24,25 +24,35 @@ def download_hush_assets():
   assets[target]=data
  print('Verified pinned Hush native runtime, model, license and dataset notice.',flush=True)
  return assets
-def smoke_test_hush(assets):
+def smoke_test_hush(assets,test_conversion=False):
  with tempfile.TemporaryDirectory(prefix='shiur-hush-smoke-',ignore_cleanup_errors=True) as directory:
   directory=pathlib.Path(directory);app=directory/'app';speech=app/'runtime'/'speech';speech.mkdir(parents=True)
   library=speech/'weya_nc.dll';model=speech/'advanced_dfnet16k_model_best_onnx.tar.gz'
   library.write_bytes(assets['runtime/speech/weya_nc.dll'])
   model.write_bytes(assets['runtime/speech/advanced_dfnet16k_model_best_onnx.tar.gz'])
   source=directory/'input.wav';output=directory/'output.wav'
-  samples=array.array('h',(round(5000*math.sin(2*math.pi*220*i/16000)+350*math.sin(2*math.pi*1100*i/16000)) for i in range(32000)))
+  if test_conversion:
+   vlc_source=ROOT/'app'/'runtime'/'vlc'
+   if not (vlc_source/'vlc.exe').is_file():raise ValueError('Verified VLC test runtime is missing its executable.')
+   shutil.copytree(vlc_source,app/'runtime'/'vlc')
+   frames=44100*2
+   samples=array.array('h',(round(4500*math.sin(2*math.pi*220*(i//2)/44100)) for i in range(frames*2)))
+   rate=44100;channels=2
+  else:
+   frames=16000*2
+   samples=array.array('h',(round(5000*math.sin(2*math.pi*220*i/16000)+350*math.sin(2*math.pi*1100*i/16000)) for i in range(frames)))
+   rate=16000;channels=1
   with wave.open(str(source),'wb') as audio:
-   audio.setnchannels(1);audio.setsampwidth(2);audio.setframerate(16000);audio.writeframes(samples.tobytes())
+   audio.setnchannels(channels);audio.setsampwidth(2);audio.setframerate(rate);audio.writeframes(samples.tobytes())
   sys.path.insert(0,str(ROOT/'app'))
   from speech_enhancement import enhance_file
   original=source.read_bytes()
   enhance_file(source,output,app)
   if source.read_bytes()!=original:raise ValueError('Speech enhancement modified the original input.')
   with wave.open(str(output),'rb') as audio:
-   if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or audio.getnframes()!=len(samples):
+   if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or audio.getnframes()!=32000:
     raise ValueError('Hush native runtime smoke test produced invalid audio.')
- print('Hush native runtime loaded the model and processed a WAV successfully.',flush=True)
+ print('Hush native runtime loaded the model and processed audio successfully.',flush=True)
 def git(*args):subprocess.run(['git',*args],cwd=REPO,check=True)
 def build():
  if not re.fullmatch(r'\d+\.\d+\.\d+',VERSION):raise ValueError('Invalid version')
