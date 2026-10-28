@@ -56,6 +56,26 @@ class FolderMonitorTests(unittest.TestCase):
             monitor._run()
             self.assertEqual(player.scans, [root])
 
+    def test_growing_file_is_not_scanned_until_size_and_mtime_stabilize(self):
+        with __import__("tempfile").TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            player = FakePlayer(root)
+            monitor = FolderMonitor(player, interval=1, stable_polls=2)
+            baseline = {"shiur.mp3": (100, 1)}
+            growing = {"shiur.mp3": (200, 2)}
+            finished = {"shiur.mp3": (9000, 9)}
+            # Establish the initial baseline, then simulate a copy growing in
+            # two steps. A scan is allowed only after the final snapshot repeats.
+            snapshots = iter(
+                [baseline, baseline, baseline, baseline,
+                 growing, finished, finished, finished, finished]
+            )
+            monitor._snapshot = mock.Mock(side_effect=lambda _root: next(snapshots))
+            monitor.stop_event = SequenceEvent([False] * 9 + [True])
+            monitor._run()
+            self.assertEqual(player.scans, [root])
+            self.assertEqual(monitor._applied, finished)
+
     def test_missing_root_does_not_crash_monitor(self):
         player = FakePlayer(None)
         monitor = FolderMonitor(player, interval=1)
