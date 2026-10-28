@@ -27,18 +27,19 @@ def color(value,fallback):
  except ValueError:return color(fallback,fallback)
  return r|(g<<8)|(b<<16)
 
-def layout(width,height,collapsed=False,hovered=False,hover_left=False):
+def layout(width,height,collapsed=False,hovered=False,hover_left=False,collapsed_width=None):
  """Client coordinates; title, transport, timing and a clickable progress strip."""
  if collapsed:
   # Keep transport large and stable; stack expand/close in a dedicated right rail.
-  rail_x=width-32
+  base_width=collapsed_width if collapsed_width is not None else width-(96 if hovered else 0)
+  shift=width-base_width
+  rail_x=base_width-32
   bounds={102:(10,10,42,max(30,height-20)),108:(rail_x,3,24,22),109:(rail_x,height-25,24,22)}
   if hovered:
-   shift=max(HOVER_SIZE[0],width+96)-width
    if hover_left:
     bounds={ident:(x+shift,y,w,h) for ident,(x,y,w,h) in bounds.items()}
     bounds.update({101:(12,10,46,max(30,height-20)),103:(64,10,46,max(30,height-20))})
-   else:bounds.update({101:(62,10,46,max(30,height-20)),103:(114,10,46,max(30,height-20))})
+   else:bounds.update({101:(base_width-102,10,46,max(30,height-20)),103:(base_width-50,10,46,max(30,height-20))})
   return bounds
  width=max(270,width);height=max(96,height);pad=14;gap=8
  available=width-2*pad-3*gap;back=int(available*.19);play=int(available*.32);speed=available-2*back-play
@@ -48,9 +49,9 @@ def layout(width,height,collapsed=False,hovered=False,hover_left=False):
          103:(pad+back+play+2*gap,34,back,row_height),106:(width-pad-speed,34,speed,row_height),
          104:(pad,bottom,width-2*pad,20),107:(pad,height-10,width-2*pad,8)}
 
-def hit_test(x,y,width,height,collapsed=False,hovered=False,hover_left=False):
+def hit_test(x,y,width,height,collapsed=False,hovered=False,hover_left=False,collapsed_width=None):
  """Return HTCLIENT over controls so Windows can route clicks to child buttons."""
- for ident,(left,top,w,h) in layout(width,height,collapsed,hovered,hover_left).items():
+ for ident,(left,top,w,h) in layout(width,height,collapsed,hovered,hover_left,collapsed_width).items():
   if ident in (101,102,103,105,106,107,108,109) and left<=x<left+w and top<=y<top+h:return 1
  left=x<6;right=x>=width-6;top=y<6;bottom=y>=height-6
  if top and left:return 13
@@ -176,7 +177,7 @@ class FloatingBar:
    signature=(rect.right,rect.bottom,collapsed,hovered,hover_left)
    if signature==last_layout:return
    last_layout=signature
-   bounds=layout(rect.right,rect.bottom,collapsed,hovered,hover_left)
+   bounds=layout(rect.right,rect.bottom,collapsed,hovered,hover_left,collapsed_size[0])
    for ident,handle in controls.items():show(handle,5 if ident in bounds else 0)
    for ident,(x,y,width,height) in bounds.items():
     if ident in controls:move(controls[ident],x,y,width,height,True)
@@ -236,13 +237,13 @@ class FloatingBar:
    try:
     if msg==0x0024:
      info=ctypes.cast(lp,ctypes.POINTER(MINMAXINFO)).contents
-     info.minTrackSize.x,info.minTrackSize.y=COLLAPSED_MIN_SIZE if collapsed else MIN_SIZE;return 0
+     info.minTrackSize.x,info.minTrackSize.y=(collapsed_hover_size()[0] if hovered else COLLAPSED_MIN_SIZE[0]),COLLAPSED_MIN_SIZE[1] if collapsed else MIN_SIZE[1];return 0
     if msg==0x0083:return 0 # Remove the native non-client frame, retaining resize semantics.
     if msg==0x0084:
      rect=w.RECT();getrect(hwnd,ctypes.byref(rect))
      x=ctypes.c_short(lp&0xffff).value-rect.left;y=ctypes.c_short((lp>>16)&0xffff).value-rect.top
      client=w.RECT();clientrect(hwnd,ctypes.byref(client))
-     return hit_test(x,y,client.right,client.bottom,collapsed,hovered,hover_left)
+     return hit_test(x,y,client.right,client.bottom,collapsed,hovered,hover_left,collapsed_size[0])
     if msg==0x0005:resize();return 0
     if msg==0x0231:sizing=True;return 0
     if msg==0x0232:
