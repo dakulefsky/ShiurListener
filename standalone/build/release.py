@@ -67,7 +67,7 @@ def download_vlc_callback_assets():
  with urllib.request.urlopen(VLC_PLUGIN_URL,timeout=180) as response:payload=response.read()
  with urllib.request.urlopen('https://download.videolan.org/pub/videolan/vlc/3.0.24/win64/vlc-3.0.24-win64.zip.sha256',timeout=60) as response:
   checksum_text=response.read().decode('ascii','replace').lower()
- published=re.findall(r'\\b[0-9a-f]{64}\\b',checksum_text)
+ published=re.findall(r'\b[0-9a-f]{64}\b',checksum_text)
  actual=hashlib.sha256(payload).hexdigest()
  if len(payload)!=VLC_PLUGIN_SIZE or not published or actual!=published[0] or actual!=VLC_PLUGIN_SHA256:
   raise ValueError(f'Official VLC archive verification failed: bytes={len(payload)}, actual={actual}, published={published[0] if published else "missing"}, pinned={VLC_PLUGIN_SHA256}.')
