@@ -83,6 +83,50 @@ class SpeechEnhancementTests(unittest.TestCase):
     def tearDown(self):
         self.temporary.cleanup()
 
+    def test_slow_folder_walk_does_not_hold_player_lock_or_overwrite_newer_scan(self):
+        player = Player(None, self.root / "player-data", backend=object())
+        first = self.root / "first-library"
+        second = self.root / "second-library"
+        first.mkdir()
+        second.mkdir()
+        (first / "old.mp3").write_bytes(b"old")
+        (second / "new.mp3").write_bytes(b"new")
+        entered = threading.Event()
+        release = threading.Event()
+        errors = []
+        original_rglob = pathlib.Path.rglob
+
+        def slow_rglob(path, pattern):
+            if path.resolve() == first.resolve():
+                entered.set()
+                if not release.wait(timeout=5):
+                    raise TimeoutError("test did not release blocked scan")
+            return original_rglob(path, pattern)
+
+        with mock.patch.object(pathlib.Path, "rglob", new=slow_rglob):
+            def scan_first():
+                try:
+                    player.scan(first)
+                except Exception as error:
+                    errors.append(error)
+
+            worker = threading.Thread(target=scan_first)
+            worker.start()
+            self.assertTrue(entered.wait(timeout=2), "first scan did not reach filesystem traversal")
+            acquired = player.lock.acquire(timeout=0.2)
+            if acquired:
+                player.lock.release()
+            self.assertTrue(acquired, "filesystem traversal held the player lock")
+            # A newer scan should complete while the older traversal is blocked.
+            player.scan(second)
+            release.set()
+            worker.join(timeout=5)
+
+        self.assertFalse(worker.is_alive(), "old scan did not finish after release")
+        self.assertEqual(errors, [])
+        self.assertEqual(player.root, second.resolve())
+        self.assertEqual([track["name"] for track in player.tracks], ["new.mp3"])
+
     def test_player_default_speech_strength_matches_dialog_default(self):
         player = Player(None, self.root / "player-data", backend=object())
         self.assertEqual(player.saved["speechEnhancementStrength"], 20)
