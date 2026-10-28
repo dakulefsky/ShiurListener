@@ -13,19 +13,24 @@ DEFAULTS={
  'skip60':{'key':'3','action':{'op':'skip_interval','value':60}},
  'stop':{'key':'S','action':{'op':'stop'}},
  'floating':{'key':'F','action':{'op':'floating_toggle'}},
+ 'media_toggle':{'key':'MEDIA_PLAY_PAUSE','modifiers':[],'action':{'op':'toggle'}},
+ 'media_back':{'key':'MEDIA_PREV_TRACK','modifiers':[],'action':{'op':'skip','direction':-1}},
+ 'media_forward':{'key':'MEDIA_NEXT_TRACK','modifiers':[],'action':{'op':'skip','direction':1}},
 }
 KEYS={'LEFT':0x25,'UP':0x26,'RIGHT':0x27,'DOWN':0x28,'PAGEUP':0x21,'PAGEDOWN':0x22,'SPACE':0x20,**{chr(i):i for i in range(65,91)},**{str(i):48+i for i in range(10)}}
 KEYS.update({f'F{i}':0x6f+i for i in range(1,25)})
+KEYS.update({'MEDIA_PREV_TRACK':0xB1,'MEDIA_NEXT_TRACK':0xB0,'MEDIA_PLAY_PAUSE':0xB3})
+MEDIA_KEYS={'MEDIA_PREV_TRACK','MEDIA_NEXT_TRACK','MEDIA_PLAY_PAUSE'}
 MODS={'ALT':1,'CTRL':2,'SHIFT':4,'WIN':8}
 def bindings(config):
  result=[];used=set()
  if not isinstance(config,dict):raise ValueError('hotkeys.json must contain an object.')
  for name,spec in DEFAULTS.items():
-  value=config.get(name,{'modifiers':['CTRL','ALT','SHIFT'],'key':spec['key']})
+  value=config.get(name,{'modifiers':spec.get('modifiers',['CTRL','ALT','SHIFT']),'key':spec['key']})
   if value is None:continue
   if not isinstance(value,dict):raise ValueError('Invalid shortcut: '+name)
   modifiers=value.get('modifiers',[]);key=str(value.get('key','')).upper()
-  if not isinstance(modifiers,list) or any(not isinstance(m,str) or m not in MODS for m in modifiers) or not any(m in ('CTRL','ALT','WIN') for m in modifiers) or key not in KEYS:raise ValueError('Use Ctrl, Alt or Win and a supported key for '+name)
+  if not isinstance(modifiers,list) or any(not isinstance(m,str) or m not in MODS for m in modifiers) or (not any(m in ('CTRL','ALT','WIN') for m in modifiers) and key not in MEDIA_KEYS) or key not in KEYS:raise ValueError('Use Ctrl, Alt or Win with a supported key, or use a media key without modifiers, for '+name)
   flags=0
   for modifier in modifiers:flags|=MODS[modifier]
   chord=(flags,KEYS[key])
@@ -33,7 +38,7 @@ def bindings(config):
   used.add(chord);result.append((name,flags,KEYS[key],'+'.join(modifiers+[key]),spec['action']))
  return result
 def default_config():
- return {name:{'modifiers':['CTRL','ALT','SHIFT'],'key':item['key']} for name,item in DEFAULTS.items()}
+ return {name:{'modifiers':item.get('modifiers',['CTRL','ALT','SHIFT']),'key':item['key']} for name,item in DEFAULTS.items()}
 def load_config(path):
  config=json.loads(path.read_text('utf-8')) if path.exists() else {}
  bindings(config)
