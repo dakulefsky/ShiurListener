@@ -92,6 +92,9 @@ func setup() error {
 	if err := shortcuts(stable, root); err != nil {
 		return fmt.Errorf("Could not create shortcuts: %w", err)
 	}
+	if err := registerOpenWith(stable); err != nil {
+		return fmt.Errorf("Could not register Shiur Player in Windows audio-file options: %w", err)
+	}
 	if err := activate(root, releaseVersion); err != nil {
 		return fmt.Errorf("Could not finish installation; the previous version remains selected: %w", err)
 	}
@@ -216,5 +219,56 @@ func makeLink(file, target, working string, ole *syscall.LazyDLL) error {
 	if failed(result) {
 		return fmt.Errorf("Could not save Windows shortcut")
 	}
+	return nil
+}
+
+
+// registerOpenWith adds a per-user "Open with Shiur Player" handler without
+// changing Windows' default audio player. It also adds a direct Explorer verb.
+func registerOpenWith(target string) error {
+	command := fmt.Sprintf("%q --open-file "%%1"", target)
+	app := `Software\Classes\Applications\Shiur Player.exe`
+	if err := setRegistryString(app, "FriendlyAppName", "Shiur Player"); err != nil { return err }
+	if err := setRegistryString(app+`\DefaultIcon`, "", target+",0"); err != nil { return err }
+	if err := setRegistryString(app+`\shell\open\command`, "", command); err != nil { return err }
+	extensions := []string{".mp3", ".m4a", ".m4b", ".wav", ".ogg", ".oga", ".opus", ".flac", ".aac", ".aiff", ".aif", ".wma"}
+	for _, extension := range extensions {
+		if err := setRegistryString(app+`\SupportedTypes`, extension, ""); err != nil { return err }
+		verb := `Software\Classes\SystemFileAssociations\`+extension+`\shell\Play with Shiur Player`
+		if err := setRegistryString(verb, "MUIVerb", "Play with Shiur Player"); err != nil { return err }
+		if err := setRegistryString(verb, "Icon", target+",0"); err != nil { return err }
+		if err := setRegistryString(verb+`\command`, "", command); err != nil { return err }
+	}
+	// Ask Explorer to refresh its association cache.
+	shell := syscall.NewLazyDLL("shell32.dll")
+	shell.NewProc("SHChangeNotify").Call(0x08000000, 0, 0, 0)
+	return nil
+}
+
+func setRegistryString(path, name, value string) error {
+	advapi := syscall.NewLazyDLL("advapi32.dll")
+	create := advapi.NewProc("RegCreateKeyExW")
+	set := advapi.NewProc("RegSetValueExW")
+	closeKey := advapi.NewProc("RegCloseKey")
+	subkey, err := syscall.UTF16PtrFromString(path)
+	if err != nil { return err }
+	var key syscall.Handle
+	status, _, _ := create.Call(0x80000001, uintptr(unsafe.Pointer(subkey)), 0, 0, 0, 0x20006, 0, uintptr(unsafe.Pointer(&key)), 0)
+	runtime.KeepAlive(subkey)
+	if status != 0 { return syscall.Errno(status) }
+	defer closeKey.Call(uintptr(key))
+	var valueName uintptr
+	var namePtr *uint16
+	if name != "" {
+		namePtr, err = syscall.UTF16PtrFromString(name)
+		if err != nil { return err }
+		valueName = uintptr(unsafe.Pointer(namePtr))
+	}
+	data, err := syscall.UTF16FromString(value)
+	if err != nil { return err }
+	status, _, _ = set.Call(uintptr(key), valueName, 0, 1, uintptr(unsafe.Pointer(&data[0])), uintptr(len(data)*2))
+	runtime.KeepAlive(namePtr)
+	runtime.KeepAlive(data)
+	if status != 0 { return syscall.Errno(status) }
 	return nil
 }
