@@ -15,8 +15,8 @@ class FakePlayer:
         self.lock = threading.RLock()
         self.scans = []
 
-    def scan(self, root):
-        self.scans.append(pathlib.Path(root))
+    def scan(self, root=None):
+        self.scans.append(pathlib.Path(root) if root is not None else self.root)
 
 
 class SequenceEvent:
