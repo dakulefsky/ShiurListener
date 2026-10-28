@@ -1,33 +1,81 @@
-"""Native-runtime enhancement stress/measurement test.
+"""Native speech-enhancement quality and long-file performance checks.
 
-Run on Windows after obtaining the pinned Hush assets. This is a repeatable
-synthetic speech-like signal benchmark, not a substitute for listening tests on
-real shiur recordings.
+Uses a checksum-pinned, public-domain human speech sample plus known added noise
+for an objective SNR comparison. A deterministic synthetic signal separately
+stresses long-file processing. Listening tests on actual shiur recordings remain
+necessary before making broad real-world quality claims.
 """
 import array
+import hashlib
 import math
 import pathlib
+import random
 import runpy
 import sys
 import tempfile
 import time
+import urllib.request
 import wave
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "app"))
+SAMPLE_URL = "https://raw.githubusercontent.com/pyannote/pyannote-audio/develop/src/pyannote/audio/sample/sample.wav"
+SAMPLE_GIT_BLOB_SHA = "150d49a69dc2da2310fbb526759ff26638595bdc"
+SAMPLE_BYTES = 960104
 
 
-def make_signal(path, seconds, seed=20261028, noise_amplitude=0.12):
-    # Deterministic voiced harmonics with a syllabic envelope and low-level
-    # broadband noise. It provides a known clean reference for SNR measurement.
-    import random
+def read_float(path):
+    with wave.open(str(path), "rb") as source:
+        params = source.getparams()
+        raw = source.readframes(source.getnframes())
+        samples = array.array("h")
+        samples.frombytes(raw)
+        return [sample / 32768 for sample in samples], params
+
+
+def write_float(path, samples, rate=16000):
+    values = array.array("h", (round(max(-0.999, min(0.999, x)) * 32767) for x in samples))
+    with wave.open(str(path), "wb") as target:
+        target.setnchannels(1)
+        target.setsampwidth(2)
+        target.setframerate(rate)
+        target.writeframes(values.tobytes())
+
+
+def make_real_noisy_sample(root):
+    with urllib.request.urlopen(SAMPLE_URL, timeout=60) as response:
+        payload = response.read()
+    blob = hashlib.sha1(f"blob {len(payload)}\\0".encode() + payload).hexdigest()
+    assert len(payload) == SAMPLE_BYTES and blob == SAMPLE_GIT_BLOB_SHA, (
+        f"Public-domain speech fixture changed: bytes={len(payload)}, git_blob={blob}"
+    )
+    clean_file = root / "human-speech-clean.wav"
+    clean_file.write_bytes(payload)
+    clean, params = read_float(clean_file)
+    assert params.nchannels == 1 and params.sampwidth == 2 and params.framerate == 16000, (
+        f"Expected mono 16-bit 16 kHz fixture; got {params}"
+    )
+    count = min(12 * 16000, len(clean))
+    clean = clean[:count]
+    base_rms = math.sqrt(sum(x*x for x in clean) / max(1, count))
+    assert base_rms > 0.005, "Speech fixture unexpectedly silent"
+    gain = min(0.75 / max(abs(x) for x in clean), 0.16 / base_rms)
+    clean = [x * gain for x in clean]
+    rng = random.Random(20261028)
+    noisy = [max(-0.98, min(0.98, x + rng.gauss(0, 0.045))) for x in clean]
+    clean_path = root / "reference.wav"
+    noisy_path = root / "noisy-human-speech.wav"
+    write_float(clean_path, clean)
+    write_float(noisy_path, noisy)
+    return clean_path, noisy_path, clean, noisy
+
+
+def make_synthetic_signal(path, seconds, seed=20261029, noise_amplitude=0.12):
     rng = random.Random(seed)
-    rate = 16000
-    clean = []
-    noisy = []
-    for i in range(rate * seconds):
-        t = i / rate
+    clean, noisy = [], []
+    for i in range(16000 * seconds):
+        t = i / 16000
         syllable = 0.25 + 0.75 * (0.5 + 0.5 * math.sin(2 * math.pi * 3.1 * t)) ** 2
         f0 = 118 + 13 * math.sin(2 * math.pi * 0.7 * t)
         voiced = (0.22 * math.sin(2 * math.pi * f0 * t)
@@ -36,24 +84,10 @@ def make_signal(path, seconds, seed=20261028, noise_amplitude=0.12):
                   + 0.045 * math.sin(2 * math.pi * 5 * f0 * t))
         consonant = 0.025 * math.sin(2 * math.pi * (1700 + 300 * math.sin(t)) * t)
         wanted = syllable * (voiced + consonant)
-        noise = noise_amplitude * rng.uniform(-1, 1)
         clean.append(wanted)
-        noisy.append(max(-0.98, min(0.98, wanted + noise)))
-    with wave.open(str(path), "wb") as out:
-        out.setnchannels(1)
-        out.setsampwidth(2)
-        out.setframerate(rate)
-        out.writeframes(array.array("h", (round(x * 32767) for x in noisy)).tobytes())
+        noisy.append(max(-0.98, min(0.98, wanted + noise_amplitude * rng.uniform(-1, 1))))
+    write_float(path, noisy)
     return clean, noisy
-
-
-def read_float(path):
-    with wave.open(str(path), "rb") as source:
-        assert source.getnchannels() == 1 and source.getsampwidth() == 2 and source.getframerate() == 16000
-        raw = source.readframes(source.getnframes())
-        samples = array.array("h")
-        samples.frombytes(raw)
-        return [sample / 32768 for sample in samples], source.getnframes()
 
 
 def snr_db(reference, observed):
@@ -71,8 +105,8 @@ def main():
     release = runpy.run_path(str(ROOT / "build" / "release.py"))
     assets = release["download_hush_assets"]()
     import speech_enhancement
-    # Windows keeps a loaded DLL locked until process exit, so ignore cleanup
-    # failures for that one temporary runtime directory.
+    # Windows locks the native DLL until process exit; ignore cleanup errors for
+    # this disposable test runtime only.
     with tempfile.TemporaryDirectory(prefix="shiur-native-quality-", ignore_cleanup_errors=True) as directory:
         root = pathlib.Path(directory)
         app = root / "app"
@@ -85,52 +119,60 @@ def main():
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(data)
 
-        source = root / "noisy-reference.wav"
-        clean, noisy = make_signal(source, 12)
+        _, source, clean, noisy = make_real_noisy_sample(root)
         source_original = source.read_bytes()
+        input_snr = snr_db(clean, noisy)
+        output_snrs = []
         for strength in (20, 35, 50):
-            output = root / f"enhanced-{strength}.wav"
+            output = root / f"human-enhanced-{strength}.wav"
             progress = []
             started = time.monotonic()
             speech_enhancement.enhance_file(
                 source, output, app, strength_db=strength, progress=progress.append
             )
             elapsed = time.monotonic() - started
-            processed, frames = read_float(output)
-            assert frames == len(noisy), f"strength {strength}: frame count changed"
-            assert source.read_bytes() == source_original, "source WAV was modified"
+            processed, params = read_float(output)
+            assert params.nchannels == 1 and params.sampwidth == 2 and params.framerate == 16000
+            assert len(processed) == len(clean), f"strength {strength}: frame count changed"
+            assert source.read_bytes() == source_original, "source recording was modified"
             assert progress and progress[-1] == 100, "progress did not finish at 100%"
             assert progress == sorted(progress), "progress moved backwards"
+            assert all(math.isfinite(x) for x in processed), "output contains non-finite samples"
             clipped = sum(abs(x) >= 0.9999 for x in processed) / max(1, len(processed))
             assert clipped < 0.01, f"unexpected clipping at strength {strength}: {clipped:.2%}"
             assert rms(processed) > 0.001, f"output unexpectedly silent at strength {strength}"
-            input_snr = snr_db(clean, noisy)
             output_snr = snr_db(clean, processed)
+            output_snrs.append(output_snr)
             print(
-                f"QUALITY strength={strength} duration=12s elapsed={elapsed:.2f}s "
+                f"REAL_SPEECH strength={strength} duration=12s elapsed={elapsed:.2f}s "
                 f"input_snr={input_snr:.2f}dB output_snr={output_snr:.2f}dB "
                 f"input_rms={rms(noisy):.4f} output_rms={rms(processed):.4f} clipped={clipped:.4%}",
                 flush=True,
             )
+        best_gain = max(output_snrs) - input_snr
+        print(f"REAL_SPEECH best_snr_gain={best_gain:.2f}dB across tested strengths", flush=True)
+        assert best_gain >= 0.5, (
+            f"Speech enhancement did not improve objective SNR on the pinned human-speech fixture "
+            f"by at least 0.5 dB (best gain {best_gain:.2f} dB)."
+        )
 
-        long_source = root / "long-noisy.wav"
-        long_clean, long_noisy = make_signal(long_source, 60, seed=20261029)
+        long_source = root / "long-synthetic.wav"
+        long_clean, long_noisy = make_synthetic_signal(long_source, 60)
         long_output = root / "long-enhanced.wav"
         started = time.monotonic()
         speech_enhancement.enhance_file(long_source, long_output, app)
         elapsed = time.monotonic() - started
-        processed, frames = read_float(long_output)
-        assert frames == 16000 * 60, f"60-second output has {frames} frames"
-        assert long_source.exists() and long_output.exists()
+        processed, params = read_float(long_output)
+        assert params.nframes == 16000 * 60, f"60-second output has {params.nframes} frames"
         assert elapsed < 240, f"60-second enhancement took too long: {elapsed:.1f}s"
-        assert all(math.isfinite(x) for x in processed), "output contains non-finite samples"
+        assert all(math.isfinite(x) for x in processed), "long output contains non-finite samples"
         print(
             f"LONG duration=60s elapsed={elapsed:.2f}s realtime_factor={60/max(elapsed, 0.001):.2f}x "
             f"input_snr={snr_db(long_clean, long_noisy):.2f}dB "
             f"output_snr={snr_db(long_clean, processed):.2f}dB",
             flush=True,
         )
-        print("Synthetic benchmark finished. These SNR values do not establish quality on real shiur audio.", flush=True)
+        print("Native enhancement quality and long-file benchmark completed.", flush=True)
 
 
 if __name__ == "__main__":
