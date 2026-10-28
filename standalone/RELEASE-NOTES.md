@@ -1,7 +1,7 @@
-# Shiur Player 0.9.21
+# Shiur Player 0.9.22
 
-Fixes mini-player seek behavior so both the normal progress strip and the hover-to-scrub control respond to a click, not only a drag. Moves the collapsed mini-player's stacked expand/close controls farther from the right edge so they no longer block resizing from that side.
+The Offline speech enhancement window is now a normal, independently minimizable window, so you can minimize it to the taskbar while processing continues.
 
-Fixes the Settings → Audio enhancements transition by opening the next dialog after the current click callback completes. Long settings labels now wrap responsively instead of being clipped in narrower windows. Mouse clicks no longer leave persistent keyboard-focus rings around custom buttons, switches, and sliders; keyboard navigation remains supported.
+Speeds up the offline enhancement pipeline by reducing Python-to-native buffer overhead for every audio frame. Audio is still processed locally, the original recording is never overwritten, and output quality/settings are unchanged. Total time still depends on recording length, file format, and computer performance.
 
-Existing listening positions, collections, bookmarks and original recordings are preserved. Offline speech enhancement remains optional and runs locally.
+Includes the 0.9.21 fixes for mini-player seeking/resizing, Settings text wrapping, and the Audio enhancements navigation flow. Existing listening positions, collections, bookmarks and original recordings are preserved.
