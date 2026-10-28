@@ -1,7 +1,7 @@
-# Shiur Player 0.9.6
+# Shiur Player 0.9.7
 
-The shiurim list starts higher on the screen, with less unused header space and a shorter expanded player. Main-player cards, buttons, playback icons, toggles and slider knobs now have antialiased edges. Windows DPI awareness improves rendering at the system display scale. The existing Windows styling, playback controls and saved listening positions are preserved.
+The collapsed mini-player pill can now be resized from its edges and corners, with a 140 × 52 minimum. Its size is stored separately from the expanded mini-player size and restored on the next launch. Expand/collapse and close controls are stacked vertically with clean resize gutters; hover skip controls reposition without overlapping the transport or stacked buttons.
 
-For the clearest result, launch the app on the display you use for listening. Moving an open window between monitors with different scaling may still let Windows rescale it; reopen it on that monitor if needed.
+The “Shiur Player” name in the main window's upper-left sidebar now has flexible width and tighter spacing to prevent clipping.
 
-The mini player's button surfaces and icons now use antialiased GDI+ compositing as well. Settings → Customize keyboard shortcuts lets you assign, disable and reset global shortcuts, including function keys. Enable them to control playback while other apps are active. Duplicate shortcuts and Windows registration conflicts are reported.
+Playback behavior and existing listening data are preserved, including resume positions, collections, bookmarks, playback speeds, shortcuts and the expanded mini-player's saved dimensions.
