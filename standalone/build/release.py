@@ -68,7 +68,7 @@ VLC_PLUGIN_SIZE=82765861
 VLC_PLUGIN_SHA256='fcf30850371ad10c9373cc4f0f4501e7dee49e3e9ae9f20c72fb2661a1ca6323'
 def download_vlc_callback_assets():
  with urllib.request.urlopen(VLC_PLUGIN_URL,timeout=180) as response:payload=response.read()
- with urllib.request.urlopen('https://get.videolan.org/vlc/3.0.24/win64/vlc-3.0.24-win64.zip.sha256',timeout=60) as response:
+ with urllib.request.urlopen('https://downloads.videolan.org/vlc/3.0.24/win64/vlc-3.0.24-win64.zip.sha256',timeout=60) as response:
   checksum_text=response.read().decode('ascii','replace').lower()
  published=re.findall(r'\b[0-9a-f]{64}\b',checksum_text)
  actual=hashlib.sha256(payload).hexdigest()
