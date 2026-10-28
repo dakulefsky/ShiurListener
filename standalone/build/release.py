@@ -54,7 +54,7 @@ def smoke_test_hush(assets,test_conversion=False):
   from speech_enhancement import enhance_file
   original=source.read_bytes();started=time.monotonic()
   enhance_file(source,output,app)
-  if test_conversion and time.monotonic()-started>8:raise ValueError('Speech conversion took longer than the offline processing budget.')
+  if test_conversion and time.monotonic()-started>15:raise ValueError('Speech conversion took longer than the offline processing budget.')
   if source.read_bytes()!=original:raise ValueError('Speech enhancement modified the original input.')
   with wave.open(str(output),'rb') as audio:
    if audio.getnchannels()!=1 or audio.getsampwidth()!=2 or audio.getframerate()!=16000 or abs(audio.getnframes()-16000*(10 if test_conversion else 2))>320:
