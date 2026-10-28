@@ -37,41 +37,42 @@ def _is_supported_wav(path):
 
 
 def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
-    vlc = app_dir / "runtime" / "vlc" / "vlc.exe"
-    if not vlc.is_file():
-        raise RuntimeError("The bundled VLC converter is missing. Repair or reinstall Shiur Player.")
-    destination = output.resolve().as_posix().replace('"', r'\"')
+    from engine import VLC
+    destination = pathlib.Path(output).resolve().as_posix().replace('"', r'\\"')
     sout = f'#transcode{{acodec=s16l,channels=1,samplerate=16000}}:std{{access=file,mux=wav,dst="{destination}"}}'
-    command = [
-        str(vlc), "-I", "dummy", "--ignore-config", "--no-plugins-cache",
-        "--no-one-instance", "--no-video", "--no-video-title-show",
-        "--no-metadata-network-access", "--play-and-exit", f"--sout={sout}",
-        str(pathlib.Path(source).resolve()),
-    ]
-    flags = getattr(subprocess, "CREATE_NO_WINDOW", 0) if sys.platform == "win32" else 0
-    environment = os.environ.copy()
-    environment["VLC_PLUGIN_PATH"] = str(vlc.parent / "plugins")
-    process = subprocess.Popen(command, stdin=subprocess.DEVNULL,
-                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                               creationflags=flags, env=environment)
+    decoder = None
     try:
-        while process.poll() is None:
+        decoder = VLC(options=[f'--sout={sout}', '--sout-keep'])
+        decoder.load(source)
+        if decoder.play() < 0:
+            raise RuntimeError("VLC could not start audio conversion.")
+        started = time.monotonic()
+        while True:
             _check_cancel(cancel)
+            state = decoder.state()
+            if state["status"] == "ended":
+                break
+            if state["status"] == "error":
+                raise RuntimeError("VLC could not decode this recording for speech enhancement.")
+            if state["status"] == "stopped" and time.monotonic() - started > 2:
+                raise RuntimeError("VLC stopped before audio conversion finished.")
+            duration = state.get("duration", 0)
+            if duration > 0 and progress:
+                try:
+                    written = output.stat().st_size if output.exists() else 0
+                    expected = max(1, round(duration * 16000 * 2) + 44)
+                    _report(progress, min(9, round(9 * written / expected)))
+                except OSError:
+                    pass
             time.sleep(.08)
-    except EnhancementCancelled:
-        process.terminate()
-        try:
-            process.wait(timeout=2)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait()
-        raise
-    if process.returncode != 0 or not output.is_file() or output.stat().st_size <= 44:
+    finally:
+        if decoder:
+            decoder.close()
+    if not output.is_file() or output.stat().st_size <= 44:
         raise RuntimeError("VLC could not convert this recording for speech enhancement.")
     if not _is_supported_wav(output):
         raise RuntimeError("The local converter did not produce the expected 16 kHz mono WAV.")
     _report(progress, 10)
-
 
 def _bind(lib, name, result, args):
     function = getattr(lib, name)
