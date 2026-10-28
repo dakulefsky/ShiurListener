@@ -237,7 +237,8 @@ class FloatingBar:
    try:
     if msg==0x0024:
      info=ctypes.cast(lp,ctypes.POINTER(MINMAXINFO)).contents
-     info.minTrackSize.x,info.minTrackSize.y=(collapsed_hover_size()[0] if hovered else COLLAPSED_MIN_SIZE[0]),COLLAPSED_MIN_SIZE[1] if collapsed else MIN_SIZE[1];return 0
+     info.minTrackSize.x=(collapsed_hover_size()[0] if hovered else COLLAPSED_MIN_SIZE[0]) if collapsed else MIN_SIZE[0]
+     info.minTrackSize.y=COLLAPSED_MIN_SIZE[1] if collapsed else MIN_SIZE[1];return 0
     if msg==0x0083:return 0 # Remove the native non-client frame, retaining resize semantics.
     if msg==0x0084:
      rect=w.RECT();getrect(hwnd,ctypes.byref(rect))
