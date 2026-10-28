@@ -19,7 +19,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,6 +37,9 @@ jobs:
       - name: Unit and desktop tests (Windows, including native mini-player mouse input)
         if: runner.os == 'Windows'
         run: python standalone/tests/run_suite.py
+      - name: Verify pinned offline speech model and full enhancement path
+        if: runner.os == 'Windows'
+        run: python -c "import runpy; p=runpy.run_path('standalone/build/release.py'); p['smoke_test_hush'](p['download_hush_assets']())"
       - name: Fetch verified Windows VLC runtime for integration test
         if: runner.os == 'Windows'
         run: python standalone/tests/fetch_test_runtime.py
