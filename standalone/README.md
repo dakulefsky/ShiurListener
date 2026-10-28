@@ -1,4 +1,4 @@
-# Shiur Player 0.9.8
+# Shiur Player 0.9.9
 
 An English-only local Windows x64 desktop player with a light interface, rounded controls, violet accents and a dedicated Now Playing panel. The complete portable ZIP includes Python, Tk and VLC; users install none separately. No Otzaria, pairing code, browser or network service.
 
