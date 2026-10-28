@@ -33,8 +33,8 @@ def layout(width,height,collapsed=False,hovered=False,hover_left=False,collapsed
   # Keep transport large and stable; stack expand/close in a dedicated right rail.
   base_width=collapsed_width if collapsed_width is not None else width-(96 if hovered else 0)
   shift=width-base_width
-  rail_x=base_width-32
-  bounds={102:(10,10,42,max(30,height-20)),108:(rail_x,3,24,22),109:(rail_x,height-25,24,22)}
+  rail_x=base_width-30
+  bounds={102:(10,10,42,max(30,height-20)),108:(rail_x,7,24,18),109:(rail_x,height-25,24,18)}
   if hovered:
    if hover_left:
     bounds={ident:(x+shift,y,w,h) for ident,(x,y,w,h) in bounds.items()}
