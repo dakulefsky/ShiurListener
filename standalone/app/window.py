@@ -104,16 +104,23 @@ class SoftToggle(tk.Canvas):
 class SlimScrollbar(tk.Canvas):
  """Arrowless scrollbar with a narrow, draggable thumb."""
  def __init__(self,parent,command):
-  super().__init__(parent,width=10,bg=PAPER,highlightthickness=0,bd=0)
-  self.command=command;self.first=0.;self.last=1.;self.offset=0;self.last_paint=None
-  self.thumb=self.create_line(5,0,5,1,width=4,fill='#C3BFCE',capstyle='round',state='hidden')
+  super().__init__(parent,width=14,bg=parent.cget('bg'),highlightthickness=0,bd=0,cursor='hand2')
+  self.command=command;self.first=0.;self.last=1.;self.offset=0;self.last_paint=None;self.hover=False
+  self.track=self.create_line(7,4,7,5,width=4,fill='#EAE7F0',capstyle='round')
+  self.thumb=self.create_line(7,4,7,5,width=5,fill='#BEB9CB',capstyle='round',state='hidden')
   self.bind('<Configure>',lambda _:self.paint());self.bind('<Button-1>',self.press);self.bind('<B1-Motion>',self.drag)
+  self.bind('<Enter>',lambda _:self.set_hover(True));self.bind('<Leave>',lambda _:self.set_hover(False))
+ def set_hover(self,value):
+  self.hover=value;self.last_paint=None;self.paint()
  def set(self,first,last):self.first=float(first);self.last=float(last);self.paint()
  def paint(self):
-  height=self.winfo_height();key=(height,self.first,self.last)
+  height=max(1,self.winfo_height());key=(height,self.first,self.last,self.hover)
   if key==self.last_paint:return
-  self.last_paint=key;self.itemconfigure(self.thumb,state='normal' if self.last-self.first<.999 else 'hidden')
-  self.coords(self.thumb,5,max(8,self.first*height),5,min(height-8,max(self.first*height+22,self.last*height)))
+  self.last_paint=key
+  self.coords(self.track,7,4,7,max(5,height-4))
+  self.itemconfigure(self.thumb,state='normal' if self.last-self.first<.999 else 'hidden',fill='#8E87A5' if self.hover else '#BEB9CB')
+  top=max(8,self.first*height);bottom=min(height-8,max(top+24,self.last*height))
+  self.coords(self.thumb,7,top,7,bottom)
  def press(self,event):
   height=max(1,self.winfo_height());self.offset=event.y-self.first*height
   if not self.first*height<=event.y<=self.last*height:self.offset=0;self.command('moveto',max(0,min(1,event.y/height)))
