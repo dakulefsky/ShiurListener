@@ -399,9 +399,6 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
-if __name__=='__main__':unittest.main(verbosity=2)
-
-
  def test_settings_audio_enhancement_buttons_open_and_respond(self):
   fixture=test_player.Tests();fixture.setUp();window=None
   try:
@@ -431,3 +428,4 @@ if __name__=='__main__':unittest.main(verbosity=2)
   finally:
    if window:window.close()
    fixture.tearDown()
+if __name__=='__main__':unittest.main(verbosity=2)
