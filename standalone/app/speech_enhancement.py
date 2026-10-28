@@ -37,46 +37,26 @@ def _is_supported_wav(path):
 
 
 def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
+    """Decode/transcode with VLC's file-output pipeline instead of realtime audio callbacks.
+
+    Audio-memory callbacks run on VLC's playback clock, so a 90-minute recording
+    could spend at least 90 minutes just converting before denoising even begins.
+    The sout pipeline writes 16 kHz mono PCM directly and disables audio-clock sync.
+    """
     from engine import VLC
     decoder = None
-    writer = None
-    callback_errors = []
-    written_samples = [0]
     try:
-        decoder = VLC()
-        lib = decoder.lib
-        play_type = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint, ctypes.c_int64)
-        lib.libvlc_audio_set_callbacks.restype = None
-        lib.libvlc_audio_set_callbacks.argtypes = [ctypes.c_void_p, play_type, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
-        lib.libvlc_audio_set_format.restype = None
-        lib.libvlc_audio_set_format.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint, ctypes.c_uint]
-        writer = wave.open(str(output), 'wb')
-        writer.setnchannels(1);writer.setsampwidth(2);writer.setframerate(16000)
-        def play_callback(opaque, samples, count, pts):
-            try:
-                count = int(count)
-                if count <= 0 or not samples:return
-                writer.writeframesraw(ctypes.string_at(samples, count * 2))
-                written_samples[0] += count
-            except BaseException as error:
-                callback_errors.append(error)
-        decoder.load(source)
-        lib.libvlc_audio_output_set.restype = ctypes.c_int
-        lib.libvlc_audio_output_set.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
-        if lib.libvlc_audio_output_set(decoder.player, b'amem') < 0:
-            raise RuntimeError('The bundled VLC audio-memory output plugin could not be selected.')
-        play_fn = play_type(play_callback)
-        lib.libvlc_audio_set_callbacks(decoder.player, play_fn, None, None, None, None, None)
-        lib.libvlc_audio_set_format(decoder.player, b'S16N', 16000, 1)
-        decoder.play()
+        _check_cancel(cancel)
+        decoder = VLC(options=('--aout=dummy',))
+        destination = pathlib.Path(output).resolve().as_posix()
+        sout = f':sout=#transcode{{acodec=s16l,channels=1,samplerate=16000}}:std{{access=file,mux=wav,dst="{destination}"}}'
+        decoder.load(source, media_options=(sout, ':sout-transcode-audio-sync=0', ':no-sout-video'))
+        if decoder.lib.libvlc_media_player_play(decoder.player) < 0:
+            raise RuntimeError("VLC could not start audio conversion.")
         started = time.monotonic()
         while True:
             _check_cancel(cancel)
-            if callback_errors:
-                raise RuntimeError("VLC failed while decoding audio for speech enhancement.") from callback_errors[0]
             state = decoder.state()
-            # Keep normal playback speed: changing VLC rate shortens the PCM stream
-            # and would silently truncate/alter the recording before denoising.
             if state["status"] == "ended":
                 break
             if state["status"] == "error":
@@ -84,22 +64,19 @@ def _convert_to_mono_16k(source, output, app_dir, cancel, progress):
             if state["status"] == "stopped" and time.monotonic() - started > 2:
                 raise RuntimeError("VLC stopped before audio conversion finished.")
             duration = state.get("duration", 0)
+            position = state.get("position", 0)
             if duration > 0 and progress:
-                _report(progress, min(9, round(9 * written_samples[0] / max(1, duration * 16000))))
+                _report(progress, min(9, round(9 * position / duration)))
             time.sleep(.03)
     finally:
         if decoder:
             decoder.close()
             if getattr(decoder, 'dll_directory', None):
                 decoder.dll_directory.close();decoder.dll_directory=None
-        if writer:
-            writer.close()
-    if callback_errors:
-        raise RuntimeError("VLC failed while writing converted audio.") from callback_errors[0]
     if not output.is_file() or output.stat().st_size <= 44:
-        raise RuntimeError(f"VLC could not convert this recording for speech enhancement (samples captured: {written_samples[0]}).")
+        raise RuntimeError("VLC could not create the converted WAV for speech enhancement.")
     if not _is_supported_wav(output):
-        raise RuntimeError("The local converter did not produce the expected 16 kHz mono WAV.")
+        raise RuntimeError("VLC conversion did not produce the expected 16 kHz mono WAV.")
     _report(progress, 10)
 
 def _bind(lib, name, result, args):
