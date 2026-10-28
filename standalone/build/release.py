@@ -62,7 +62,7 @@ def smoke_test_hush(assets,test_conversion=False):
  print('Hush native runtime loaded the model and processed audio successfully.',flush=True)
 VLC_PLUGIN_URL='https://mirrors.ocf.berkeley.edu/videolan-ftp/vlc/3.0.24/win64/vlc-3.0.24-win64.zip'
 VLC_PLUGIN_SIZE=82765861
-VLC_PLUGIN_SHA256='93d34578352c50936da35c01e7f358a9b36395b350ee44096f2d3837f42a08a9'
+VLC_PLUGIN_SHA256='fcf30850371ad10c9373cc4f0f4501e7dee49e3e9ae9f20c72fb2661a1ca6323'
 def download_vlc_callback_assets():
  with urllib.request.urlopen(VLC_PLUGIN_URL,timeout=180) as response:payload=response.read()
  with urllib.request.urlopen('https://get.videolan.org/vlc/3.0.24/win64/vlc-3.0.24-win64.zip.sha256',timeout=60) as response:
