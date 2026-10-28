@@ -37,12 +37,12 @@ jobs:
       - name: Unit and desktop tests (Windows, including native mini-player mouse input)
         if: runner.os == 'Windows'
         run: python standalone/tests/run_suite.py
-      - name: Verify pinned offline speech model and full enhancement path
-        if: runner.os == 'Windows'
-        run: python -c "import runpy; p=runpy.run_path('standalone/build/release.py'); p['smoke_test_hush'](p['download_hush_assets']())"
       - name: Fetch verified Windows VLC runtime for integration test
         if: runner.os == 'Windows'
         run: python standalone/tests/fetch_test_runtime.py
+      - name: Verify offline speech model and conversion through bundled VLC
+        if: runner.os == 'Windows'
+        run: python -c "import runpy; p=runpy.run_path('standalone/build/release.py'); p['smoke_test_hush'](p['download_hush_assets'](), True)"
       - name: Actual Windows desktop controls with real VLC (dummy audio output)
         if: runner.os == 'Windows'
         run: python standalone/tests/test_desktop_vlc.py
