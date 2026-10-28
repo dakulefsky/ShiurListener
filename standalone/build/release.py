@@ -65,8 +65,12 @@ VLC_PLUGIN_SIZE=82765861
 VLC_PLUGIN_SHA256='93d34578352c50936da35c01e7f358a9b36395b350ee44096f2d3837f42a08a9'
 def download_vlc_callback_assets():
  with urllib.request.urlopen(VLC_PLUGIN_URL,timeout=180) as response:payload=response.read()
- if len(payload)!=VLC_PLUGIN_SIZE or hashlib.sha256(payload).hexdigest()!=VLC_PLUGIN_SHA256:
-  raise ValueError(f'Official VideoLAN VLC 3.0.24 archive checksum mismatch: bytes={len(payload)}, sha256={hashlib.sha256(payload).hexdigest()}.')
+ with urllib.request.urlopen('https://download.videolan.org/pub/videolan/vlc/3.0.24/win64/vlc-3.0.24-win64.zip.sha256',timeout=60) as response:
+  checksum_text=response.read().decode('ascii','replace').lower()
+ published=re.findall(r'\\b[0-9a-f]{64}\\b',checksum_text)
+ actual=hashlib.sha256(payload).hexdigest()
+ if len(payload)!=VLC_PLUGIN_SIZE or not published or actual!=published[0] or actual!=VLC_PLUGIN_SHA256:
+  raise ValueError(f'Official VLC archive verification failed: bytes={len(payload)}, actual={actual}, published={published[0] if published else "missing"}, pinned={VLC_PLUGIN_SHA256}.')
  files={
   'runtime/vlc/libvlc.dll':'vlc-3.0.24/libvlc.dll',
   'runtime/vlc/libvlccore.dll':'vlc-3.0.24/libvlccore.dll',
