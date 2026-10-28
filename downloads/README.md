@@ -4,17 +4,17 @@
 
 [Download plugin](shiur-player-1.5.0.otzplugin). Bundled offline model/runtime; no Python or companion installation. Keeps the five-minute minimum, checks speech/music locally before playback, and preserves saved positions. Filtering is experimental and can make mistakes. [Instructions and limitations](../player/README.md). Install as an update to נגן שיעורים in Otzaria.
 
-## Current standalone: 0.9.10
+## Current standalone: 0.9.12
 
-[Download setup](shiur-player-setup-0.9.10.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.10
+[Download setup](shiur-player-setup-0.9.12.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.12
 
-Fixes the floating mini-player so the expanded window can resize smaller as well as larger. The expanded minimum size is now more compact, and the resize borders remain clear of the controls so shrinking works reliably. Playback controls and the progress strip reflow with the window size.
+Fixes Windows installer verification so the complete installer is downloaded before checksum validation. Fixes startup when an existing saved profile contains a setting or value the current build cannot validate. Before attempting recovery, the app makes a byte-for-byte backup named `state.json.recovery-YYYYMMDD-HHMMSS.bak` beside the original profile. It then recovers individually valid settings and shiur positions, leaving malformed entries out rather than resetting the entire library. If the JSON itself is damaged, the complete original remains in the recovery backup.
 
-Hover over the playback-time display in the expanded mini-player to reveal a larger seek scrubber. Hold the mouse button and drag along the bar to move through the shiur; the normal time display returns when the pointer leaves.
+Adds optional **offline speech enhancement**. From Settings → Audio enhancements, choose **Enhance current shiur** to create a separate cleaned copy using a local CPU model. Choose a suppression strength from gentle to strong. Processing runs in the background, shows progress, can be cancelled, and works without a cloud service or runtime model download. Enhanced copies are cached separately; the original recording is never overwritten, and **Use original audio** switches back while preserving the listening position.
 
-The Settings audio equalizer from 0.9.9 remains available, with Speech clarity, Strong speech, Warm voice and Off presets. These EQ controls do not yet perform AI vocal isolation. The separate offline speech-enhancement engine is still being evaluated, including redistribution rights for its pretrained model, before we bundle it.
+The enhancement can reduce hiss, hum, and some competing voices, but results depend on the recording. It is not guaranteed vocal/music separation and cannot restore speech that was not captured. Existing EQ presets remain available. The optional model/runtime and its license/dataset notices are bundled with the installer.
 
-Bluetooth headphone media keys and the clearer keyboard shortcut editor from 0.9.8 remain included. Existing listening positions, collections, bookmarks and audio files are preserved. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
+Includes the mini-player resizing, responsive controls, and hover-to-scrub improvements. Existing listening positions, collections, bookmarks and audio files are preserved. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
 
 ## Standalone: 0.8.1
 
