@@ -31,6 +31,21 @@ class TestBar(unittest.TestCase):
     if ident in (101,102,103,105,106,107,108,109):
      self.assertEqual(module.hit_test(x+w//2,y+h//2,width,height,collapsed,hovered),1,f'Control {ident} must receive clicks')
    self.assertEqual(module.hit_test(8,20,width,height,collapsed,hovered),2)
+ def test_collapsed_pill_is_resizable_and_stacked_controls_do_not_overlap(self):
+  width,height=module.COLLAPSED_SIZE
+  bounds=module.layout(width,height,True)
+  self.assertEqual(module.hit_test(1,height//2,width,height,True),10)
+  self.assertEqual(module.hit_test(width-2,height//2,width,height,True),11)
+  self.assertEqual(module.hit_test(width//2,1,width,height,True),12)
+  self.assertEqual(module.hit_test(width//2,height-2,width,height,True),15)
+  expand=bounds[108];close=bounds[109]
+  self.assertLess(expand[1]+expand[3],close[1])
+  self.assertLess(expand[0]+expand[2],width)
+  self.assertLess(close[0]+close[2],width)
+  hovered=module.layout(module.HOVER_SIZE[0],module.HOVER_SIZE[1],True,True,False,width)
+  self.assertLessEqual(hovered[101][0]+hovered[101][2],hovered[103][0])
+  self.assertLessEqual(hovered[103][0]+hovered[103][2],hovered[108][0])
+
  def test_hover_waits_for_intent_and_ignores_brief_crossings(self):
   intent=module.HoverIntent()
   self.assertFalse(intent.update(True,0))
