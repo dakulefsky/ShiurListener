@@ -79,8 +79,8 @@ class TestBar(unittest.TestCase):
   self.assertEqual(module.hit_test(width//2,height-2,width,height,True),15)
   expand=bounds[108];close=bounds[109]
   self.assertLess(expand[1]+expand[3],close[1])
-  self.assertLess(expand[0]+expand[2],width)
-  self.assertLess(close[0]+close[2],width)
+  self.assertLessEqual(expand[0]+expand[2],width-8,'Expand control must not cover the right resize border')
+  self.assertLessEqual(close[0]+close[2],width-8,'Close control must not cover the right resize border')
   hovered=module.layout(module.HOVER_SIZE[0],module.HOVER_SIZE[1],True,True,False,width)
   for first,second in ((101,103),(101,108),(101,109),(103,108),(103,109),(102,101),(102,103),(102,108),(102,109),(108,109)):
    x,y,w,h=hovered[first];u,v,a,b=hovered[second]
@@ -140,7 +140,7 @@ class TestBar(unittest.TestCase):
      if cmd['op']=='speed_cycle':self.state['speed']=1.5
      if cmd['op']=='seek':self.state['position']=cmd['value']
     def persist(self):self.writes+=1
-   player=Player();callbacks={};handles={};shows=[];texts=[];next_handle=10;messages=[(0x111,106),(0x111,105),(0x0005,0),(0x0232,0)]+[(0x113,0)]*10+[(0x111,107),(0x111,102),(0x111,101),(0x111,103),(0x10,0),(0x8001,0),(0x8003,1),(0x8003,1),(0x8003,0)];registered_style=[];window_sizes=[];invalidations=[];moves=[];caption_updates=[];bounds={};idle_checks=[]
+   player=Player();callbacks={};handles={};shows=[];texts=[];next_handle=10;messages=[(0x111,106),(0x111,105),(0x0005,0),(0x0232,0)]+[(0x113,0)]*10+[(0x111,107),(0x111,110),(0x111,102),(0x111,101),(0x111,103),(0x10,0),(0x8001,0),(0x8003,1),(0x8003,1),(0x8003,0)];registered_style=[];window_sizes=[];invalidations=[];moves=[];caption_updates=[];bounds={};idle_checks=[]
    if close_button:messages[messages.index((0x10,0))]=(0x111,109)
    messages.append((0x000F,0))
    messages.extend((0x002B,ident) for ident in (102,105,108,109,106,107))
@@ -190,7 +190,7 @@ class TestBar(unittest.TestCase):
    libraries={'user32':Library(user_funcs),'gdi32':Library({}),'kernel32':Library({}),'dwmapi':Library({})}
    with unittest.mock.patch.object(module.time,'monotonic',side_effect=lambda:fake_clock[0]),unittest.mock.patch.object(module.ctypes,'WinDLL',side_effect=lambda name,**kwargs:libraries[name],create=True),unittest.mock.patch.object(module.ctypes,'WINFUNCTYPE',ctypes.CFUNCTYPE,create=True):
     bar=module.FloatingBar(player);bar.run()
-   self.assertEqual(player.commands,[{'op':'speed_cycle'},{'op':'seek','value':180.0},{'op':'toggle'},{'op':'skip','direction':-1},{'op':'skip','direction':1}]);self.assertIn(0,shows);self.assertEqual(shows[-3:],[4,4,0]);self.assertFalse(player.saved['floatingVisible']);self.assertEqual(player.writes,10 if hover else 9 if collapse else 6);self.assertIn('Current shiur',texts);self.assertEqual(registered_style[0]&0x08000088,0x08000088);self.assertEqual(bar.status,'ready')
+   self.assertEqual(player.commands,[{'op':'speed_cycle'},{'op':'seek','value':180.0},{'op':'seek','value':180.0},{'op':'toggle'},{'op':'skip','direction':-1},{'op':'skip','direction':1}]);self.assertIn(0,shows);self.assertEqual(shows[-3:],[4,4,0]);self.assertFalse(player.saved['floatingVisible']);self.assertEqual(player.writes,10 if hover else 9 if collapse else 6);self.assertIn('Current shiur',texts);self.assertEqual(registered_style[0]&0x08000088,0x08000088);self.assertEqual(bar.status,'ready')
    self.assertEqual(player.saved['floatingSize'],[420,180]);self.assertEqual(player.saved['floatingPosition'],[72,96]);self.assertEqual(player.opens,1)
    self.assertEqual(window_sizes[0][:2],module.DEFAULT_SIZE);self.assertTrue(window_sizes[0][2]&0x00040000)
    self.assertTrue(moves);self.assertEqual(len([i for i in invalidations if i[0]==11]),5 if hover else 3 if collapse else 1);self.assertFalse(any(erase for _,erase in invalidations))
