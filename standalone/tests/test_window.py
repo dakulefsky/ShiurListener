@@ -486,6 +486,30 @@ class Tests(unittest.TestCase):
   finally:
    if window:window.close()
    fixture.tearDown()
+ def test_shortcut_editor_explains_preview_and_save_steps(self):
+  fixture=test_player.Tests();fixture.setUp();window=None
+  try:
+   window=PlayerWindow(fixture.player,fixture.library,lambda _:None)
+   window.edit_shortcuts();window.root.update()
+   popup=window.shortcut_controls['popup']
+   texts=[]
+   def collect(widget):
+    try:
+     value=widget.cget('text')
+     if value:texts.append(str(value))
+    except Exception:pass
+    for child in widget.winfo_children():collect(child)
+   collect(popup)
+   self.assertTrue(any('STEP 1' in value for value in texts))
+   self.assertTrue(any('STEP 2' in value for value in texts))
+   self.assertIn('Preview shortcut',texts)
+   self.assertIn('Save changes',texts)
+   self.assertTrue(any('Save activates it' in value for value in texts))
+   popup.destroy()
+  finally:
+   if window:window.close()
+   fixture.tearDown()
+
  def test_modern_popup_menu_uses_app_buttons_and_runs_action(self):
   fixture=test_player.Tests();fixture.setUp();window=None;calls=[]
   try:
