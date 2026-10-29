@@ -905,9 +905,9 @@ class PlayerWindow:
      error.configure(text='Settings saved, but some global shortcuts could not start: '+'; '.join(conflicts));return
     pop.destroy()
    except (OSError,ValueError) as issue:error.configure(text=str(issue))
+  self.label(pop,'Preview checks it. Save activates it; Cancel discards changes.',9,MUTED).pack(anchor='w',padx=20,pady=(4,0))
   row=tk.Frame(pop,bg=BG);row.pack(fill='x',padx=20,pady=(6,16))
   self.button(row,'Preview shortcut',assign,True).pack(side='left')
-  self.label(row,'Preview checks it. Save activates it; Cancel discards changes.',9,MUTED).pack(side='left',padx=10)
   self.button(row,'Restore defaults',reset).pack(side='left',padx=8)
   self.button(row,'Cancel',pop.destroy).pack(side='right')
   self.button(row,'Save changes',save,True).pack(side='right',padx=8)
