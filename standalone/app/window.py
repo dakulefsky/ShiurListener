@@ -880,7 +880,7 @@ class PlayerWindow:
    selected[0]=tree.selection()[0];value=draft[selected[0]];disabled.set(value is None)
    for name,var in variables.items():var.set(bool(value and name in value['modifiers']))
    key.set(value['key'] if value else hotkeys.DEFAULTS[selected[0]]['key'])
-   error.configure(text='Selected: '+labels[selected[0]]+'. Change the settings below, then click Apply to action.')
+   error.configure(text='Selected: '+labels[selected[0]]+'. Change the settings below, then click Preview shortcut.')
   def assign():
    name=selected[0]
    if not name:
