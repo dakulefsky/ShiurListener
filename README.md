@@ -4,7 +4,7 @@ An English-only local shiur player for Windows x64. The recording library and pl
 
 ## Download
 
-**[Download the standalone Windows app — 0.9.8](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-0.9.8.exe)**
+**[Download Shiur Player 0.9.23 for Windows](https://github.com/dakulefsky/ShiurListener/releases/download/standalone-v0.9.23/shiur-player-setup-0.9.23.exe)** · [Release notes and portable ZIP](https://github.com/dakulefsky/ShiurListener/releases/tag/standalone-v0.9.23)
 
 Close the older player and run the **setup EXE once**. It creates desktop and Start menu shortcuts. Use **Check for updates** inside the app for future releases—no repeated manual extraction. Python and VLC are bundled. Existing standalone listening data stays in the same profile.
 
@@ -14,7 +14,7 @@ After restarting the computer, open the Shiur Player shortcut and press Play. Th
 
 ## Features
 
-Version 0.9.8 raises the shiurim list, shortens the expanded player, smooths both players’ controls and adds editable global keyboard shortcuts in Settings. Windows installation, repair and saved-position checks pass.
+Version 0.9.23 improves offline speech-enhancement processing responsiveness and clarifies shortcut editing. The floating mini player and collapsed pill can be resized independently; Bluetooth media-button support is available through compatible Windows-wide shortcuts. Windows installation, repair and saved-position checks pass.
 
 - Unplayed and Finished views; natural numbered sorting and multiword search.
 - Editable queue with Play next, reordering and removal of upcoming recordings.
@@ -37,7 +37,7 @@ Version 0.9.8 raises the shiurim list, shortens the expanded player, smooths bot
 
 Minimizing keeps playback running. Closing the main window stops the app and saves progress. Run the EXE again to restore an already-running main window. Use **Rescan** after adding audio files. Recordings stay in their existing folders. Rename changes the filename and preserves listening data; audio contents are not rewritten or deleted.
 
-[Installation and source guide](standalone/README.md) · [Source ZIP](https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-standalone-source-0.9.8.zip) · [Checksums](downloads/SHA256SUMS.txt)
+[Installation and source guide](standalone/README.md) · [Source ZIP](https://github.com/dakulefsky/ShiurListener/releases/download/standalone-v0.9.23/shiur-player-standalone-source-0.9.23.zip) · [Checksums](downloads/SHA256SUMS.txt)
 
 See the [0.9.4 whole-app review](docs/STANDALONE_REVIEW_0.9.4.md) for fixes, test evidence and remaining limits.
 
