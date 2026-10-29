@@ -36,6 +36,89 @@ jobs:
         run: python standalone/tests/run_suite.py
       - name: Build installer from checksum-verified runtime and current source
         run: python standalone/build/release.py build
+      - name: Sign installer and refresh signed-byte metadata
+        shell: pwsh
+        env:
+          SIGNING_CERT_PFX_BASE64: ${{ secrets.SIGNING_CERT_PFX_BASE64 }}
+          SIGNING_CERT_PASSWORD: ${{ secrets.SIGNING_CERT_PASSWORD }}
+          SIGNING_CERT_THUMBPRINT: ${{ secrets.SIGNING_CERT_THUMBPRINT }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ([string]::IsNullOrWhiteSpace($env:SIGNING_CERT_PFX_BASE64) -or
+              [string]::IsNullOrWhiteSpace($env:SIGNING_CERT_PASSWORD) -or
+              [string]::IsNullOrWhiteSpace($env:SIGNING_CERT_THUMBPRINT)) {
+            throw 'Release blocked: configure SIGNING_CERT_PFX_BASE64, SIGNING_CERT_PASSWORD, and SIGNING_CERT_THUMBPRINT GitHub Actions secrets before publishing. No unsigned fallback is permitted.'
+          }
+          $version = python -c "import runpy; print(runpy.run_path('standalone/app/version.py')['APP_VERSION'])"
+          $installer = "downloads/shiur-player-setup-$version.exe"
+          $pfxPath = Join-Path $env:RUNNER_TEMP 'shiur-player-signing.pfx'
+          try {
+            [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:SIGNING_CERT_PFX_BASE64))
+            $expectedThumbprint = ($env:SIGNING_CERT_THUMBPRINT -replace '\s','').ToUpperInvariant()
+            $cert = [Security.Cryptography.X509Certificates.X509Certificate2]::new(
+              $pfxPath, $env:SIGNING_CERT_PASSWORD,
+              [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::EphemeralKeySet)
+            if ($cert.Thumbprint.ToUpperInvariant() -ne $expectedThumbprint) {
+              throw "Signing certificate thumbprint does not match SIGNING_CERT_THUMBPRINT."
+            }
+            if (-not $cert.HasPrivateKey) { throw 'Signing PFX does not contain its private key.' }
+            $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Filter signtool.exe -Recurse |
+              Where-Object { $_.FullName -match '\\x64\\signtool\.exe        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Stage candidate without changing the public update channel
+        run: python standalone/build/release.py stage
+      - name: Verify actual setup, startup, shortcut, duplicate guard, repair and retained positions
+        shell: pwsh
+        run: |
+          $env:SHIUR_INSTALLER_VERSION = python -c "import runpy; print(runpy.run_path('standalone/app/version.py')['APP_VERSION'])"
+          python standalone/tests/test_windows_installation.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Publish verified installer and update channel
+        run: python standalone/build/release.py publish
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $version = python -c "import runpy; print(runpy.run_path('standalone/app/version.py')['APP_VERSION'])"
+          $tag = "standalone-v$version"
+          $assets = @("downloads/shiur-player-setup-$version.exe", "downloads/shiur-player-windows-x64-$version.zip", "downloads/shiur-player-standalone-source-$version.zip")
+          $releases = gh release list --limit 100 --json tagName | ConvertFrom-Json
+          $existing = @($releases | Where-Object { $_.tagName -eq $tag }).Count -gt 0
+          if ($existing) {
+            gh release edit $tag --title "Shiur Player $version" --notes-file standalone/RELEASE-NOTES.md
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            gh release upload $tag $assets --clobber
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } else {
+            $head = git rev-parse HEAD
+            gh release create $tag --target $head --title "Shiur Player $version" --notes-file standalone/RELEASE-NOTES.md $assets
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+ } |
+              Sort-Object FullName -Descending | Select-Object -First 1
+            if (-not $signtool) { throw 'Windows SDK signtool.exe was not found.' }
+            & $signtool.FullName sign /fd SHA256 /td SHA256 /tr 'http://timestamp.digicert.com' /f $pfxPath /p $env:SIGNING_CERT_PASSWORD /sha1 $expectedThumbprint /d 'Shiur Player' $installer
+            if ($LASTEXITCODE -ne 0) { throw "signtool sign failed with exit code $LASTEXITCODE." }
+            & $signtool.FullName verify /pa /all /v $installer
+            if ($LASTEXITCODE -ne 0) { throw "Authenticode verification failed with exit code $LASTEXITCODE." }
+            $signature = Get-AuthenticodeSignature -FilePath $installer
+            if ($signature.Status -ne 'Valid') { throw "Installer signature status is $($signature.Status), not Valid." }
+            if ($signature.SignerCertificate.Thumbprint.ToUpperInvariant() -ne $expectedThumbprint) {
+              throw 'The final installer signer does not match the configured publisher certificate.'
+            }
+            $metadataPath = 'standalone/build/release-metadata.json'
+            $metadata = Get-Content $metadataPath -Raw | ConvertFrom-Json
+            $bytes = [IO.File]::ReadAllBytes($installer)
+            $sha = [Security.Cryptography.SHA256]::HashData($bytes)
+            $metadata.size = $bytes.Length
+            $metadata.sha256 = ([Convert]::ToHexString($sha)).ToLowerInvariant()
+            $metadata | ConvertTo-Json -Depth 5 | Set-Content -Encoding utf8 $metadataPath
+            Write-Host "Signed and verified $installer; updated metadata for $($bytes.Length) signed bytes."
+          } finally {
+            Remove-Item $pfxPath -Force -ErrorAction SilentlyContinue
+          }
       - name: Configure release commit author
         run: |
           git config user.name "github-actions[bot]"
