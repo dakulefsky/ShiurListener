@@ -30,7 +30,7 @@ class Tests(unittest.TestCase):
  def test_download_rejects_foreign_redirect_and_removes_partial_file(self):
   release=self.release()
   with __import__('tempfile').TemporaryDirectory() as root:
-   directory=pathlib.Path(root)/'update-temp'
+   directory=pathlib.Path(root)/'update-temp';directory.mkdir()
    with patch.object(updater.tempfile,'mkdtemp',return_value=str(directory)),patch.object(updater.urllib.request,'urlopen',return_value=Response(b'installer', 'https://example.com/installer.exe')):
     with self.assertRaisesRegex(ValueError,'redirect'):
      updater.download(release)
@@ -39,7 +39,7 @@ class Tests(unittest.TestCase):
  def test_download_rejects_oversized_response_and_cleans_up(self):
   release=self.release(b'installer')
   with __import__('tempfile').TemporaryDirectory() as root:
-   directory=pathlib.Path(root)/'update-temp'
+   directory=pathlib.Path(root)/'update-temp';directory.mkdir()
    with patch.object(updater.tempfile,'mkdtemp',return_value=str(directory)),patch.object(updater.urllib.request,'urlopen',return_value=Response(b'installer-extra','https://raw.githubusercontent.com/dakulefsky/ShiurListener/main/downloads/shiur-player-setup-0.6.1.exe')):
     with self.assertRaisesRegex(ValueError,'exceeds its expected size'):
      updater.download(release)
