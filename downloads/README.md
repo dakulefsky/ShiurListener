@@ -4,15 +4,17 @@
 
 [Download plugin](shiur-player-1.5.0.otzplugin). Bundled offline model/runtime; no Python or companion installation. Keeps the five-minute minimum, checks speech/music locally before playback, and preserves saved positions. Filtering is experimental and can make mistakes. [Instructions and limitations](../player/README.md). Install as an update to נגן שיעורים in Otzaria.
 
-## Current standalone: 0.9.22
+## Current standalone: 0.9.23
 
-[Download setup](shiur-player-setup-0.9.22.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.22
+[Download setup](shiur-player-setup-0.9.23.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.23
 
-Hardens the standalone player after a whole-app reliability audit. Fixes background updater download startup, preserves the language preference on startup and profile import, and makes profile restore safer so a failed profile write does not stop current playback.
+Makes the offline speech-enhancement window independently minimizable while processing continues, and reduces Python/native buffer overhead in the audio-frame conversion path. The model, settings, clipping, and output format remain unchanged; actual processing time depends on the recording and computer.
 
-Improves folder monitoring so a scan cannot switch the library back to an outdated folder after the user manually changes it. Normalizes natural-sort keys and adds regression coverage for these fixes.
+Carries forward the 0.9.22 reliability fixes for updater download startup, language preference preservation, safer profile restoration, and folder-monitor race protection. New or renamed audio files in the selected folder are detected automatically after they finish copying.
 
-Speech enhancement remains optional and runs locally. Existing listening positions, collections, bookmarks and original recordings are preserved. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
+Clarifies the shortcut editor with simpler steps and an explicit preview-before-save flow. Global shortcut conflicts are still checked before settings are saved.
+
+Speech enhancement remains optional and runs locally. Original recordings are never overwritten. Existing listening positions, collections, bookmarks, and original recordings are preserved. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
 
 ## Standalone: 0.8.1
 
