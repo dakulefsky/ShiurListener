@@ -79,7 +79,7 @@ class LibraryController:
    return list(values)
  def _validate_collection_name(self,name):
   name=str(name).strip()
-  if (not name or len(name)>160 or re.search(r'[<>:"/\\\\|?*\\x00-\\x1f]',name)
+  if (not name or len(name)>160 or any(ch in '<>:"/|?*' or ch==chr(92) or ord(ch)<32 for ch in name)
       or name.endswith(('.', ' ')) or name.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*(f'COM{i}' for i in range(1,10)),*(f'LPT{i}' for i in range(1,10))}):
    raise ValueError('Choose a collection name that is a valid folder name.')
   return name
