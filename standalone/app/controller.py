@@ -141,6 +141,8 @@ class LibraryController:
     ident=new_id
    self.player.library_revision+=1
    if was_active:self.player.load(ident,position=position,autoplay=autoplay)
+  for item in self.player.saved['folders']:
+   if item is not folder:item['trackIds']=[value for value in item['trackIds'] if value!=ident]
   if ident not in folder['trackIds']:folder['trackIds'].append(ident)
   self.player.persist()
   return ident
