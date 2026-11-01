@@ -58,7 +58,8 @@ class Tests(unittest.TestCase):
         self.assertIsNone(self.player.active)
         self.assertIsNone(self.player.pending)
         self.assertEqual(json.loads(safety.read_text())['state']['tracks'][current_id]['position'], 70.125)
-        self.assertEqual(original_audio, {path.name: path.read_bytes() for path in self.fixture.audio.iterdir()})
+        self.assertEqual(original_audio, {path.relative_to(self.fixture.audio).as_posix(): path.read_bytes()
+                                           for path in self.fixture.audio.rglob('*') if path.is_file()})
         reopened = Player(None, self.player.data_dir, test_player.Audio())
         self.assertEqual(reopened.saved['tracks'][self.ids[1]]['position'], 19.375)
 
