@@ -9,7 +9,8 @@ class RenameTests(unittest.TestCase):
  def test_rename_keeps_progress_bookmarks_queue_and_collections_after_reopen(self):
   self.library.play();self.player.tick();self.backend.position=42.875
   old=self.player.active;source=self.player.paths[old];self.library.mark('Review');self.library.assign_many([old],'My series')
-  new=self.library.rename(old,'My renamed shiur')
+  moved=next(track['id'] for track in self.player.tracks if track['name']==source.name)
+  new=self.library.rename(moved,'My renamed shiur')
   self.assertFalse(source.exists());self.assertEqual(self.player.paths[new].name,'My renamed shiur.wav')
   self.player.tick();self.assertEqual(self.backend.position,42.875);self.assertEqual(self.backend.status,'playing')
   self.assertIn(new,self.player.saved['queue']);self.assertNotIn(old,self.player.saved['queue'])

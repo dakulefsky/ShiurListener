@@ -328,8 +328,10 @@ class Tests(unittest.TestCase):
    ids=list(window.tree.get_children());window.select_all();window.root.update()
    self.assertEqual(window.selection_info.cget('text'),'2 selected')
    window.assign_collection('A series')
-   self.assertEqual(fixture.player.saved['folders'][0]['trackIds'],ids)
-   window.assign_collection('a SERIES');self.assertEqual(len(fixture.player.saved['folders']),1)
+   ids=[track['id'] for track in fixture.player.tracks]
+   self.assertEqual(set(fixture.player.saved['folders'][0]['trackIds']),set(ids))
+   window.update_rows();ids=list(window.tree.get_children())
+   window.select_all();window.assign_collection('a SERIES');self.assertEqual(len(fixture.player.saved['folders']),1)
    window.sort_by('name');window.sort_by('name');self.assertEqual(list(window.tree.get_children()),ids[::-1])
    self.assertEqual(set(window.tree.selection()),set(ids))
    view=fixture.player.saved['folders'][0]['id'];window.navigate(view);window.select_all();window.remove_selected()

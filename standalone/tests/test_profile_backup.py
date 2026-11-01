@@ -36,10 +36,14 @@ class Tests(unittest.TestCase):
         self.library.mark('Review this point')
         self.player.saved['tracks'][self.ids[1]] = {'position': 19.375, 'duration': 120, 'favorite': True}
         self.library.assign_many(self.ids, 'My series')
+        self.ids = [track['id'] for track in self.player.tracks]
+        self.player.tick()
         self.player.saved['speed'] = 1.5
-        original_audio = {path.name: path.read_bytes() for path in self.fixture.audio.iterdir()}
+        original_audio = {path.relative_to(self.fixture.audio).as_posix(): path.read_bytes()
+                          for path in self.fixture.audio.rglob('*') if path.is_file()}
         export_profile(self.player, self.backup)
         self.backend.position = 70.125
+        current_id = self.player.saved['currentId']
         self.player.saved['tracks'][self.ids[1]]['position'] = 81
         self.player.saved['folders'] = []
         self.player.saved['bookmarks'] = {}
@@ -53,8 +57,9 @@ class Tests(unittest.TestCase):
         self.assertEqual(self.backend.status, 'stopped')
         self.assertIsNone(self.player.active)
         self.assertIsNone(self.player.pending)
-        self.assertEqual(json.loads(safety.read_text())['state']['tracks'][self.ids[0]]['position'], 70.125)
-        self.assertEqual(original_audio, {path.name: path.read_bytes() for path in self.fixture.audio.iterdir()})
+        self.assertEqual(json.loads(safety.read_text())['state']['tracks'][current_id]['position'], 70.125)
+        self.assertEqual(original_audio, {path.relative_to(self.fixture.audio).as_posix(): path.read_bytes()
+                                           for path in self.fixture.audio.rglob('*') if path.is_file()})
         reopened = Player(None, self.player.data_dir, test_player.Audio())
         self.assertEqual(reopened.saved['tracks'][self.ids[1]]['position'], 19.375)
 

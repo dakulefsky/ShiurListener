@@ -92,11 +92,45 @@ class Tests(unittest.TestCase):
   self.library.view='continue';self.assertEqual([t['id'] for t in self.library.tracks()],[ids[0]])
   self.library.selected=ids[1];self.library.reset();self.assertFalse(self.player.saved['tracks'][ids[1]]['completed'])
   self.assertEqual(self.player.saved['tracks'][ids[0]]['position'],119.9)
- def test_collections_are_user_created_and_do_not_copy_audio(self):
-  self.assertEqual(self.player.saved['folders'],[]);self.library.selected=self.player.tracks[0]['id']
-  self.library.collection('folder_create','My series');folder=self.library.view;self.library.add_to(folder)
-  self.assertEqual(len(self.library.tracks()),1);self.library.collection('folder_rename','Renamed');self.assertEqual(self.player.saved['folders'][0]['name'],'Renamed')
-  self.library.collection('folder_delete');self.assertEqual(len(list(self.audio.iterdir())),2)
+ def test_collections_create_subfolders_move_audio_and_preserve_library_state(self):
+  self.assertEqual(self.player.saved['folders'],[])
+  original=self.player.tracks[0]['id'];self.library.selected=original
+  self.library.play();self.player.tick();self.backend.position=37.5;self.library.mark('Review')
+  self.player.saved['queue']=[original,self.player.tracks[1]['id']]
+  self.library.collection('folder_create','My series');folder=self.library.view
+  self.assertTrue((self.audio/'My series').is_dir())
+  self.library.assign_many([original],'My series')
+  moved=next(t for t in self.player.tracks if t['name']=='01.wav')
+  self.assertEqual(moved['source'],'My series/01.wav')
+  self.assertFalse((self.audio/'01.wav').exists())
+  self.assertTrue((self.audio/'My series'/'01.wav').is_file())
+  self.assertNotIn(original,self.player.paths);self.assertIn(moved['id'],self.player.paths)
+  self.assertEqual(self.player.saved['currentId'],moved['id'])
+  self.assertEqual(self.player.active,moved['id'])
+  self.assertEqual(self.player.saved['tracks'][moved['id']]['position'],37.5)
+  self.assertEqual(self.player.saved['bookmarks'][moved['id']][0]['name'],'Review')
+  self.assertEqual(self.player.saved['queue'][0],moved['id'])
+  self.assertEqual(self.player.saved['folders'][0]['trackIds'],[moved['id']])
+  self.player.tick();self.assertEqual(self.backend.position,37.5)
+  self.library.collection('folder_rename','Renamed')
+  self.assertTrue((self.audio/'Renamed'/'01.wav').is_file())
+  self.assertFalse((self.audio/'My series').exists())
+  self.library.collection('folder_delete')
+  self.assertTrue((self.audio/'Renamed'/'01.wav').is_file())
+  self.assertEqual(len(self.player.tracks),2)
+ def test_moving_recording_to_another_collection_moves_file_and_reassigns_it(self):
+  original=self.player.tracks[0]['id']
+  self.library.assign_many([original],'First')
+  first=self.player.saved['folders'][0]
+  first_path=self.audio/'First'/'01.wav'
+  self.assertTrue(first_path.is_file())
+  moved=next(track['id'] for track in self.player.tracks if track['name']=='01.wav')
+  self.library.assign_many([moved],'Second')
+  second=self.player.saved['folders'][1]
+  self.assertFalse(first_path.exists())
+  self.assertTrue((self.audio/'Second'/'01.wav').is_file())
+  self.assertEqual(first['trackIds'],[])
+  self.assertEqual(second['trackIds'],[next(track['id'] for track in self.player.tracks if track['name']=='01.wav')])
  def test_bookmarks_are_local_and_survive_restart(self):
   self.library.play();self.player.tick();self.backend.position=32.456;self.library.mark('Review')
   mark=self.library.bookmarks()[0];self.assertEqual(mark['position'],32.456)
