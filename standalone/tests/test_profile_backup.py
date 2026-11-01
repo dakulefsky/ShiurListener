@@ -36,8 +36,10 @@ class Tests(unittest.TestCase):
         self.library.mark('Review this point')
         self.player.saved['tracks'][self.ids[1]] = {'position': 19.375, 'duration': 120, 'favorite': True}
         self.library.assign_many(self.ids, 'My series')
+        self.ids = [track['id'] for track in self.player.tracks]
         self.player.saved['speed'] = 1.5
-        original_audio = {path.name: path.read_bytes() for path in self.fixture.audio.iterdir()}
+        original_audio = {path.relative_to(self.fixture.audio).as_posix(): path.read_bytes()
+                          for path in self.fixture.audio.rglob('*') if path.is_file()}
         export_profile(self.player, self.backup)
         self.backend.position = 70.125
         self.player.saved['tracks'][self.ids[1]]['position'] = 81
