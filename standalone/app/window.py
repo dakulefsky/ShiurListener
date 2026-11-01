@@ -626,7 +626,7 @@ class PlayerWindow:
   self.label(pop,'Choose a collection, or type a new name:',10,MUTED).pack(anchor='w',fill='x',padx=24)
   target=ttk.Combobox(pop,values=names);target.pack(fill='x',padx=24,pady=12);target.focus_set()
   if names:target.current(0)
-  self.label(pop,'Audio files move into this collection's subfolder and leave any previous collection.',9,MUTED).pack(anchor='w',fill='x',padx=24)
+  self.label(pop,"Audio files move into the selected collection subfolder and leave any previous collection.",9,MUTED).pack(anchor='w',fill='x',padx=24)
   def add():
    self.assign_collection(target.get(),ids);pop.destroy()
   self.button(pop,'Add recording' if len(ids)==1 else 'Add recordings',add,True).pack(anchor='e',padx=24,pady=22)
