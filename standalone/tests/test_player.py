@@ -118,6 +118,19 @@ class Tests(unittest.TestCase):
   self.library.collection('folder_delete')
   self.assertTrue((self.audio/'Renamed'/'01.wav').is_file())
   self.assertEqual(len(self.player.tracks),2)
+ def test_moving_recording_to_another_collection_moves_file_and_reassigns_it(self):
+  original=self.player.tracks[0]['id']
+  self.library.assign_many([original],'First')
+  first=self.player.saved['folders'][0]
+  first_path=self.audio/'First'/'01.wav'
+  self.assertTrue(first_path.is_file())
+  moved=next(track['id'] for track in self.player.tracks if track['name']=='01.wav')
+  self.library.assign_many([moved],'Second')
+  second=self.player.saved['folders'][1]
+  self.assertFalse(first_path.exists())
+  self.assertTrue((self.audio/'Second'/'01.wav').is_file())
+  self.assertEqual(first['trackIds'],[])
+  self.assertEqual(second['trackIds'],[next(track['id'] for track in self.player.tracks if track['name']=='01.wav')])
  def test_bookmarks_are_local_and_survive_restart(self):
   self.library.play();self.player.tick();self.backend.position=32.456;self.library.mark('Review')
   mark=self.library.bookmarks()[0];self.assertEqual(mark['position'],32.456)
