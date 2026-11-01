@@ -626,7 +626,7 @@ class PlayerWindow:
   self.label(pop,'Choose a collection, or type a new name:',10,MUTED).pack(anchor='w',fill='x',padx=24)
   target=ttk.Combobox(pop,values=names);target.pack(fill='x',padx=24,pady=12);target.focus_set()
   if names:target.current(0)
-  self.label(pop,'Audio files stay in their original folder.',9,MUTED).pack(anchor='w',fill='x',padx=24)
+  self.label(pop,'Audio files are moved into the collection subfolder.',9,MUTED).pack(anchor='w',fill='x',padx=24)
   def add():
    self.assign_collection(target.get(),ids);pop.destroy()
   self.button(pop,'Add recording' if len(ids)==1 else 'Add recordings',add,True).pack(anchor='e',padx=24,pady=22)
@@ -676,7 +676,7 @@ class PlayerWindow:
   name=self.ask_value('Rename collection','New name:')
   if name:self.library.collection('folder_rename',name);self.nav_signature=None
  def delete_collection(self):
-  if messagebox.askyesno('Delete collection','Delete this collection? Audio files will remain.',parent=self.root):self.library.collection('folder_delete');self.nav_signature=None
+  if messagebox.askyesno('Delete collection','Delete this collection? Audio files will remain in their subfolder.',parent=self.root):self.library.collection('folder_delete');self.nav_signature=None
  def bookmark(self):
   name=self.ask_value('Bookmark','Name this moment:')
   if name is not None:self.library.mark(name)
