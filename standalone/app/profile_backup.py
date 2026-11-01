@@ -73,8 +73,14 @@ def _validate(payload):
     _require(isinstance(folders, list) and len(folders) <= 10000, 'collections are missing.')
     folder_ids = set()
     for folder in folders:
-        _require(isinstance(folder, dict) and set(folder) == {'id', 'name', 'trackIds'},
+        _require(isinstance(folder, dict) and set(folder) in (
+                     {'id', 'name', 'trackIds'}, {'id', 'name', 'trackIds', 'directory'}),
                  'invalid collection entry.')
+        if 'directory' in folder:
+            directory = folder['directory']
+            _require(_text(directory) and directory not in ('.', '..')
+                     and '/' not in directory and chr(92) not in directory,
+                     'invalid collection folder path.')
         _require(_ident(folder['id']) and folder['id'] not in folder_ids
                  and folder['id'] not in ('all', 'continue', 'favorites', 'unplayed', 'finished'),
                  'invalid or duplicate collection identifier.')
