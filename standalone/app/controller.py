@@ -1,5 +1,5 @@
 """Local library actions shared by the native desktop controls and tests."""
-import re,secrets
+import hashlib,re,secrets
 
 def natural_key(value):
  """Keep numbered shiurim in listening order, including nested source folders."""
@@ -77,15 +77,83 @@ class LibraryController:
    values.insert(target,values.pop(index));self.player.saved['queue']=values
    self.player.persist();self.revision+=1
    return list(values)
+ def _validate_collection_name(self,name):
+  name=str(name).strip()
+  if (not name or len(name)>160 or re.search(r'[<>:"/\\\\|?*\\x00-\\x1f]',name)
+      or name.endswith(('.', ' ')) or name.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*(f'COM{i}' for i in range(1,10)),*(f'LPT{i}' for i in range(1,10))}):
+   raise ValueError('Choose a collection name that is a valid folder name.')
+  return name
+ def _collection_directory(self,folder,create=False):
+  root=self.player.root
+  if root is None:raise ValueError('Choose a recordings folder before creating a collection.')
+  relative=folder.get('directory') or folder['name']
+  directory=(root/relative)
+  if directory.resolve()==root.resolve() or not directory.resolve().is_relative_to(root.resolve()):
+   raise ValueError('The collection folder must stay inside the recordings folder.')
+  if directory.is_symlink():raise ValueError('A collection cannot use a symbolic-link folder.')
+  if directory.exists() and not directory.is_dir():raise ValueError('A file already uses the collection folder name.')
+  if create:directory.mkdir(parents=True,exist_ok=True)
+  folder['directory']=directory.relative_to(root).as_posix()
+  return directory
+ def _move_track_to_collection(self,ident,folder):
+  import pathlib
+  source=self.player.paths.get(ident)
+  if source is None:raise ValueError('Recording not found.')
+  root=self.player.root.resolve()
+  if not source.resolve().is_relative_to(root):raise ValueError('The recording is outside the selected recordings folder.')
+  directory=self._collection_directory(folder,create=True)
+  target=directory/source.name
+  if source.resolve()!=target.resolve() and target.exists():
+   stem,suffix=source.stem,source.suffix;number=2
+   while target.exists():
+    target=directory/f'{stem} ({number}){suffix}';number+=1
+  if source.resolve()!=target.resolve():
+   was_active=self.player.active==ident
+   if was_active:
+    self.player.capture()
+    raw=self.player.backend.state()
+    autoplay=self.player.pending['autoplay'] if self.player.pending else raw['status']=='playing'
+    position=self.player.saved['tracks'].get(ident,{}).get('position',0)
+    self.player.backend.stop();self.player.active=None;self.player.pending=None;self.player.seek_target=None
+   try:
+    target.parent.mkdir(parents=True,exist_ok=True)
+    source.rename(target)
+   except OSError:
+    if was_active:
+     try:self.player.load(ident,position=position,autoplay=autoplay)
+     except Exception:pass
+    raise
+   relative=target.relative_to(root).as_posix()
+   new_id=hashlib.sha256((str(root)+'/'+relative).encode()).hexdigest()[:24]
+   if new_id!=ident:
+    if new_id in self.player.paths:raise ValueError('The destination recording is already in the library.')
+    self.player.paths.pop(ident);self.player.paths[new_id]=target
+    for track in self.player.tracks:
+     if track['id']==ident:track.update(id=new_id,name=target.name,source=relative)
+    if ident in self.player.saved['tracks']:self.player.saved['tracks'][new_id]=self.player.saved['tracks'].pop(ident)
+    if ident in self.player.saved['bookmarks']:self.player.saved['bookmarks'][new_id]=self.player.saved['bookmarks'].pop(ident)
+    self.player.saved['queue']=[new_id if value==ident else value for value in self.player.saved['queue']]
+    if self.player.saved['currentId']==ident:self.player.saved['currentId']=new_id
+    for item in self.player.saved['folders']:
+     item['trackIds']=[new_id if value==ident else value for value in item['trackIds']]
+    if self.selected==ident:self.selected=new_id
+    if self.player.loop_track==ident:self.player.loop_track=new_id
+    ident=new_id
+   self.player.library_revision+=1
+   if was_active:self.player.load(ident,position=position,autoplay=autoplay)
+  if ident not in folder['trackIds']:folder['trackIds'].append(ident)
+  self.player.persist()
+  return ident
  def assign_many(self,ids,name):
-  name=name.strip();ids=list(dict.fromkeys(ids))
-  if not name or len(name)>160:raise ValueError('Enter a collection name of 1–160 characters.')
+  name=self._validate_collection_name(name);ids=list(dict.fromkeys(ids))
   if not ids or any(ident not in self.player.paths for ident in ids):raise ValueError('Select available recordings first.')
   with self.player.lock:
    folder=next((f for f in self.player.saved['folders'] if f['name'].casefold()==name.casefold()),None)
    if folder is None:
-    folder={'id':secrets.token_hex(12),'name':name,'trackIds':[]};self.player.saved['folders'].append(folder)
-   folder['trackIds']=list(dict.fromkeys(folder['trackIds']+ids));self.player.persist();self.revision+=1
+    self.collection('folder_create',name)
+    folder=next(f for f in self.player.saved['folders'] if f['name'].casefold()==name.casefold())
+   for ident in ids:self._move_track_to_collection(ident,folder)
+   self.revision+=1
    return folder['id']
  def play(self,force=False):
   with self.player.lock:
@@ -102,14 +170,34 @@ class LibraryController:
    self.player.saved['queue']=ids
    return self.player.command({'op':'play' if force else 'toggle'})
  def collection(self,op,name=''):
-  if op=='folder_create':
-   result=self.player.command({'op':op,'name':name});self.view=result['folders'][-1]['id']
-  else:result=self.player.command({'op':op,'id':self.view,'name':name})
+  with self.player.lock:
+   if op=='folder_create':
+    name=self._validate_collection_name(name)
+    if self.player.root is None:raise ValueError('Choose a recordings folder before creating a collection.')
+    result=self.player.command({'op':op,'name':name});folder=next(f for f in self.player.saved['folders'] if f['id']==result['folders'][-1]['id'])
+    try:self._collection_directory(folder,create=True);self.player.persist()
+    except Exception:
+     self.player.command({'op':'folder_delete','id':folder['id']});raise
+    self.view=folder['id']
+   elif op=='folder_rename':
+    folder=next((f for f in self.player.saved['folders'] if f['id']==self.view),None)
+    if folder is None:raise ValueError('Folder not found.')
+    name=self._validate_collection_name(name);old_directory=self._collection_directory(folder,create=True);new_directory=self.player.root/name
+    if old_directory.resolve()!=new_directory.resolve():
+     if new_directory.exists():raise ValueError('A folder with that name already exists in the recordings folder.')
+     old_directory.rename(new_directory)
+    result=self.player.command({'op':op,'id':self.view,'name':name})
+    folder['directory']=new_directory.relative_to(self.player.root).as_posix();self.player.persist()
+   else:result=self.player.command({'op':op,'id':self.view,'name':name})
   if op=='folder_delete':self.view='all'
   self.revision+=1;return result
  def add_to(self,folder):
   if not self.selected:raise ValueError('Select a recording first.')
-  self.player.command({'op':'folder_add','id':folder,'trackId':self.selected});self.revision+=1
+  with self.player.lock:
+   target=next((f for f in self.player.saved['folders'] if f['id']==folder),None)
+   if target is None:raise ValueError('Collection not found.')
+   self._move_track_to_collection(self.selected,target)
+   self.revision+=1
  def reset(self):
   with self.player.lock:
    ident=self.selected
