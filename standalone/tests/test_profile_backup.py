@@ -42,6 +42,7 @@ class Tests(unittest.TestCase):
                           for path in self.fixture.audio.rglob('*') if path.is_file()}
         export_profile(self.player, self.backup)
         self.backend.position = 70.125
+        current_id = self.player.saved['currentId']
         self.player.saved['tracks'][self.ids[1]]['position'] = 81
         self.player.saved['folders'] = []
         self.player.saved['bookmarks'] = {}
@@ -55,7 +56,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(self.backend.status, 'stopped')
         self.assertIsNone(self.player.active)
         self.assertIsNone(self.player.pending)
-        self.assertEqual(json.loads(safety.read_text())['state']['tracks'][self.ids[0]]['position'], 70.125)
+        self.assertEqual(json.loads(safety.read_text())['state']['tracks'][current_id]['position'], 70.125)
         self.assertEqual(original_audio, {path.name: path.read_bytes() for path in self.fixture.audio.iterdir()})
         reopened = Player(None, self.player.data_dir, test_player.Audio())
         self.assertEqual(reopened.saved['tracks'][self.ids[1]]['position'], 19.375)
