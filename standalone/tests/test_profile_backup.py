@@ -37,6 +37,7 @@ class Tests(unittest.TestCase):
         self.player.saved['tracks'][self.ids[1]] = {'position': 19.375, 'duration': 120, 'favorite': True}
         self.library.assign_many(self.ids, 'My series')
         self.ids = [track['id'] for track in self.player.tracks]
+        self.player.tick()
         self.player.saved['speed'] = 1.5
         original_audio = {path.relative_to(self.fixture.audio).as_posix(): path.read_bytes()
                           for path in self.fixture.audio.rglob('*') if path.is_file()}
