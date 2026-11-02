@@ -1135,6 +1135,10 @@ class PlayerWindow:
    if worker and worker.is_alive():worker.join(timeout=5)
   self.closed=True
   for callback in self.root.tk.call('after','info'):self.root.tk.call('after','cancel',callback)
-  if self.drop_target:\n   try:self.drop_target.close()\n   except Exception:pass\n   self.drop_target=None\n  self.root.destroy();return True
+  if self.drop_target:
+   try:self.drop_target.close()
+   except Exception:pass
+   self.drop_target=None
+  self.root.destroy();return True
  def run(self):self.root.mainloop()
 
