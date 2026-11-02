@@ -27,11 +27,12 @@ class RenameTests(unittest.TestCase):
   self.player.saved['folders']=[{'id':'series1','name':'Series','trackIds':[ident]}]
   self.player.persist()
   target=source.with_name('Recovered name'+source.suffix)
-  relative_source=source.relative_to(self.root).as_posix()
-  relative_target=target.relative_to(self.root).as_posix()
-  new_id=hashlib.sha256((str(self.root.resolve())+'/'+relative_target).encode()).hexdigest()[:24]
+  library_root=self.player.root.resolve()
+  relative_source=source.relative_to(library_root).as_posix()
+  relative_target=target.relative_to(library_root).as_posix()
+  new_id=hashlib.sha256((str(library_root)+'/'+relative_target).encode()).hexdigest()[:24]
   journal=self.root/'data'/'rename-recovery.json'
-  journal.write_text(json.dumps({'root':str(self.root.resolve()),'source':relative_source,'target':relative_target,'old_id':ident,'new_id':new_id}),encoding='utf-8')
+  journal.write_text(json.dumps({'root':str(library_root),'source':relative_source,'target':relative_target,'old_id':ident,'new_id':new_id}),encoding='utf-8')
   source.rename(target)  # Simulate power loss immediately after the filesystem rename.
   restored=Player(None,self.root/'data',test_player.Audio())
   self.assertIn(new_id,restored.paths);self.assertNotIn(ident,restored.paths)
