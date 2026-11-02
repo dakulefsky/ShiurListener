@@ -128,11 +128,55 @@ class Player:
         self.seek_target=None
         self.paths={};self.tracks=[];self.library_revision=0;self.choose_folder=None;self.show_window=None;self.hide_window=None
         self.saved.setdefault('folders',[]);self.saved.setdefault('skipSeconds',15);self.saved.setdefault('audioEnhancement',{'bass':0,'body':0,'clarity':0,'treble':0});self.saved.setdefault('speechEnhancementEnabled',False);self.saved.setdefault('speechEnhancementStrength',20)
+        self._recover_rename_journal()
         selected=self.root or (pathlib.Path(self.saved['libraryRoot']) if self.saved.get('libraryRoot') else None)
         if selected:
             self.root=selected.resolve()
             if self.root.is_dir():self.scan(self.root)
             else:self.error='The recordings folder is missing or disconnected. Reconnect it, then click Refresh.'
+    def _recover_rename_journal(self):
+        """Finish or roll back an interrupted recording rename before scanning."""
+        journal=self.data_dir/'rename-recovery.json'
+        if not journal.exists():return
+        try:
+            record=json.loads(journal.read_text(encoding='utf-8'))
+            if not isinstance(record,dict) or set(record)!={'root','source','target','old_id','new_id'}:
+                raise ValueError('Invalid rename recovery record.')
+            root=pathlib.Path(record['root']).resolve()
+            saved_root=self.saved.get('libraryRoot')
+            if ((self.root is not None and root!=self.root.resolve())
+                    or (saved_root and root!=pathlib.Path(saved_root).resolve())):
+                raise ValueError('Rename recovery belongs to a different recordings folder.')
+            source=(root/record['source']).resolve()
+            target=(root/record['target']).resolve()
+            if not source.is_relative_to(root) or not target.is_relative_to(root) or source==target:
+                raise ValueError('Rename recovery paths are outside the recordings folder.')
+            expected_old=__import__('hashlib').sha256((str(root)+'/'+pathlib.PurePosixPath(record['source']).as_posix()).encode()).hexdigest()[:24]
+            expected_new=__import__('hashlib').sha256((str(root)+'/'+pathlib.PurePosixPath(record['target']).as_posix()).encode()).hexdigest()[:24]
+            if record['old_id']!=expected_old or record['new_id']!=expected_new:
+                raise ValueError('Rename recovery identifiers do not match their paths.')
+            if target.exists() and not source.exists():
+                old,new=record['old_id'],record['new_id']
+                if old in self.saved['tracks']:
+                    self.saved['tracks'][new]={**self.saved['tracks'].get(old,{}),**self.saved['tracks'].pop(old)}
+                if old in self.saved.get('bookmarks',{}):
+                    prior=self.saved['bookmarks'].pop(old)
+                    current=self.saved['bookmarks'].setdefault(new,[])
+                    known={item.get('id') for item in current}
+                    current.extend(item for item in prior if item.get('id') not in known)
+                self.saved['queue']=list(dict.fromkeys(new if value==old else value for value in self.saved.get('queue',[])))
+                if self.saved.get('currentId')==old:self.saved['currentId']=new
+                for folder in self.saved.get('folders',[]):
+                    folder['trackIds']=list(dict.fromkeys(new if value==old else value for value in folder.get('trackIds',[])))
+                self.persist()
+            elif source.exists() and not target.exists():
+                # The process stopped before the filesystem rename; the old ID remains valid.
+                pass
+            else:
+                raise ValueError('Cannot safely resolve the interrupted rename because the source and destination files are ambiguous.')
+            journal.unlink()
+        except (OSError,ValueError,TypeError,KeyError) as error:
+            self.error='A recording rename needs recovery. Your saved progress was left untouched: '+str(error)
     def speech_cache_path(self,ident,strength=None):
         source=self.paths.get(ident)
         if source is None:return None

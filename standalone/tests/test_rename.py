@@ -17,6 +17,32 @@ class RenameTests(unittest.TestCase):
   self.assertEqual(self.player.saved['folders'][0]['trackIds'],[new]);self.assertEqual(self.player.saved['bookmarks'][new][0]['position'],42.875)
   restored=Player(None,self.root/'data',test_player.Audio());self.assertEqual(restored.snapshot()['position'],42.875)
   self.assertIn(new,restored.paths);self.assertNotIn(old,restored.paths)
+ def test_startup_recovers_progress_after_interrupted_filesystem_rename(self):
+  import hashlib
+  ident=self.player.tracks[0]['id'];source=self.player.paths[ident]
+  self.player.saved['tracks'][ident]={'position':73.5,'duration':300,'completed':False,'lastListenedAt':123456,'favorite':True}
+  self.player.saved['bookmarks'][ident]=[{'id':'bookmark1','position':73.5,'name':'Review'}]
+  self.player.saved['queue']=[ident]
+  self.player.saved['currentId']=ident
+  self.player.saved['folders']=[{'id':'series1','name':'Series','trackIds':[ident]}]
+  self.player.persist()
+  target=source.with_name('Recovered name'+source.suffix)
+  library_root=self.player.root.resolve()
+  relative_source=source.relative_to(library_root).as_posix()
+  relative_target=target.relative_to(library_root).as_posix()
+  new_id=hashlib.sha256((str(library_root)+'/'+relative_target).encode()).hexdigest()[:24]
+  journal=self.root/'data'/'rename-recovery.json'
+  journal.write_text(json.dumps({'root':str(library_root),'source':relative_source,'target':relative_target,'old_id':ident,'new_id':new_id}),encoding='utf-8')
+  source.rename(target)  # Simulate power loss immediately after the filesystem rename.
+  restored=Player(None,self.root/'data',test_player.Audio())
+  self.assertIn(new_id,restored.paths);self.assertNotIn(ident,restored.paths)
+  self.assertEqual(restored.saved['tracks'][new_id]['position'],73.5)
+  self.assertTrue(restored.saved['tracks'][new_id]['favorite'])
+  self.assertEqual(restored.saved['bookmarks'][new_id][0]['name'],'Review')
+  self.assertEqual(restored.saved['queue'],[new_id])
+  self.assertEqual(restored.saved['currentId'],new_id)
+  self.assertEqual(restored.saved['folders'][0]['trackIds'],[new_id])
+  self.assertFalse(journal.exists())
  def test_rename_rejects_existing_names_and_path_traversal_without_changes(self):
   ident=self.player.tracks[0]['id'];original=self.player.paths[ident];original_bytes=original.read_bytes()
   (self.audio/'existing.wav').write_bytes(b'other')
