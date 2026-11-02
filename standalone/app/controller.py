@@ -235,7 +235,7 @@ class LibraryController:
    if ident not in self.player.paths:raise ValueError('Select an available recording.')
    source=self.player.paths[ident];name=str(name).strip()
    if name.lower().endswith(source.suffix.lower()):name=name[:-len(source.suffix)]
-   if not name or len(name)>180 or re.search(r'[<>:"/\\|?*\\x00-\\x1f]',name) or name.endswith(('.', ' ')) or name.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*(f'COM{i}' for i in range(1,10)),*(f'LPT{i}' for i in range(1,10))}:raise ValueError('Choose a valid filename without slashes or special characters.')
+   if not name or len(name)>180 or re.search(r'[<>:"/\\|?*\x00-\x1f]',name) or name.endswith(('.', ' ')) or name.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*(f'COM{i}' for i in range(1,10)),*(f'LPT{i}' for i in range(1,10))}:raise ValueError('Choose a valid filename without slashes or special characters.')
    target=source.with_name(name+source.suffix)
    if target==source:return ident
    if target.exists() or target.is_symlink():raise ValueError('A recording with that filename already exists.')
