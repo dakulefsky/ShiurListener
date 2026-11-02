@@ -230,35 +230,60 @@ class LibraryController:
    else:self.player.command({'op':'seek','value':mark['position']})
 
  def rename(self,ident,name):
-  import hashlib,re
+  import hashlib,json,os,re
   with self.player.lock:
    if ident not in self.player.paths:raise ValueError('Select an available recording.')
    source=self.player.paths[ident];name=str(name).strip()
    if name.lower().endswith(source.suffix.lower()):name=name[:-len(source.suffix)]
-   if not name or len(name)>180 or re.search(r'[<>:"/\\|?*\x00-\x1f]',name) or name.endswith(('.', ' ')) or name.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*(f'COM{i}' for i in range(1,10)),*(f'LPT{i}' for i in range(1,10))}:raise ValueError('Choose a valid filename without slashes or special characters.')
+   if not name or len(name)>180 or re.search(r'[<>:"/\\|?*\\x00-\\x1f]',name) or name.endswith(('.', ' ')) or name.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*(f'COM{i}' for i in range(1,10)),*(f'LPT{i}' for i in range(1,10))}:raise ValueError('Choose a valid filename without slashes or special characters.')
    target=source.with_name(name+source.suffix)
    if target==source:return ident
    if target.exists() or target.is_symlink():raise ValueError('A recording with that filename already exists.')
-   if not source.resolve().is_relative_to(self.player.root):raise ValueError('The recording is outside the audio folder.')
-   state=self.player.snapshot();active=self.player.active==ident;position=self.player.saved['tracks'].get(ident,{}).get('position',0)
-   if active:
-    self.player.backend.stop();self.player.active=None;self.player.pending=None;self.player.seek_target=None
-   try:source.rename(target)
+   root=self.player.root.resolve()
+   if not source.resolve().is_relative_to(root):raise ValueError('The recording is outside the audio folder.')
+   relative_source=source.relative_to(root).as_posix()
+   relative_target=target.relative_to(root).as_posix()
+   new_id=hashlib.sha256((str(root)+'/'+relative_target).encode()).hexdigest()[:24]
+   if new_id in self.player.paths:raise ValueError('The destination recording is already in the library.')
+   journal=self.player.data_dir/'rename-recovery.json'
+   temporary=journal.with_suffix('.tmp')
+   record={'root':str(root),'source':relative_source,'target':relative_target,'old_id':ident,'new_id':new_id}
+   state=self.player.snapshot();active=self.player.active==ident
+   position=self.player.saved['tracks'].get(ident,{}).get('position',0)
+   was_playing=state['status']=='playing' or state.get('playRequested',False)
+   # Write and fsync the recovery intent before touching the audio file.
+   with temporary.open('w',encoding='utf-8') as stream:
+    json.dump(record,stream,ensure_ascii=False);stream.flush();os.fsync(stream.fileno())
+   os.replace(temporary,journal)
+   try:
+    if active:
+     self.player.backend.stop();self.player.active=None;self.player.pending=None;self.player.seek_target=None
+    source.rename(target)
    except OSError:
-    if active:self.player.load(ident,position=position,autoplay=state['status']=='playing' or state.get('playRequested',False))
+    try:journal.unlink(missing_ok=True)
+    except OSError:pass
+    if active:
+     try:self.player.load(ident,position=position,autoplay=was_playing)
+     except Exception:pass
     raise
-   relative=target.relative_to(self.player.root).as_posix();new_id=hashlib.sha256((str(self.player.root)+'/'+relative).encode()).hexdigest()[:24]
    self.player.paths.pop(ident);self.player.paths[new_id]=target
    for track in self.player.tracks:
-    if track['id']==ident:track.update(id=new_id,name=target.name,source=relative)
-   if ident in self.player.saved['tracks']:self.player.saved['tracks'][new_id]=self.player.saved['tracks'].pop(ident)
+    if track['id']==ident:track.update(id=new_id,name=target.name,source=relative_target)
+   if ident in self.player.saved['tracks']:
+    self.player.saved['tracks'][new_id]={**self.player.saved['tracks'].get(new_id,{}),**self.player.saved['tracks'].pop(ident)}
    marks=self.player.saved['bookmarks']
-   if ident in marks:marks[new_id]=marks.pop(ident)
-   self.player.saved['queue']=[new_id if i==ident else i for i in self.player.saved['queue']]
-   for folder in self.player.saved['folders']:folder['trackIds']=[new_id if i==ident else i for i in folder['trackIds']]
+   if ident in marks:
+    previous=marks.pop(ident);current=marks.setdefault(new_id,[])
+    known={item['id'] for item in current};current.extend(item for item in previous if item['id'] not in known)
+   self.player.saved['queue']=list(dict.fromkeys(new_id if i==ident else i for i in self.player.saved['queue']))
+   for folder in self.player.saved['folders']:folder['trackIds']=list(dict.fromkeys(new_id if value==ident else value for value in folder['trackIds']))
    if self.player.saved['currentId']==ident:self.player.saved['currentId']=new_id
    if self.selected==ident:self.selected=new_id
    if self.player.loop_track==ident:self.player.loop_track=new_id
-   self.player.library_revision+=1;self.revision+=1;self.player.persist()
-   if active:self.player.load(new_id,position=position,autoplay=state['status']=='playing' or state.get('playRequested',False))
+   self.player.library_revision+=1;self.revision+=1
+   # If this fails, leave the journal in place so startup can finish the migration.
+   self.player.persist()
+   journal.unlink()
+   if active:self.player.load(new_id,position=position,autoplay=was_playing)
    return new_id
+
