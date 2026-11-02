@@ -246,6 +246,7 @@ class LibraryController:
    new_id=hashlib.sha256((str(root)+'/'+relative_target).encode()).hexdigest()[:24]
    if new_id in self.player.paths:raise ValueError('The destination recording is already in the library.')
    journal=self.player.data_dir/'rename-recovery.json'
+   if journal.exists():raise ValueError('A previous recording rename still needs recovery. Restart the player before renaming another recording.')
    temporary=journal.with_suffix('.tmp')
    record={'root':str(root),'source':relative_source,'target':relative_target,'old_id':ident,'new_id':new_id}
    state=self.player.snapshot();active=self.player.active==ident
