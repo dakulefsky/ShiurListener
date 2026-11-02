@@ -1,2 +1,2 @@
-APP_VERSION = '0.9.24'
+APP_VERSION = '0.9.25'
 # Release workflow retrigger after restoring the pre-signing publish process.
