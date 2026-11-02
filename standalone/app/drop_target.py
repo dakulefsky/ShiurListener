@@ -41,7 +41,7 @@ def copy_dropped_audio(paths, recordings_root):
             temporary = root / f".shiur-import-{uuid.uuid4().hex}.part"
             try:
                 shutil.copy2(source, temporary)
-                os.replace(temporary, target)
+                os.rename(temporary, target)
             finally:
                 try:
                     temporary.unlink(missing_ok=True)
