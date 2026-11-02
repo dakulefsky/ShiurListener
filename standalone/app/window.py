@@ -2,7 +2,7 @@
 import queue,sys,threading,pathlib
 from rendering import rounded_png,icon_png
 from version import APP_VERSION
-import updater,profile_backup,hotkeys,speech_enhancement
+import updater,profile_backup,hotkeys,speech_enhancement,drop_target
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from controller import clock
@@ -306,7 +306,7 @@ class ModernPopupMenu:
 
 class PlayerWindow:
  def __init__(self,player,library,shortcuts):
-  self.player=player;self.library=library;self.shortcuts=shortcuts;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False;self.update_busy=False;self.speech_job=None;self.queue_window=None;self.tools_window=None;self.last_volume=1;self.dock_collapsed=bool(player.saved.get('mainDockCollapsed',False))
+  self.player=player;self.library=library;self.shortcuts=shortcuts;self.drop_target=None;self.requests=queue.SimpleQueue();self.closed=False;self.dragging=False;self.rows={};self.nav_signature=None;self.minimized=False;self.auto_bar=False;self.column_drag_blocked=False;self.update_busy=False;self.speech_job=None;self.queue_window=None;self.tools_window=None;self.last_volume=1;self.dock_collapsed=bool(player.saved.get('mainDockCollapsed',False))
   global FONT
   self.root=tk.Tk();self.root.title(TITLE);self.root.configure(bg=BG)
   if sys.platform=='win32':
@@ -330,7 +330,7 @@ class PlayerWindow:
   style.map('Treeview',background=[('selected',TINT)],foreground=[('selected',INK)])
   style.configure('TScale',background=PAPER,troughcolor=LINE)
   self.player.show_window=lambda:self.requests.put('show');self.player.hide_window=lambda:self.requests.put('hide');self.player.choose_folder=lambda:self.requests.put('folder')
-  self.build();self.root.protocol('WM_DELETE_WINDOW',self.close)
+  self.build();self.root.protocol('WM_DELETE_WINDOW',self.close);self.root.after_idle(self.enable_drop_target)
   for key,fn in [('<space>',self.toggle),('<Left>',lambda:self.skip(-1)),('<Right>',lambda:self.skip(1)),('<Control-b>',self.bookmark),('<Control-f>',lambda:self.search.focus_set()),('<Control-j>',self.jump_to),('<Control-m>',lambda:self.command('floating_toggle'))]:
    self.root.bind(key,lambda event,f=fn:self.key(event,f))
   self.root.bind('<Control-o>',lambda _:self.safe(self.choose_folder));self.root.bind('<Escape>',lambda _:self.root.focus_set())
@@ -1096,6 +1096,29 @@ class PlayerWindow:
    self.set_options(self.status,text=str(error),fg=ERROR)
    if not self.status.winfo_manager():self.status.pack(fill='x',pady=(6,0))
   self.root.after(500,self.refresh)
+ def enable_drop_target(self):
+  if self.closed:return
+  try:self.drop_target=drop_target.WindowsDropTarget(self.root,self.import_dropped)
+  except Exception as error:
+   self.set_options(self.status,text=f'Drag-and-drop unavailable: {error}',fg=ERROR)
+ def import_dropped(self,paths):
+  if self.closed:return
+  if self.player.root is None:
+   messagebox.showinfo('Choose recordings folder','Choose your recordings folder first. Dropped audio will then be copied there.',parent=self.root);return
+  result=drop_target.copy_dropped_audio(paths,self.player.root)
+  if result['imported']:
+   self.player.scan()
+   self.library.view='all';self.library.selected=self.player.saved.get('currentId')
+   self.nav_signature=None;self.update_rows()
+   count=len(result['imported'])
+   message=f'Added {count} recording{"s" if count!=1 else ""} to {self.player.root.name}.'
+   if result['skipped']:message+=f' Skipped {len(result["skipped"])} unsupported or already-library file(s).'
+   if result['errors']:message+=f' {len(result["errors"])} file(s) could not be copied.'
+   messagebox.showinfo('Import complete',message,parent=self.root)
+  elif result['errors']:
+   messagebox.showwarning('Import incomplete','No recordings were imported.\\n\\n'+'\\n'.join(result['errors'][:5]),parent=self.root)
+  else:
+   messagebox.showinfo('Nothing to import','Drop supported audio files (MP3, M4A, WAV, FLAC, OGG, AAC, OPUS and more).',parent=self.root)
  def close(self):
   try:
    with self.player.lock:
@@ -1112,6 +1135,10 @@ class PlayerWindow:
    if worker and worker.is_alive():worker.join(timeout=5)
   self.closed=True
   for callback in self.root.tk.call('after','info'):self.root.tk.call('after','cancel',callback)
+  if self.drop_target:
+   try:self.drop_target.close()
+   except Exception:pass
+   self.drop_target=None
   self.root.destroy();return True
  def run(self):self.root.mainloop()
 
