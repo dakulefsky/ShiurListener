@@ -4,7 +4,7 @@ An English-only local Windows x64 desktop player with a light interface, rounded
 
 Close the old player and run **shiur-player-setup-0.9.23.exe** once. Setup installs per user under `%LOCALAPPDATA%\Programs\ShiurPlayer` and creates desktop/Start menu shortcuts, without elevation, PowerShell, browser UI or separate runtime installation. Open the installed shortcut on future days.
 
-New audio files are detected automatically in the selected folder after copying finishes; use **Refresh** for an immediate manual rescan.
+New audio files are detected automatically in the selected folder after copying finishes; use **Refresh** for an immediate manual rescan. You can also drag downloaded audio files from File Explorer onto the player window; supported files are copied into the selected recordings folder and added to the library automatically. Existing files are never intentionally overwritten; name collisions receive a numbered suffix.
 
 Click **Check for updates** in the app for subsequent releases. Checks run only when requested. The app fetches a small release JSON from this repository, validates its version/URL/size/SHA-256, downloads the installer in a worker thread, saves playback state and starts setup. Setup waits for the old player process to exit before selecting and starting the new version. Program files use separate version directories and an atomic `active.json` pointer, leaving the previous version selected if extraction/activation fails. User data and audio recordings are outside the installation tree. Previous program versions are retained; old portable copies are not removed.
 
