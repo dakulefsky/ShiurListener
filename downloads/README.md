@@ -4,9 +4,9 @@
 
 [Download plugin](shiur-player-1.5.0.otzplugin). Bundled offline model/runtime; no Python or companion installation. Keeps the five-minute minimum, checks speech/music locally before playback, and preserves saved positions. Filtering is experimental and can make mistakes. [Instructions and limitations](../player/README.md). Install as an update to נגן שיעורים in Otzaria.
 
-## Current standalone: 0.9.23
+## Current standalone: 0.9.24
 
-[Download setup](shiur-player-setup-0.9.23.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.23
+[Download setup](shiur-player-setup-0.9.24.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.23
 
 Makes the offline speech-enhancement window independently minimizable while processing continues, and reduces Python/native buffer overhead in the audio-frame conversion path. The model, settings, clipping, and output format remain unchanged; actual processing time depends on the recording and computer.
 
