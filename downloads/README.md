@@ -4,15 +4,11 @@
 
 [Download plugin](shiur-player-1.5.0.otzplugin). Bundled offline model/runtime; no Python or companion installation. Keeps the five-minute minimum, checks speech/music locally before playback, and preserves saved positions. Filtering is experimental and can make mistakes. [Instructions and limitations](../player/README.md). Install as an update to נגן שיעורים in Otzaria.
 
-## Current standalone: 0.9.25
+## Current standalone: 0.9.26
 
-[Download setup](shiur-player-setup-0.9.25.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.25
+[Download setup](shiur-player-setup-0.9.26.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.26
 
-Makes shiur collections easier to organize and identify. Collections are listed alphabetically with recording counts, and opening a collection shows its details and the number of shiurim it contains.
-
-Adds an optional Maggid Shiur / Speaker field to each collection. Collection name and speaker details can be created or edited together, and the speaker is shown with the collection rather than redundantly attached to every recording.
-
-Preserves existing recordings, collection membership, listening positions, bookmarks, and favorites. Speaker metadata is included in profile backup and restore. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
+Fixes popup menus that could remain open after clicking elsewhere. Clicking outside a menu now dismisses it reliably, including the More menu and other shared popup menus, while clicks inside the menu continue to work normally. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
 
 ## Standalone: 0.8.1
 
