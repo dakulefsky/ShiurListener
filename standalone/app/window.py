@@ -289,18 +289,40 @@ class ModernPopupMenu:
   sw=self.popup.winfo_screenwidth();sh=self.popup.winfo_screenheight()
   x=max(4,min(int(x),sw-actual_width-4));y=max(4,min(int(y),sh-actual_height-4))
   self.popup.geometry(f'{actual_width}x{actual_height}+{x}+{y}')
-  self.popup.bind('<Escape>',lambda _:self.popup.destroy());self.popup.bind('<FocusOut>',self.focus_lost,add='+')
+  self.popup.bind('<Escape>',lambda _:self.close())
+  self.popup.bind('<FocusOut>',self.focus_lost,add='+')
+  # Override-redirect windows do not reliably receive focus/capture events on
+  # every desktop. Watch global mouse presses so any click outside the menu
+  # dismisses it, while clicks on menu items remain available to their buttons.
+  self._outside_binding=self.root.bind_all('<ButtonPress-1>',self.outside_click,add='+')
+  self.popup.bind('<Destroy>',self.cleanup,add='+')
   self.popup.deiconify();self.popup.lift();self.popup.focus_force()
+ def outside_click(self,event):
+  try:
+   if not self.popup.winfo_exists():return
+   target=event.widget.winfo_toplevel()
+   if target is not self.popup:self.close()
+  except tk.TclError:pass
  def focus_lost(self,event=None):
   if self.popup.winfo_exists():self.popup.after(180,self.close_if_unfocused)
  def close_if_unfocused(self):
   try:
-   if self.popup.winfo_exists() and self.popup.focus_displayof() is None:self.popup.destroy()
+   if self.popup.winfo_exists() and self.popup.focus_displayof() is None:self.close()
   except tk.TclError:pass
- def choose(self,command):
+ def cleanup(self,event=None):
+  if event is not None and event.widget is not self.popup:return
+  # Remove only this menu's global binding; do not disturb other app bindings.
+  try:
+   if self._outside_binding:
+    self.root._unbind(('bind','all'),'<ButtonPress-1>',self._outside_binding)
+    self._outside_binding=None
+  except (tk.TclError,AttributeError):pass
+ def close(self):
   try:
    if self.popup.winfo_exists():self.popup.destroy()
   except tk.TclError:pass
+ def choose(self,command):
+  self.close()
   command()
 
 
