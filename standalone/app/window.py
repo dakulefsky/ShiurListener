@@ -634,9 +634,11 @@ class PlayerWindow:
   self.label(body,'Leave blank for a collection with multiple speakers.',9,MUTED,anchor='w').pack(fill='x')
   actions=tk.Frame(body,bg=PAPER);actions.pack(fill='x',pady=(22,0))
   def save():
-   collection_name=name.get().strip()
+   collection_name=name.get().strip();speaker_name=speaker.get().strip()
    if not collection_name:
     messagebox.showwarning('Collection name required','Enter a name for this collection.',parent=pop);name_entry.focus_set();return
+   if len(speaker_name)>160 or any(ord(char)<32 for char in speaker_name):
+    messagebox.showwarning('Speaker name too long','Use a speaker name of up to 160 characters.',parent=pop);speaker_entry.focus_set();return
    def apply():
     if creating:
      self.library.collection('folder_create',collection_name)
