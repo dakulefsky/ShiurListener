@@ -74,8 +74,13 @@ def _validate(payload):
     folder_ids = set()
     for folder in folders:
         _require(isinstance(folder, dict) and set(folder) in (
-                     {'id', 'name', 'trackIds'}, {'id', 'name', 'trackIds', 'directory'}),
+                     {'id', 'name', 'trackIds'}, {'id', 'name', 'trackIds', 'directory'},
+                     {'id', 'name', 'trackIds', 'speaker'}, {'id', 'name', 'trackIds', 'directory', 'speaker'}),
                  'invalid collection entry.')
+        if 'speaker' in folder:
+            _require(_text(folder['speaker'], maximum=160, empty=True)
+                     and not any(ord(char) < 32 for char in folder['speaker']),
+                     'invalid collection speaker.')
         if 'directory' in folder:
             directory = folder['directory']
             _require(_text(directory) and directory not in ('.', '..')
