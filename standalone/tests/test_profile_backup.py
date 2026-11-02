@@ -63,6 +63,24 @@ class Tests(unittest.TestCase):
         reopened = Player(None, self.player.data_dir, test_player.Audio())
         self.assertEqual(reopened.saved['tracks'][self.ids[1]]['position'], 19.375)
 
+    def test_collection_speaker_survives_backup_and_restart(self):
+        self.library.assign_many([self.ids[0]], 'Berachos')
+        folder = self.player.saved['folders'][0]
+        self.library.update_collection_details(folder['id'], 'Berachos', 'Rav Example')
+        export_profile(self.player, self.backup)
+        self.player.saved['folders'][0].pop('speaker')
+        import_profile(self.player, self.backup)
+        self.assertEqual(self.player.saved['folders'][0]['speaker'], 'Rav Example')
+        reopened = Player(None, self.player.data_dir, test_player.Audio())
+        self.assertEqual(reopened.saved['folders'][0]['speaker'], 'Rav Example')
+
+    def test_invalid_collection_speaker_is_rejected(self):
+        state = copy.deepcopy(self.player.saved)
+        state['folders'] = [{'id': 'series', 'name': 'Series', 'trackIds': [], 'speaker': 'x' * 161}]
+        self.write_payload(state)
+        with self.assertRaises(ValueError):
+            import_profile(self.player, self.backup)
+
     def test_restore_preserves_language_from_backup(self):
         state = copy.deepcopy(self.player.saved)
         state['language'] = 'he'

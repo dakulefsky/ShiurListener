@@ -193,6 +193,23 @@ class LibraryController:
    else:result=self.player.command({'op':op,'id':self.view,'name':name})
   if op=='folder_delete':self.view='all'
   self.revision+=1;return result
+ def update_collection_details(self,ident,name,speaker=''):
+  speaker=str(speaker).strip()
+  if len(speaker)>160 or any(ord(char)<32 for char in speaker):
+   raise ValueError('Use a speaker name of up to 160 characters.')
+  with self.player.lock:
+   folder=next((item for item in self.player.saved['folders'] if item['id']==ident),None)
+   if folder is None:raise ValueError('Collection not found.')
+   name=self._validate_collection_name(name)
+   if name!=folder['name']:
+    previous=self.view;self.view=ident
+    try:self.collection('folder_rename',name)
+    finally:self.view=previous
+   if speaker:folder['speaker']=speaker
+   else:folder.pop('speaker',None)
+   self.player.persist();self.revision+=1
+   return dict(folder)
+
  def add_to(self,folder):
   if not self.selected:raise ValueError('Select a recording first.')
   with self.player.lock:
