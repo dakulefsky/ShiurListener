@@ -1,5 +1,9 @@
 name: Validate standalone player
 on:
+  pull_request:
+    paths:
+      - 'standalone/**'
+      - '.github/workflows/validate-standalone.yml'
   push:
     paths:
       - 'standalone/**'
