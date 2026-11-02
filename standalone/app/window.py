@@ -5,7 +5,7 @@ from version import APP_VERSION
 import updater,profile_backup,hotkeys,speech_enhancement
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-from controller import clock
+from controller import clock,natural_key
 
 TITLE='Shiur Player'
 FONT='Segoe UI' if sys.platform=='win32' else 'Helvetica'
@@ -614,8 +614,43 @@ class PlayerWindow:
   path=filedialog.askdirectory(title='Choose your shiur audio folder',parent=self.root)
   if path:self.player.scan(path);self.library.selected=None;self.update_rows()
  def new_collection(self):
-  name=self.ask_value('New collection','Collection name:')
-  if name:self.library.collection('folder_create',name);self.nav_signature=None;self.update_rows()
+  self.collection_dialog()
+
+ def collection_dialog(self,folder=None):
+  creating=folder is None
+  pop=tk.Toplevel(self.root);pop.title('New collection' if creating else 'Collection details')
+  pop.configure(bg=PAPER);pop.transient(self.root);pop.resizable(False,False)
+  body=tk.Frame(pop,bg=PAPER);body.pack(fill='both',expand=True,padx=26,pady=24)
+  self.label(body,'Organize your shiurim',16,anchor='w').pack(fill='x')
+  self.label(body,'Give this collection a name and, if applicable, its maggid shiur.',10,MUTED,anchor='w').pack(fill='x',pady=(4,18))
+  self.label(body,'Collection name',10,MUTED,anchor='w').pack(fill='x')
+  name=tk.StringVar(value='' if creating else folder['name'])
+  name_entry=tk.Entry(body,textvariable=name,relief='flat',bg=BG,fg=INK,insertbackground=INK,font=(FONT,12),highlightthickness=1,highlightbackground=LINE,highlightcolor=GREEN)
+  name_entry.pack(fill='x',ipady=8,pady=(5,14))
+  self.label(body,'Maggid shiur / Speaker (optional)',10,MUTED,anchor='w').pack(fill='x')
+  speaker=tk.StringVar(value='' if creating else folder.get('speaker',''))
+  speaker_entry=tk.Entry(body,textvariable=speaker,relief='flat',bg=BG,fg=INK,insertbackground=INK,font=(FONT,12),highlightthickness=1,highlightbackground=LINE,highlightcolor=GREEN)
+  speaker_entry.pack(fill='x',ipady=8,pady=(5,6))
+  self.label(body,'Leave blank for a collection with multiple speakers.',9,MUTED,anchor='w').pack(fill='x')
+  actions=tk.Frame(body,bg=PAPER);actions.pack(fill='x',pady=(22,0))
+  def save():
+   collection_name=name.get().strip()
+   if not collection_name:
+    messagebox.showwarning('Collection name required','Enter a name for this collection.',parent=pop);name_entry.focus_set();return
+   def apply():
+    if creating:
+     self.library.collection('folder_create',collection_name)
+     target=next(f for f in self.player.saved['folders'] if f['name'].casefold()==collection_name.casefold())
+     self.library.update_collection_details(target['id'],collection_name,speaker.get())
+    else:
+     self.library.update_collection_details(folder['id'],collection_name,speaker.get())
+    self.nav_signature=None;self.update_rows();pop.destroy()
+   self.safe(apply)
+  self.button(actions,'Save collection',save,True).pack(side='right')
+  self.button(actions,'Cancel',pop.destroy).pack(side='right',padx=(0,8))
+  pop.bind('<Return>',lambda _:save());pop.bind('<Escape>',lambda _:pop.destroy())
+  pop.update_idletasks();pop.geometry(f'480x{pop.winfo_reqheight()}+{self.root.winfo_rootx()+max(0,(self.root.winfo_width()-480)//2)}+{self.root.winfo_rooty()+max(0,(self.root.winfo_height()-pop.winfo_reqheight())//2)}')
+  pop.grab_set();pop.lift();name_entry.focus_force()
  def add_collection(self):
   ids=self.selected_ids()
   if not ids:raise ValueError('Select a recording first.')
@@ -657,7 +692,7 @@ class PlayerWindow:
    if minimized:self.root.deiconify()
  def more(self):
   items=[('Rename recording…',lambda:self.safe(self.rename_recording)),('Play next',lambda:self.safe(lambda:self.add_queue(True))),('Add to queue',lambda:self.safe(lambda:self.add_queue(False))),None,('Reset selected recording to the beginning',lambda:self.safe(self.reset_selected))]
-  if self.library.view not in VIEWS:items.extend([('Remove selected from this collection',lambda:self.safe(self.remove_selected)),('Rename collection',lambda:self.safe(self.rename_collection)),('Delete collection',lambda:self.safe(self.delete_collection))])
+  if self.library.view not in VIEWS:items.extend([('Remove selected from this collection',lambda:self.safe(self.remove_selected)),('Edit collection details',lambda:self.safe(self.rename_collection)),('Delete collection',lambda:self.safe(self.delete_collection))])
   ModernPopupMenu(self.root,self.root.winfo_pointerx(),self.root.winfo_pointery(),items,width=280)
 
  def reset_selected(self):
@@ -673,8 +708,8 @@ class PlayerWindow:
   if name is None:return
   self.library.rename(ident,name);self.rows.clear();self.update_rows()
  def rename_collection(self):
-  name=self.ask_value('Rename collection','New name:')
-  if name:self.library.collection('folder_rename',name);self.nav_signature=None
+  folder=next((f for f in self.player.saved['folders'] if f['id']==self.library.view),None)
+  if folder:self.collection_dialog(folder)
  def delete_collection(self):
   if messagebox.askyesno('Delete collection','Delete this collection? Audio files will remain in their subfolder.',parent=self.root):self.library.collection('folder_delete');self.nav_signature=None
  def bookmark(self):
@@ -1044,17 +1079,25 @@ class PlayerWindow:
    message='No matching recordings' if self.query.get() else 'Choose an audio folder to get started' if not self.player.root else 'No recordings in this view'
    self.set_options(self.empty,text=message);self.empty.place(relx=.5,rely=.55,anchor='center')
   else:self.empty.place_forget()
-  folders=self.player.saved['folders'];name=next((f['name'] for f in folders if f['id']==self.library.view),VIEWS.get(self.library.view,'All shiurim'))
-  self.set_options(self.heading,text=single_line(name));self.set_options(self.subtitle,text=f"{len(tracks)} recording{'s' if len(tracks)!=1 else ''}")
-  signature=(self.library.view,tuple((f['id'],f['name']) for f in folders))
+  folders=self.player.saved['folders'];folder=next((f for f in folders if f['id']==self.library.view),None)
+  name=folder['name'] if folder else VIEWS.get(self.library.view,'All shiurim')
+  self.set_options(self.heading,text=single_line(name))
+  if folder:
+   count=len(folder['trackIds']);speaker=single_line(folder.get('speaker',''))
+   detail=(f"Speaker: {speaker}  ·  " if speaker else '')+f"{count} shiurim"
+   self.set_options(self.subtitle,text=detail)
+  else:self.set_options(self.subtitle,text=f"{len(tracks)} shiurim")
+  signature=(self.library.view,tuple((f['id'],f['name'],f.get('speaker',''),len(f['trackIds'])) for f in folders))
   if signature!=self.nav_signature:
    self.nav_signature=signature
    for widget in self.nav.winfo_children():widget.destroy()
    for ident,title in VIEWS.items():
     b=self.button(self.nav,title,lambda i=ident:self.navigate(i),anchor='w');b.configure(bg=TINT if ident==self.library.view else SIDEBAR);b.pack(fill='x',pady=2)
    self.label(self.nav,'Collections',10,MUTED,anchor='w').pack(fill='x',padx=12,pady=(24,10))
-   for folder in folders:
-    b=self.button(self.nav,folder['name'],lambda i=folder['id']:self.navigate(i),anchor='w');b.configure(bg=TINT if folder['id']==self.library.view else SIDEBAR);b.pack(fill='x',pady=2)
+   for folder in sorted(folders,key=lambda item:natural_key(item['name'])):
+    count=len(folder['trackIds'])
+    title=f"{folder['name']}  ·  {count}"
+    b=self.button(self.nav,title,lambda i=folder['id']:self.navigate(i),anchor='w');b.configure(bg=TINT if folder['id']==self.library.view else SIDEBAR);b.pack(fill='x',pady=2)
    self.button(self.nav,'+ New collection',self.new_collection,anchor='w').pack(fill='x',pady=(4,12))
    for widget in self.nav.winfo_children():widget.bind('<MouseWheel>',lambda e:self.nav_canvas.yview_scroll(-int(e.delta/120),'units'))
  def refresh(self):
