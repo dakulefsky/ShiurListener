@@ -4,17 +4,15 @@
 
 [Download plugin](shiur-player-1.5.0.otzplugin). Bundled offline model/runtime; no Python or companion installation. Keeps the five-minute minimum, checks speech/music locally before playback, and preserves saved positions. Filtering is experimental and can make mistakes. [Instructions and limitations](../player/README.md). Install as an update to נגן שיעורים in Otzaria.
 
-## Current standalone: 0.9.24
+## Current standalone: 0.9.25
 
-[Download setup](shiur-player-setup-0.9.24.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.23
+[Download setup](shiur-player-setup-0.9.25.exe) or choose **Check for updates** in the app. # Shiur Player 0.9.25
 
-Makes the offline speech-enhancement window independently minimizable while processing continues, and reduces Python/native buffer overhead in the audio-frame conversion path. The model, settings, clipping, and output format remain unchanged; actual processing time depends on the recording and computer.
+Makes shiur collections easier to organize and identify. Collections are listed alphabetically with recording counts, and opening a collection shows its details and the number of shiurim it contains.
 
-Carries forward the 0.9.22 reliability fixes for updater download startup, language preference preservation, safer profile restoration, and folder-monitor race protection. New or renamed audio files in the selected folder are detected automatically after they finish copying.
+Adds an optional Maggid Shiur / Speaker field to each collection. Collection name and speaker details can be created or edited together, and the speaker is shown with the collection rather than redundantly attached to every recording.
 
-Clarifies the shortcut editor with simpler steps and an explicit preview-before-save flow. Global shortcut conflicts are still checked before settings are saved.
-
-Speech enhancement remains optional and runs locally. Original recordings are never overwritten. Existing listening positions, collections, bookmarks, and original recordings are preserved. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
+Preserves existing recordings, collection membership, listening positions, bookmarks, and favorites. Speaker metadata is included in profile backup and restore. Existing listening positions are preserved. Windows and Linux desktop checks and the actual packaged Windows installer pass.
 
 ## Standalone: 0.8.1
 
