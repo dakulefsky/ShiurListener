@@ -143,7 +143,9 @@ class Player:
             if not isinstance(record,dict) or set(record)!={'root','source','target','old_id','new_id'}:
                 raise ValueError('Invalid rename recovery record.')
             root=pathlib.Path(record['root']).resolve()
-            if self.root is not None and root!=self.root.resolve():
+            saved_root=self.saved.get('libraryRoot')
+            if ((self.root is not None and root!=self.root.resolve())
+                    or (saved_root and root!=pathlib.Path(saved_root).resolve())):
                 raise ValueError('Rename recovery belongs to a different recordings folder.')
             source=(root/record['source']).resolve()
             target=(root/record['target']).resolve()
